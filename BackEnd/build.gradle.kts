@@ -19,14 +19,29 @@ repositories {
 }
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
+	// Spring Boot Starters
+	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
+
+	// Reactor and Kotlin Coroutines
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
-	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-	runtimeOnly("com.mysql:mysql-connector-j")
-	runtimeOnly("io.asyncer:r2dbc-mysql")
-	runtimeOnly("org.postgresql:postgresql")
-	runtimeOnly("org.postgresql:r2dbc-postgresql")
+
+	// Kotlin (Reflect & Stdlib)
+	implementation("org.jetbrains.kotlin:kotlin-reflect")
+	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+
+	// Jakarta Annotations (cho @PostConstruct, v.v.)
+	implementation("jakarta.annotation:jakarta.annotation-api:2.1.1")
+
+	// Driver cho cơ sở dữ liệu: JDBC và R2DBC cho MySQL và PostgreSQL
+	runtimeOnly("com.mysql:mysql-connector-j")          // JDBC MySQL
+
+	runtimeOnly("org.postgresql:postgresql")             // JDBC PostgreSQL
+
+
+	// Thư viện test
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.projectreactor:reactor-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
