@@ -4,6 +4,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -11,7 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,25 +42,46 @@ fun LoginScreen() {
             .background(Color(0xFF30393E)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(90.dp))
         Box(modifier = Modifier.height(200.dp)) {
-//            Image(
-//                painter = painterResource(id = R.drawable.car_image),
-//                contentDescription = "Car Image",
-//                contentScale = ContentScale.Crop,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(180.dp)
-//            )
+            Image(
+                painter = painterResource(id = R.drawable.login2),
+                contentDescription = "Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .width(30.dp)
+                    .fillMaxHeight()
+                    .offset(x=(30).dp,y =(20).dp)
+                    .graphicsLayer(
+                        scaleY = 1.3f
+                    )
+//                    .border(2.dp, Color.Black, shape =RoundedCornerShape(10.dp))
+//                    .shadow(8.dp, shape = RoundedCornerShape(10.dp))
+
+            )
+            Image(
+                painter = painterResource(id = R.drawable.login),
+                contentDescription = "Car Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .offset(x=(40).dp)
+//                    .border(2.dp, Color.Black, shape =RoundedCornerShape(10.dp))
+                    .shadow(8.dp, shape = RoundedCornerShape(10.dp))
+
+            )
             Text(
                 text = "LOGIN",
                 fontSize = 72.sp,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.BottomCenter)
+                    .offset(y=(55).dp, x = (-20).dp)
+                    .shadow(8.dp, shape = RoundedCornerShape(10.dp))
             )
         }
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(200.dp))
         LoginField("Enter your user name")
         Spacer(modifier = Modifier.height(10.dp))
         LoginField("Enter your password", isPassword = true)
