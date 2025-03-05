@@ -81,8 +81,8 @@ fun LoginScreen() {
                     .shadow(8.dp, shape = RoundedCornerShape(10.dp))
             )
         }
-        Spacer(modifier = Modifier.height(200.dp))
-        LoginField("Enter your user name")
+        Spacer(modifier = Modifier.height(120.dp))
+        LoginField("Enter your user name",)
         Spacer(modifier = Modifier.height(10.dp))
         LoginField("Enter your password", isPassword = true)
         Spacer(modifier = Modifier.height(20.dp))
@@ -99,29 +99,31 @@ fun LoginScreen() {
         Spacer(modifier = Modifier.height(20.dp))
         Text(text = "Use other methods", color = Color.Gray, fontSize = 12.sp)
         Spacer(modifier = Modifier.height(10.dp))
-//        Image(
-//            painter = painterResource(id = R.drawable.n),
-//            contentDescription = "Google Login",
-//            modifier = Modifier.size(40.dp)
-//        )
+        Image(
+            painter = painterResource(id = R.drawable.logogoogle),
+            contentDescription = "Google Login",
+            modifier = Modifier.size(50.dp)
+        )
     }
 }
 
 @Composable
-fun LoginField(placeholder: String, isPassword: Boolean = false) {
+fun LoginField(placeholder: String, isPassword: Boolean = false, modifier: Modifier = Modifier) {
     TextField(
         value = "",
         onValueChange = {},
-        placeholder = { Text(text = placeholder, color = Color.Gray) },
+        placeholder = { Text(text = placeholder, color = Color.Gray, fontSize = 14.sp) },
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
-//        colors = TextFieldDefaults.textFieldColors(containerColor = Color.White),
         shape = RoundedCornerShape(16.dp),
-        modifier = Modifier
+        modifier = modifier
+            .width(300.dp)
+            .height(55.dp)
+            .clip(RoundedCornerShape(16.dp)
 
-            .fillMaxHeight(0.1f)
-            .clip(RoundedCornerShape(16.dp))
+            )
     )
 }
+
 
 @Preview(showBackground = true)
 @Composable
