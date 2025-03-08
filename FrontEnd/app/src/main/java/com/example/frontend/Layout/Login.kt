@@ -42,7 +42,7 @@ fun LoginScreen() {
             .background(Color(0xFF30393E)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(90.dp))
+        Spacer(modifier = Modifier.height(70.dp))
         Box(modifier = Modifier.height(200.dp)) {
             Image(
                 painter = painterResource(id = R.drawable.login2),
