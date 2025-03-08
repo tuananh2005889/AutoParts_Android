@@ -47,7 +47,7 @@ fun SignUpScreen() {
             .background(Color(0xFF30393E)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(90.dp))
+        Spacer(modifier = Modifier.height(70.dp))
         Box(modifier = Modifier.height(200.dp)) {
             Image(
                 painter = painterResource(id = R.drawable.login2),
@@ -78,7 +78,7 @@ fun SignUpScreen() {
             )
             Text(
                 text = "SIGN UP",
-                fontSize = 72.sp,
+                fontSize = 67.sp,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.BottomCenter)
@@ -86,7 +86,7 @@ fun SignUpScreen() {
                     .shadow(8.dp, shape = RoundedCornerShape(10.dp))
             )
         }
-        Spacer(modifier = Modifier.height(80.dp))
+        Spacer(modifier = Modifier.height(90.dp))
         SignUpField("Enter your user name",)
         Spacer(modifier = Modifier.height(10.dp))
         SignUpField("Enter your full name", isPassword = true)
@@ -96,7 +96,7 @@ fun SignUpScreen() {
         SignUpField("Enter your phone", isPassword = true)
         Spacer(modifier = Modifier.height(10.dp))
         SignUpField("Enter your password", isPassword = true)
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         Button(
             onClick = {},
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF15D43)),
@@ -107,7 +107,7 @@ fun SignUpScreen() {
         }
         Spacer(modifier = Modifier.height(10.dp))
         Text(text = "You have an account? Sign In now", color = Color.White, fontSize = 12.sp)
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         Text(text = "Use other methods", color = Color.Gray, fontSize = 12.sp)
         Spacer(modifier = Modifier.height(10.dp))
         Image(
