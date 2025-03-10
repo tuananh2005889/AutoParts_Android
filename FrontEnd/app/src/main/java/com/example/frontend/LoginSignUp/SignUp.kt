@@ -1,14 +1,18 @@
-package com.example.frontend.Layout
+package com.example.frontend.LoginSignUp
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.frontend.R
 
-class MainActivity : ComponentActivity() {
+class MainActivitys : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -35,7 +39,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun LoginScreen() {
+fun SignUpScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -51,7 +55,7 @@ fun LoginScreen() {
                 modifier = Modifier
                     .width(40.dp)
                     .fillMaxHeight()
-                    .offset(x=(30).dp,y =(20).dp)
+                    .offset(x=(320).dp,y =(20).dp)
                     .graphicsLayer(
                         scaleY = 1.3f
                     )
@@ -66,14 +70,14 @@ fun LoginScreen() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
-                    .offset(x=(40).dp)
+                    .offset(x=(-50).dp)
 //                    .border(2.dp, Color.Black, shape =RoundedCornerShape(10.dp))
                     .shadow(8.dp, shape = RoundedCornerShape(10.dp))
 
             )
             Text(
-                text = "LOGIN",
-                fontSize = 72.sp,
+                text = "SIGN UP",
+                fontSize = 67.sp,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.BottomCenter)
@@ -81,22 +85,28 @@ fun LoginScreen() {
                     .shadow(8.dp, shape = RoundedCornerShape(10.dp))
             )
         }
-        Spacer(modifier = Modifier.height(120.dp))
-        LoginField("Enter your user name",)
+        Spacer(modifier = Modifier.height(90.dp))
+        SignUpField("Enter your user name",)
         Spacer(modifier = Modifier.height(10.dp))
-        LoginField("Enter your password", isPassword = true)
+        SignUpField("Enter your full name", isPassword = true)
+        Spacer(modifier = Modifier.height(10.dp))
+        SignUpField("Enter your email", isPassword = true)
+        Spacer(modifier = Modifier.height(10.dp))
+        SignUpField("Enter your phone", isPassword = true)
+        Spacer(modifier = Modifier.height(10.dp))
+        SignUpField("Enter your password", isPassword = true)
         Spacer(modifier = Modifier.height(20.dp))
         Button(
-            onClick = { /* Handle login */ },
+            onClick = {},
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF15D43)),
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier.width(200.dp)
         ) {
-            Text(text = "LogIn", fontSize = 18.sp, color = Color.White)
+            Text(text = "Sign Up", fontSize = 18.sp, color = Color.White)
         }
         Spacer(modifier = Modifier.height(10.dp))
-        Text(text = "You don’t have an account? Register now", color = Color.White, fontSize = 12.sp)
-        Spacer(modifier = Modifier.height(20.dp))
+        Text(text = "You have an account? Sign In now", color = Color.White, fontSize = 12.sp)
+        Spacer(modifier = Modifier.height(10.dp))
         Text(text = "Use other methods", color = Color.Gray, fontSize = 12.sp)
         Spacer(modifier = Modifier.height(10.dp))
         Image(
@@ -108,7 +118,8 @@ fun LoginScreen() {
 }
 
 @Composable
-fun LoginField(placeholder: String, isPassword: Boolean = false, modifier: Modifier = Modifier) {
+fun SignUpField(placeholder: String, isPassword: Boolean = false, modifier: Modifier = Modifier) {
+    var text by remember { mutableStateOf("") }
     TextField(
         value = "",
         onValueChange = {},
@@ -117,7 +128,7 @@ fun LoginField(placeholder: String, isPassword: Boolean = false, modifier: Modif
         shape = RoundedCornerShape(16.dp),
         modifier = modifier
             .width(300.dp)
-            .height(55.dp)
+            .height(50.dp)
             .clip(RoundedCornerShape(16.dp)
 
             )
@@ -127,6 +138,6 @@ fun LoginField(placeholder: String, isPassword: Boolean = false, modifier: Modif
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewLoginScreen() {
-    LoginScreen()
+fun PreviewSignUpScreen() {
+    SignUpScreen()
 }
