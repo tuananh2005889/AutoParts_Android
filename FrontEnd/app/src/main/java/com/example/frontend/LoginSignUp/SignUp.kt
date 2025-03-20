@@ -27,26 +27,29 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.frontend.R
 
-class MainActivitys : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            LoginScreen()
-        }
-    }
-}
+//class MainActivitys : ComponentActivity() {
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        setContent {
+//            LoginScreen()
+//        }
+//    }
+//}
 
 @Composable
-fun SignUpScreen() {
+fun SignUpScreen(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF30393E)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(70.dp))
+        Spacer(modifier = Modifier.height(80.dp))
         Box(modifier = Modifier.height(200.dp)) {
             Image(
                 painter = painterResource(id = R.drawable.login2),
@@ -55,7 +58,7 @@ fun SignUpScreen() {
                 modifier = Modifier
                     .width(40.dp)
                     .fillMaxHeight()
-                    .offset(x=(320).dp,y =(20).dp)
+                    .offset(x = (320).dp, y = (20).dp)
                     .graphicsLayer(
                         scaleY = 1.3f
                     )
@@ -70,7 +73,7 @@ fun SignUpScreen() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
-                    .offset(x=(-50).dp)
+                    .offset(x = (-50).dp)
 //                    .border(2.dp, Color.Black, shape =RoundedCornerShape(10.dp))
                     .shadow(8.dp, shape = RoundedCornerShape(10.dp))
 
@@ -80,13 +83,14 @@ fun SignUpScreen() {
                 fontSize = 67.sp,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(Alignment.BottomCenter)
-                    .offset(y=(55).dp, x = (-20).dp)
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .offset(y = (55).dp, x = (-20).dp)
                     .shadow(8.dp, shape = RoundedCornerShape(10.dp))
             )
         }
         Spacer(modifier = Modifier.height(90.dp))
-        SignUpField("Enter your user name",)
+        SignUpField("Enter your user name")
         Spacer(modifier = Modifier.height(10.dp))
         SignUpField("Enter your full name", isPassword = true)
         Spacer(modifier = Modifier.height(10.dp))
@@ -105,7 +109,9 @@ fun SignUpScreen() {
             Text(text = "Sign Up", fontSize = 18.sp, color = Color.White)
         }
         Spacer(modifier = Modifier.height(10.dp))
-        Text(text = "You have an account? Sign In now", color = Color.White, fontSize = 12.sp)
+        TextButton(onClick = { navController.navigate("login") }) {
+            Text(text = "You have an account? Sign In now", color = Color.White, fontSize = 12.sp)
+        }
         Spacer(modifier = Modifier.height(10.dp))
         Text(text = "Use other methods", color = Color.Gray, fontSize = 12.sp)
         Spacer(modifier = Modifier.height(10.dp))
@@ -129,7 +135,8 @@ fun SignUpField(placeholder: String, isPassword: Boolean = false, modifier: Modi
         modifier = modifier
             .width(300.dp)
             .height(50.dp)
-            .clip(RoundedCornerShape(16.dp)
+            .clip(
+                RoundedCornerShape(16.dp)
 
             )
     )
@@ -139,5 +146,6 @@ fun SignUpField(placeholder: String, isPassword: Boolean = false, modifier: Modi
 @Preview(showBackground = true)
 @Composable
 fun PreviewSignUpScreen() {
-    SignUpScreen()
+    val navController = rememberNavController()
+    SignUpScreen(navController)
 }
