@@ -16,9 +16,9 @@ public class CheckConnection implements CommandLineRunner {
     public void run(String... args) {
         try {
             jdbcTemplate.execute("SELECT 1");
-            System.out.println("✅ Kết nối MySQL thành công!");
+            System.out.println("Successfully");
         } catch (Exception e) {
-            System.err.println("❌ Lỗi kết nối MySQL: " + e.getMessage());
+            System.err.println("Failed" + e.getMessage());
         }
     }
 }
