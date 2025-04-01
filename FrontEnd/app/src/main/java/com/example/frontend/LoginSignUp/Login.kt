@@ -1,6 +1,8 @@
 package com.example.frontend.LoginSignUp
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -9,6 +11,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,7 +31,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.frontend.R
+import com.example.frontend.dataClass.LoginData
+import com.example.frontend.dataClass.UserData
+import com.google.gson.Gson
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
+import java.io.IOException
 
 //class MainActivity : ComponentActivity() {
 //    override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +56,10 @@ import com.example.frontend.R
 
 @Composable
 fun LoginScreen(navController: NavHostController) {
+    var userName by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
+    var loginSuccess by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -57,8 +79,6 @@ fun LoginScreen(navController: NavHostController) {
                     .graphicsLayer(
                         scaleY = 1.3f
                     )
-//                    .border(2.dp, Color.Black, shape =RoundedCornerShape(10.dp))
-//                    .shadow(8.dp, shape = RoundedCornerShape(10.dp))
             )
             Image(
                 painter = painterResource(id = R.drawable.login),
@@ -68,7 +88,6 @@ fun LoginScreen(navController: NavHostController) {
                     .fillMaxWidth()
                     .fillMaxHeight()
                     .offset(x = (40).dp)
-//                    .border(2.dp, Color.Black, shape =RoundedCornerShape(10.dp))
                     .shadow(8.dp, shape = RoundedCornerShape(10.dp))
 
             )
@@ -84,12 +103,30 @@ fun LoginScreen(navController: NavHostController) {
             )
         }
         Spacer(modifier = Modifier.height(120.dp))
-        LoginField("Enter your user name")
+        LoginField("Enter your user name", value = userName, onValueChange = {userName = it})
         Spacer(modifier = Modifier.height(10.dp))
-        LoginField("Enter your password", isPassword = true)
+        LoginField("Enter your password", isPassword = true, value = password, onValueChange = {password = it})
         Spacer(modifier = Modifier.height(20.dp))
+
+        if (errorMessage.isNotEmpty()) {
+            Text(text = errorMessage, color = Color.Red, fontSize = 14.sp)
+            Spacer(modifier = Modifier.height(10.dp))
+        }
         Button(
-            onClick = { /* Handle login */ },
+            onClick = {
+                val user = LoginData(userName, password)
+                loginAccount(user) { success, message ->
+                    if (success) {
+                        loginSuccess = true
+                            navController.navigate("signup") {
+                                popUpTo("login") { inclusive = true }
+                            }
+                    } else {
+                        loginSuccess = false
+                        errorMessage = message
+                    }
+                }
+            },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF15D43)),
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier.width(200.dp)
@@ -115,27 +152,56 @@ fun LoginScreen(navController: NavHostController) {
     }
 }
 
+fun loginAccount(user: LoginData, onResult: (Boolean, String) -> Unit) {
+    val url = "http://10.0.2.2:8080/auth/login"
+    val client = OkHttpClient()
+    val json = Gson().toJson(user)
+    val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
+
+    val request = Request.Builder().url(url).post(requestBody).build()
+
+    client.newCall(request).enqueue(object: Callback {
+        override fun onFailure(call: Call, e: IOException) {
+             Handler(Looper.getMainLooper()).post {
+                    onResult(false,"Failed to connect to server")
+             }
+        }
+
+        override fun onResponse(call: Call, response: Response) {
+            Handler(Looper.getMainLooper()).post {
+                if (response.isSuccessful) onResult(true, "Login successful")
+                else onResult(false, "User name or password incorrect")
+            }
+        }
+    })
+}
+
 @Composable
-fun LoginField(placeholder: String, isPassword: Boolean = false, modifier: Modifier = Modifier) {
+fun LoginField(
+    placeholder: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    isPassword: Boolean = false
+) {
     TextField(
-        value = "",
-        onValueChange = {},
+        value = value,
+        onValueChange = onValueChange,
         placeholder = { Text(text = placeholder, color = Color.Gray, fontSize = 14.sp) },
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
         shape = RoundedCornerShape(16.dp),
-        modifier = modifier
+        modifier = Modifier
             .width(300.dp)
             .height(55.dp)
             .clip(
                 RoundedCornerShape(16.dp)
-
             )
     )
 }
 
 
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewLoginScreen() {
-//    LoginScreen()
-//}
+@Preview(showBackground = true)
+@Composable
+fun PreviewLoginScreen() {
+    val navController = rememberNavController()
+    LoginScreen(navController)
+}

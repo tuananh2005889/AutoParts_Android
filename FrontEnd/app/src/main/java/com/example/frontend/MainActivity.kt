@@ -14,12 +14,12 @@ import com.example.frontend.LoginSignUp.SignUpScreen
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-            setContent {
-                    AppNavigator()
+        setContent {
+            AppNavigator()
 
-            }
         }
     }
+}
 
 @Composable
 fun AppNavigator() {
