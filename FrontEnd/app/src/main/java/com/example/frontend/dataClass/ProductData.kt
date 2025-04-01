@@ -2,7 +2,7 @@ package com.example.frontend.dataClass
 
 
 data class ProductData(
-    val categoryId: Long? = null,
+    val category_id: String? = null,
     val name: String = "",
     val brand: String = "",
     val description: String = "",

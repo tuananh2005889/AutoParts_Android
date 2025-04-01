@@ -118,9 +118,9 @@ fun LoginScreen(navController: NavHostController) {
                 loginAccount(user) { success, message ->
                     if (success) {
                         loginSuccess = true
-                            navController.navigate("signup") {
-                                popUpTo("login") { inclusive = true }
-                            }
+                        navController.navigate("addProduct") {
+                            popUpTo("login") { inclusive = true }
+                        }
                     } else {
                         loginSuccess = false
                         errorMessage = message
@@ -133,6 +133,7 @@ fun LoginScreen(navController: NavHostController) {
         ) {
             Text(text = "LogIn", fontSize = 18.sp, color = Color.White)
         }
+
         Spacer(modifier = Modifier.height(10.dp))
         TextButton(onClick = { navController.navigate("signup") }) {
             Text(
