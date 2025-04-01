@@ -6,7 +6,7 @@ function App() {
   return (
     <>
         <Routes>
-          <Route path="/admin" element={<AdminBrandLayout />} />
+          <Route path="/" element={<AdminBrandLayout />} />
         </Routes>
     </>
   )

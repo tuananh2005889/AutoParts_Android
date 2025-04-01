@@ -1,5 +1,6 @@
 package com.example.frontend
 
+import AddProductScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,12 +15,12 @@ import com.example.frontend.LoginSignUp.SignUpScreen
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-            setContent {
-                    AppNavigator()
+        setContent {
+            AppNavigator()
 
-            }
         }
     }
+}
 
 @Composable
 fun AppNavigator() {
@@ -28,6 +29,7 @@ fun AppNavigator() {
     NavHost(navController = navController, startDestination = "login") {
         composable("login") { LoginScreen(navController) }
         composable("signup") { SignUpScreen(navController) }
+        composable("addProduct") { AddProductScreen(navController) }
     }
 }
 

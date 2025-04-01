@@ -13,12 +13,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import OverviewPage from "../element/OverviewPage";
 import ProductPage from "../element/ProductPage";
 import Users from "../element/Users";
-import Sales from "../element/Sales";
 import Orders from "../element/Orders";
-import Analytics from "../element/Analytics";
-import { Scene } from "three";
-import { count } from "console";
-import { RiCoupon2Fill } from "react-icons/ri";
 const slidebar_items = [
 	{ name: "Overview", icon: BarChart2, color: "white" },
 	{ name: "Product", icon: ShoppingBag, color: "white" },

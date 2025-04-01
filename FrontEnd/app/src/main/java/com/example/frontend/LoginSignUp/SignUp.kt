@@ -1,6 +1,8 @@
 package com.example.frontend.LoginSignUp
 
 import android.annotation.SuppressLint
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -36,7 +38,7 @@ import java.io.IOException
 fun SignUpScreen(navController: NavHostController) {
     var userName by remember { mutableStateOf("") }
     var fullName by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
+    var gmail by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
@@ -48,10 +50,44 @@ fun SignUpScreen(navController: NavHostController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(90.dp))
+        Box(modifier = Modifier.height(200.dp)) {
+            Image(
+                painter = painterResource(id = R.drawable.login2),
+                contentDescription = "Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .width(40.dp)
+                    .fillMaxHeight()
+                    .offset(x = (30).dp, y = (20).dp)
+                    .graphicsLayer(
+                        scaleY = 1.3f
+                    )
+            )
+            Image(
+                painter = painterResource(id = R.drawable.login),
+                contentDescription = "Car Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .offset(x = (40).dp)
+                    .shadow(8.dp, shape = RoundedCornerShape(10.dp))
 
-        Text(text = "SIGN UP", fontSize = 32.sp, color = Color.White, fontWeight = FontWeight.Bold)
+            )
+            Text(
+                text = "SIGN UP",
+                fontSize = 72.sp,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .offset(y = (55).dp, x = (-20).dp)
+                    .shadow(8.dp, shape = RoundedCornerShape(10.dp))
+            )
+        }
 
-        Spacer(modifier = Modifier.height(50.dp))
+
+        Spacer(modifier = Modifier.height(120.dp))
 
         SignUpField("Enter your user name", value = userName, onValueChange = { userName = it })
         Spacer(modifier = Modifier.height(10.dp))
@@ -59,7 +95,7 @@ fun SignUpScreen(navController: NavHostController) {
         SignUpField("Enter your full name", value = fullName, onValueChange = { fullName = it })
         Spacer(modifier = Modifier.height(10.dp))
 
-        SignUpField("Enter your email", value = email, onValueChange = { email = it })
+        SignUpField("Enter your gmail", value = gmail, onValueChange = { gmail = it })
         Spacer(modifier = Modifier.height(10.dp))
 
         SignUpField("Enter your phone", value = phone, onValueChange = { phone = it })
@@ -70,10 +106,14 @@ fun SignUpScreen(navController: NavHostController) {
 
         Button(
             onClick = {
-                val user = UserData(userName, fullName, email, phone, password)
+                val user = UserData(userName, fullName, gmail, phone, password)
                 signUpAccount(user) { success, message ->
                     if (success) {
-                        navController.navigate("login")
+                        Handler(Looper.getMainLooper()).post {
+                            navController.navigate("login") {
+                                popUpTo("signup") { inclusive = true }
+                            }
+                        }
                     } else {
                         errorMessage = message
                     }
@@ -85,6 +125,7 @@ fun SignUpScreen(navController: NavHostController) {
         ) {
             Text(text = "Sign Up", fontSize = 18.sp, color = Color.White)
         }
+
 
         if (errorMessage.isNotEmpty()) {
             Text(text = errorMessage, color = Color.Red, fontSize = 14.sp)
@@ -107,18 +148,22 @@ fun signUpAccount(user: UserData, onResult: (Boolean, String) -> Unit) {
 
     client.newCall(request).enqueue(object : Callback {
         override fun onFailure(call: Call, e: IOException) {
-            onResult(false, "Failed to connect to server")
+            Handler(Looper.getMainLooper()).post {
+                onResult(false, "Failed to connect to server")
+            }
         }
-
         override fun onResponse(call: Call, response: Response) {
-            if (response.isSuccessful) {
-                onResult(true, "Sign up successful!")
-            } else {
-                onResult(false, "Sign up failed")
+            Handler(Looper.getMainLooper()).post {
+                if (response.isSuccessful) {
+                    onResult(true, "Sign up successful!")
+                } else {
+                    onResult(false, "Sign up failed")
+                }
             }
         }
     })
 }
+
 
 @Composable
 fun SignUpField(placeholder: String, value: String, onValueChange: (String) -> Unit, isPassword: Boolean = false) {

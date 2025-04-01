@@ -1,6 +1,7 @@
 package com.BackEnd.Controller;
 
 import com.BackEnd.Service.LoginService;
+import com.BackEnd.model.LoginRequest;
 import com.BackEnd.model.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
@@ -25,16 +27,16 @@ public class LoginController {
             return ResponseEntity.badRequest().body("Missing required fields!");
 
         }
-        System.out.println("Received user data: " + user);
+        System.out.println("Received user daata: " + user);
         loginService.saveUser(user);
         return ResponseEntity.ok("Successfully signed up!");
     }
 
-    // @PostMapping("/logIn")
-    // public ResponseEntity<String> logIN(@RequestBody String gmail, @RequestBody
-    // String password) {
-    // Optional<User> user = loginService.Login(gmail,password) ;
-    // return user.map(value -> ResponseEntity.ok(value.toString())).orElseGet(() ->
-    // ResponseEntity.status(401).body("Invalid gmail or password"));
-    // }
+    @PostMapping("/login")
+    public ResponseEntity<String> logIN(@RequestBody LoginRequest loginRequest) {
+        Optional<User> user = loginService.Login(loginRequest.getUserName(), loginRequest.getPassword());
+        return user.map(value -> ResponseEntity.ok("Login successful!"))
+                .orElseGet(() -> ResponseEntity.status(401).body("Invalid username or password"));
+    }
+
 }
