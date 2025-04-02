@@ -15,14 +15,12 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id", foreignKey = @ForeignKey(name = "fk_product_category"))
-    private Category category;
-
     @Column(nullable = false, length = 255)
     private String name;
 
     private String brand;
+
+    private String category;
 
     @Column(columnDefinition = "TEXT")
     private String description;
