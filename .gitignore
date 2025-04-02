@@ -1,0 +1,54 @@
+### Java ###
+*.class
+*.log
+*.war
+*.ear
+*.jar
+
+### IntelliJ IDEA ###
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+### Eclipse ###
+.project
+.classpath
+.settings/
+
+### Maven ###
+/logs/
+/target/
+*.log
+mvnw*
+
+### Gradle ###
+.gradle/
+/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+### Spring Boot ###
+*.properties
+*.yml
+.env
+.DS_Store
+
+### OS ###
+Thumbs.db
+.DS_Store
+
+### Node ###
+node_modules/
+
+### Docker ###
+*.container
+.dockerignore
+
+### Logs and temp files ###
+*.log
+*.tmp
+*.swp
+*.swo
+
+.idea
