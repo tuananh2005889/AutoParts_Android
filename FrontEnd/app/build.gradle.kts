@@ -1,7 +1,17 @@
+import org.gradle.kotlin.dsl.implementation
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    //serialization
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.10"
+    //hilt
+//    id("kotlin-kapt")
+//    id("com.google.dagger.hilt.android")
+
+    id("com.google.dagger.hilt.android") // Plugin Hilt
+    kotlin("kapt") // Kích hoạt kapt (Kotlin Annotation Processing)
 }
 
 android {
@@ -50,6 +60,26 @@ android {
 }
 
 dependencies {
+    //retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    //serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    // Kotlin serialization Converter - replace Gson
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+
+
+    implementation("com.google.dagger:hilt-android:2.51.1")
+    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+    // Hilt cho ViewModel
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+
+
+
+    //google font
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.7.8")
+
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

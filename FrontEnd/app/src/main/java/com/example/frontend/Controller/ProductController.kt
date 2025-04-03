@@ -1,10 +1,9 @@
 package com.example.frontend.Controller
 
 
-import android.app.VoiceInteractor
 import android.os.Handler
 import android.os.Looper
-import com.example.frontend.dataClass.ProductData
+import com.example.frontend.data.model.ProductData
 import com.google.gson.Gson
 import okhttp3.Call
 import okhttp3.Callback
