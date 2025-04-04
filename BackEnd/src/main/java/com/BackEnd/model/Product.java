@@ -5,6 +5,7 @@ import java.util.List;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "Product")
@@ -19,7 +20,6 @@ public class Product {
     private String name;
 
     private String brand;
-
     private String category;
 
     @Column(columnDefinition = "TEXT")
@@ -29,10 +29,8 @@ public class Product {
     private String compatibleVehicles;
 
     private Integer yearOfManufacture;
-
     private String size;
     private String material;
-
     private Double weight;
     private String image;
     private Double discount;
@@ -45,6 +43,6 @@ public class Product {
     private Integer quantity;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @JsonIgnore // Bỏ qua serialize trường này
     private List<Review> reviews;
-
 }

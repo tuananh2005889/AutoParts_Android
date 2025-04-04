@@ -43,7 +43,33 @@ class ProductController {
             })
         }
 
+        fun getAllProducts(onResult: (Boolean, List<ProductData>?, String) -> Unit) {
+            val url = "http://10.0.2.2:8080/product/all"
+            val client = OkHttpClient()
+
+            val request = Request.Builder().url(url).build()
+
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    Handler(Looper.getMainLooper()).post{
+                        onResult(false, null, "Failed to connect to server")
+                    }
+                    }
+
+                override fun onResponse(call: Call, response: Response) {
+                    val json = response.body?.string()
+                    if (response.isSuccessful && json != null) {
+                        val products = Gson().fromJson(json, Array<ProductData>::class.java).toList()
+                        Handler(Looper.getMainLooper()).post {
+                            onResult(true, products, "Success")
+                        }
+                    } else {
+                        Handler(Looper.getMainLooper()).post {
+                            onResult(false, null, "Failed to fetch products")
+                        }
+                    }
+                }
+            })
+        }
     }
-
-
 }
