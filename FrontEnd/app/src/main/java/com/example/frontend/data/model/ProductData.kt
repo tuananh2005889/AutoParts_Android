@@ -2,10 +2,10 @@ package com.example.frontend.data.model
 
 
 data class ProductData(
-    val category_id: String? = null,
     val name: String = "",
     val brand: String = "",
     val description: String = "",
+    val category: String="",
     val compatibleVehicles: String = "",
     val yearOfManufacture: Int? = null,
     val size: String = "",
