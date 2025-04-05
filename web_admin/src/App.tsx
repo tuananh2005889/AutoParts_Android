@@ -1,12 +1,14 @@
 import AdminBrandLayout from "./_admin/AdminBrandLayout"
 import { Routes, Route } from "react-router-dom";
+import Login from "./Login/Login";
 
 function App() {
 
   return (
     <>
         <Routes>
-          <Route path="/" element={<AdminBrandLayout />} />
+          <Route path="/admin" element={<AdminBrandLayout />} />
+          <Route path="/login" element={<Login/>}/>
         </Routes>
     </>
   )
