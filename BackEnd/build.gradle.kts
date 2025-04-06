@@ -26,7 +26,9 @@ dependencies {
 	compileOnly("org.projectlombok:lombok:1.18.30")
 	annotationProcessor("org.projectlombok:lombok:1.18.30")
 	implementation("org.springframework.boot:spring-boot-starter-web")
-
+ 	implementation("com.cloudinary:cloudinary-http5:2.0.0")
+    implementation("com.cloudinary:cloudinary-taglib:2.0.0")
+    implementation("io.github.cdimascio:dotenv-java:2.2.4")
 }
 
 

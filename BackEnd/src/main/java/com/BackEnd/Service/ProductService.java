@@ -41,7 +41,7 @@ public class ProductService {
             product.setSize(productDetails.getSize());
             product.setMaterial(productDetails.getMaterial());
             product.setWeight(productDetails.getWeight());
-            product.setImage(productDetails.getImage());
+            product.setImages(productDetails.getImages());
             product.setDiscount(productDetails.getDiscount());
             product.setWarranty(productDetails.getWarranty());
             product.setPrice(productDetails.getPrice());

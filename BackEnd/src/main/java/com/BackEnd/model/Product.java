@@ -1,7 +1,6 @@
 package com.BackEnd.model;
 
 import java.util.List;
-
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,7 +31,12 @@ public class Product {
     private String size;
     private String material;
     private Double weight;
-    private String image;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "image_url")
+    private List<String> images;
+
     private Double discount;
     private String warranty;
 
