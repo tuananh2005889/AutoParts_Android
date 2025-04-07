@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.frontend.ui.LoginSignUp.LoginScreen
 import com.example.frontend.ui.LoginSignUp.SignUpScreen
+import com.example.frontend.ui.home.HomePageScreen
 import com.example.frontend.ui.theme.FrontEndTheme
 
 
@@ -33,7 +34,7 @@ fun AppNavigator() {
     NavHost(navController = navController, startDestination = "login") {
         composable("login") { LoginScreen(navController) }
         composable("signup") { SignUpScreen(navController) }
-        composable("addProduct") { AddProductScreen(navController) }
+        composable("addProduct") { HomePageScreen(navController) }
     }
 }
 
