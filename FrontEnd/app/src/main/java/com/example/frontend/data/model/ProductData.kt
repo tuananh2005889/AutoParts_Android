@@ -11,7 +11,7 @@ data class ProductData(
     val size: String = "",
     val material: String = "",
     val weight: Double? = null,
-    val image: String = "",
+    val images: List<String> = emptyList(),
     val discount: Double? = null,
     val warranty: String = "",
     val price: Double? = null,

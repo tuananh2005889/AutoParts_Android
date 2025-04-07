@@ -59,7 +59,7 @@ fun AddProductScreen(navController: NavController) {
             .background(Color(0xFF30393E))
             .padding(16.dp)
     ) {
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(80.dp))
         Button(
             onClick = { showForm = !showForm },
             modifier = Modifier.fillMaxWidth(),
@@ -146,7 +146,7 @@ fun AddProductScreen(navController: NavController) {
                             size = size,
                             material = material,
                             weight = weight.toDoubleOrNull(),
-                            image = img,
+//                            image = [],
                             discount = discount.toDoubleOrNull(),
                             warranty = warranty,
                             price = price.toDoubleOrNull(),
@@ -217,7 +217,7 @@ fun AddProductScreen(navController: NavController) {
                         Text("Size: ${product.size}", color = Color.Black)
                         Text("Material: ${product.material}", color = Color.Black)
                         Text("Weight: ${product.weight}", color = Color.Black)
-                        Text("Image: ${product.image ?: "?"}", color = Color.Black)
+//                        Text("Image: ${product.image ?: "?"}", color = Color.Black)
                         Text("Discount: ${product.discount}", color = Color.Black)
                         Text("Warranty: ${product.warranty}", color = Color.Black)
                         Text("Price: ${product.price}", color = Color.Black)
