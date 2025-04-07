@@ -113,7 +113,7 @@ fun LoginScreen(navController: NavHostController) {
                 loginAccount(user) { success, message ->
                     if (success) {
                         loginSuccess = true
-                        navController.navigate("addProduct") {
+                        navController.navigate("homepage") {
                             popUpTo("login") { inclusive = true }
                         }
                     } else {
