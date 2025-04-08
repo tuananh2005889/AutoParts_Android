@@ -70,6 +70,7 @@ dependencies {
 
 
     implementation("com.google.dagger:hilt-android:2.51.1")
+    implementation(libs.generativeai)
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
     // Hilt cho ViewModel
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")

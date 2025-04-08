@@ -11,14 +11,13 @@ const API_ADD = "http://localhost:8080/product/add";
 
 const ProductPage = () => {
   const [productsform, setProductsform] = useState(false);
-  const [loading, setLoading] = useState(false); // state loading
-  const [refresh, setRefresh] = useState(false); // state để trigger refresh table
+  const [loading, setLoading] = useState(false); 
+  const [refresh, setRefresh] = useState(false); 
 
   const handleForm = () => {
     setProductsform(!productsform);
   };
 
-  // State sản phẩm với trường images là mảng rỗng
   const [items, setItems] = useState({
     name: "",
     brand: "",
@@ -36,7 +35,7 @@ const ProductPage = () => {
     quantity: "",
   });
 
-  // State lưu các file ảnh được chọn (chưa upload)
+
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [message, setMessage] = useState("");
 
@@ -56,7 +55,7 @@ const ProductPage = () => {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Hàm upload tất cả file ảnh đến backend (CloudinaryController) và trả về mảng URL
+  // upload tất cả file ảnh đến backend (CloudinaryController) và trả về mảng URL
   const uploadFiles = async () => {
     try {
       const uploadPromises = selectedFiles.map((file) => {
@@ -74,16 +73,16 @@ const ProductPage = () => {
       return [];
     }
   };
+  
 
-  // Khi nhấn Confirm: upload ảnh, sau đó gửi sản phẩm kèm mảng URL ảnh đến backend
   const handleAddProduct = async (e) => {
     e.preventDefault();
-    setLoading(true); // bật loading
+    setLoading(true); 
     try {
       const uploadedImageUrls = await uploadFiles();
       const productData = {
         ...items,
-        images: uploadedImageUrls, // gửi mảng URL ảnh
+        images: uploadedImageUrls, /
       };
 
       const res = await axios.post(API_ADD, productData);
