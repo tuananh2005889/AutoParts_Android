@@ -1,4 +1,4 @@
-package com.example.frontend.ui.home
+package com.example.frontend.ViewModel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

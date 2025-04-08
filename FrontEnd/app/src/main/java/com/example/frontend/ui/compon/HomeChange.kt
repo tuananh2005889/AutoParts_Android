@@ -36,12 +36,12 @@ fun HomeChange(
         IconButton(onClick = {
             navController.navigate("addProduct")
         }) {
-           Text("Add Product")
+           Text("Add")
         }
         IconButton(onClick = {
             navController.navigate("homepage")
         }) {
-            Text("Homepage")
+            Text("Home")
         }
         IconButton(onClick = {
             navController.navigate("login")
