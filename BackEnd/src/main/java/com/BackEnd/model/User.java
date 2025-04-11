@@ -1,5 +1,7 @@
 package com.BackEnd.model;
 
+import java.util.Objects;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,4 +35,19 @@ public class User {
 
     @Column(length = 15, unique = true)
     private String phone;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof User))
+            return false;
+        User user = (User) o;
+        return Objects.equals(getUserName(), user.getUserName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getUserName());
+    }
 }
