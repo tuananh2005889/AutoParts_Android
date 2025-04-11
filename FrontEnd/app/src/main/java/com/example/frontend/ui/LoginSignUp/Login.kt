@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -26,10 +27,14 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.frontend.R
+import com.example.frontend.ViewModel.UserViewModel
 import com.example.frontend.data.model.LoginData
+import com.example.frontend.data.model.UserData
+import com.example.frontend.data.saveUserData
 import com.google.gson.Gson
 import okhttp3.Call
 import okhttp3.Callback
@@ -53,8 +58,14 @@ import java.io.IOException
 fun LoginScreen(navController: NavHostController) {
     var userName by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+//    val fullName by remember { mutableStateOf("") }
+//    val gmail by remember { mutableStateOf("") }
+//    val phone by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
     var loginSuccess by remember { mutableStateOf(false) }
+    val userViewModel: UserViewModel = viewModel()
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -110,22 +121,33 @@ fun LoginScreen(navController: NavHostController) {
         Button(
             onClick = {
                 val user = LoginData(userName, password)
+
+
                 loginAccount(user) { success, message ->
                     if (success) {
-                        loginSuccess = true
+
+                        val loggedInUser = LoginData(
+                            userName = user.userName,
+                            password = user.password,
+                        )
+                        // Lưu thông tin vào SharedPreferences
+                        saveUserData(context, loggedInUser)
+                        // Nếu sử dụng ViewModel, cập nhật trạng thái người dùng đăng nhập
+                        userViewModel.setCurrentUser(loggedInUser)
+
                         navController.navigate("homepage") {
                             popUpTo("login") { inclusive = true }
                         }
                     } else {
-                        loginSuccess = false
                         errorMessage = message
                     }
                 }
+
             },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF15D43)),
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier.width(200.dp)
-        ) {
+        ) { 
             Text(text = "LogIn", fontSize = 18.sp, color = Color.White)
         }
 
