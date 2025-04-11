@@ -22,8 +22,8 @@ public class LoginService {
         return loginRepository.findAll();
     }
 
-    public Optional<User> Login(String gmail, String password) {
-        return Optional.ofNullable(loginRepository.findByGmailAndPassword(gmail, password));
+    public Optional<User> Login(String userName, String password) {
+        return Optional.ofNullable(loginRepository.findByUserNameAndPassword(userName, password));
     }
 
 }

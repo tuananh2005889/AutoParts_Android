@@ -2,6 +2,7 @@ package com.example.frontend.data.model
 
 
 data class ProductData(
+    val productId: String,
     val name: String = "",
     val brand: String = "",
     val description: String = "",

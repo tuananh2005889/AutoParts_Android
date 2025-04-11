@@ -69,7 +69,9 @@ fun AddProductScreen(navController: NavController) {
     }
 
     fun confirmAddProduct() {
+        val productIds = generateProductId()
         val product = ProductData(
+            productId = productIds,
             name = name,
             brand = brand,
             description = description,
@@ -310,4 +312,8 @@ fun AddProductScreen(navController: NavController) {
                 .fillMaxWidth()
         )
     }
+}
+fun generateProductId(): String {
+    val randomDigits = (1000..9999).random()
+    return "PR$randomDigits"
 }

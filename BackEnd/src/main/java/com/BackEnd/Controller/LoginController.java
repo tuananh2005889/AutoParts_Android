@@ -23,7 +23,7 @@ public class LoginController {
 
     @PostMapping("/signup")
     public ResponseEntity<String> signUp(@RequestBody User user) {
-        if (user.getGmail() == null || user.getPassword() == null) {
+        if (user.getUserName() == null || user.getPassword() == null) {
             return ResponseEntity.badRequest().body("Missing required fields!");
 
         }
@@ -33,8 +33,8 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> logIN(@RequestBody LoginRequest loginRequest) {
-        Optional<User> user = loginService.Login(loginRequest.getUserName(), loginRequest.getPassword());
+    public ResponseEntity<String> logIN(@RequestBody User userss) {
+        Optional<User> user = loginService.Login(userss.getUserName(), userss.getPassword());
         return user.map(value -> ResponseEntity.ok("Login successful!"))
                 .orElseGet(() -> ResponseEntity.status(401).body("Invalid username or password"));
     }

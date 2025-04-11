@@ -16,13 +16,13 @@ public class User {
     @Column(nullable = false, length = 255)
     private String fullName;
 
-    @Column(nullable = false, length = 100, unique = true)
+    @Column(name = "user_name", nullable = false, length = 100, unique = true)
     private String userName;
 
     @Column(nullable = false, length = 255)
     private String password;
 
-    @Column(nullable = false, length = 255, unique = true)
+    @Column(name = "gmail", nullable = false, length = 255, unique = true)
     private String gmail;
 
     @Column(length = 50)
