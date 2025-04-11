@@ -24,11 +24,11 @@ public class ProductService {
         return products;
     }
 
-    public Optional<Product> getProductById(Long id) {
+    public Optional<Product> getProductById(String id) {
         return productRepository.findById(id);
     }
 
-    public boolean updateProduct(Long id, Product productDetails) {
+    public boolean updateProduct(String id, Product productDetails) {
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isPresent()) {
             Product product = optionalProduct.get();
@@ -52,7 +52,7 @@ public class ProductService {
         return false;
     }
 
-    public boolean deleteProduct(Long id) {
+    public boolean deleteProduct(String id) {
         if (productRepository.existsById(id)) {
             productRepository.deleteById(id);
             return true;
