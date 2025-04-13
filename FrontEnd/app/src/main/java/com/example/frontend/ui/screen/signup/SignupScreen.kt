@@ -1,4 +1,4 @@
-package com.example.frontend.ui.LoginSignup
+package com.example.frontend.ui.screen.signup
 
 import android.annotation.SuppressLint
 import android.os.Handler

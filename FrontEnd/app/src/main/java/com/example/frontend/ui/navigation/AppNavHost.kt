@@ -7,9 +7,10 @@ import androidx.compose.runtime.MutableState
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.frontend.ui.LoginSignup.LoginScreen
-import com.example.frontend.ui.LoginSignup.SignupScreen
-import com.example.frontend.ui.home.HomePageScreen
+import androidx.navigation.compose.rememberNavController
+import com.example.frontend.ui.screen.login.LoginScreen
+import com.example.frontend.ui.screen.signup.SignupScreen
+import com.example.frontend.ui.screen.home.HomeScreen
 
 @Composable
 fun AppNavHost(
@@ -23,11 +24,12 @@ fun AppNavHost(
         // Auth Screens
         composable(Route.Login.route) {
             LoginScreen(
-//                navController  = navController,
                 onLoginSuccess = {
                     isLoggedIn.value = true
                     navController.navigate(Route.Home.route) {
-                        popUpTo(0) // Clear backstack
+                        popUpTo(Route.Login.route){ //default inclusive is false
+                            inclusive = true
+                        }
                     }
                 },
                 onSignupClick = {
@@ -35,25 +37,22 @@ fun AppNavHost(
                 }
             )
         }
-
         composable(Route.Signup.route) {
             SignupScreen(
                 onBackToLogin = {
                     navController.navigate(Route.Login.route)
                 },
                 onSignupSuccess = {
-                    Handler(Looper.getMainLooper()).post {
+//                    Handler(Looper.getMainLooper()).post {
                         navController.navigate(Route.Login.route) {
                             popUpTo("signup") { inclusive = true }
-                        }
+//                        }
                     }
                 }
             )
         }
-
         // Main Screens
-        composable(Route.Home.route) { HomePageScreen(navController) }
-//        composable(Route.Cart.route) { MainScreen(navController, "cart") }
-//        composable(Route.User.route) { MainScreen(navController, "user") }
+        composable(Route.Home.route) { HomeScreen() }
+
     }
 }
