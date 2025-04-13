@@ -1,4 +1,4 @@
-package com.example.frontend.ui.LoginSignUp
+package com.example.frontend.ui.LoginSignup
 
 import android.os.Handler
 import android.os.Looper
@@ -24,16 +24,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.frontend.R
 import com.example.frontend.ViewModel.UserViewModel
 import com.example.frontend.data.model.LoginData
-import com.example.frontend.data.model.UserData
 import com.example.frontend.data.saveUserData
 import com.google.gson.Gson
 import okhttp3.Call
@@ -45,22 +41,16 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.IOException
 
-//class MainActivity : ComponentActivity() {
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        setContent {
-//            LoginScreen()
-//        }
-//    }
-//}
+
 
 @Composable
-fun LoginScreen(navController: NavHostController) {
+fun LoginScreen(
+//    navController: NavHostController,
+    onLoginSuccess: () -> Unit = {},
+    onSignupClick: () -> Unit = {},
+) {
     var userName by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-//    val fullName by remember { mutableStateOf("") }
-//    val gmail by remember { mutableStateOf("") }
-//    val phone by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
     var loginSuccess by remember { mutableStateOf(false) }
     val userViewModel: UserViewModel = viewModel()
@@ -135,9 +125,10 @@ fun LoginScreen(navController: NavHostController) {
                         // Nếu sử dụng ViewModel, cập nhật trạng thái người dùng đăng nhập
                         userViewModel.setCurrentUser(loggedInUser)
 
-                        navController.navigate("homepage") {
-                            popUpTo("login") { inclusive = true }
-                        }
+                        onLoginSuccess()
+//                        navController.navigate("homepage") {
+//                            popUpTo("login") { inclusive = true }
+//                        }
                     } else {
                         errorMessage = message
                     }
@@ -152,7 +143,8 @@ fun LoginScreen(navController: NavHostController) {
         }
 
         Spacer(modifier = Modifier.height(10.dp))
-        TextButton(onClick = { navController.navigate("signup") }) {
+//        TextButton(onClick = { navController.navigate("signup") }) {
+        TextButton(onClick = { onSignupClick() }) {
             Text(
                 text = "You don’t have an account? Register now",
                 color = Color.White,
@@ -217,9 +209,9 @@ fun LoginField(
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewLoginScreen() {
-    val navController = rememberNavController()
-    LoginScreen(navController)
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewLoginScreen() {
+//    val navController = rememberNavController()
+//    LoginScreen(navController)
+//}
