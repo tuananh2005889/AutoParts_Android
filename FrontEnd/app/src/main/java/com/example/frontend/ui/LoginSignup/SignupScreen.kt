@@ -1,4 +1,4 @@
-package com.example.frontend.ui.LoginSignUp
+package com.example.frontend.ui.LoginSignup
 
 import android.annotation.SuppressLint
 import android.os.Handler
@@ -20,11 +20,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.frontend.R
 import com.example.frontend.data.model.UserData
 import com.google.gson.Gson
@@ -35,7 +32,10 @@ import java.io.IOException
 
 @SuppressLint("RestrictedApi")
 @Composable
-fun SignUpScreen(navController: NavHostController) {
+fun SignupScreen(
+    onBackToLogin: ()->Unit,
+    onSignupSuccess: ()->Unit,
+    ) {
     var userName by remember { mutableStateOf("") }
     var fullName by remember { mutableStateOf("") }
     var gmail by remember { mutableStateOf("") }
@@ -109,11 +109,12 @@ fun SignUpScreen(navController: NavHostController) {
                 val user = UserData(userName, fullName, gmail, phone, password)
                 signUpAccount(user) { success, message ->
                     if (success) {
-                        Handler(Looper.getMainLooper()).post {
-                            navController.navigate("login") {
-                                popUpTo("signup") { inclusive = true }
-                            }
-                        }
+                        onSignupSuccess()
+//                        Handler(Looper.getMainLooper()).post {
+//                            navController.navigate("login") {
+//                                popUpTo("signup") { inclusive = true }
+//                            }
+//                        }
                     } else {
                         errorMessage = message
                     }
@@ -132,7 +133,7 @@ fun SignUpScreen(navController: NavHostController) {
         }
 
         Spacer(modifier = Modifier.height(10.dp))
-        TextButton(onClick = { navController.navigate("login") }) {
+        TextButton(onClick = { onBackToLogin }) {
             Text(text = "You have an account? Sign In now", color = Color.White, fontSize = 12.sp)
         }
     }
@@ -179,10 +180,11 @@ fun SignUpField(placeholder: String, value: String, onValueChange: (String) -> U
             .clip(RoundedCornerShape(16.dp))
     )
 }
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewSignUpScreen() {
-    val navController = rememberNavController()
-    SignUpScreen(navController)
-}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewSignUpScreen() {
+//    val navController = rememberNavController()
+//    SignupScreen(navController)
+//}
+//
