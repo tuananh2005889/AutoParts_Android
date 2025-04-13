@@ -133,7 +133,7 @@ fun SignupScreen(
         }
 
         Spacer(modifier = Modifier.height(10.dp))
-        TextButton(onClick = { onBackToLogin }) {
+        TextButton(onClick = { onBackToLogin() }) {
             Text(text = "You have an account? Sign In now", color = Color.White, fontSize = 12.sp)
         }
     }
