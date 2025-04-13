@@ -1,10 +1,16 @@
 package com.example.frontend.ui.navigation
 
-sealed class Route(val route: String) {
-    object Login: Route("login")
-    object Signup : Route("signup")
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.ui.graphics.vector.ImageVector
 
-    object Home : Route("home")
-    object Cart : Route("cart")
-    object User : Route("user")
+sealed class Route(val route: String, val icon: ImageVector? = null) {
+    object Login: Route("login", null)
+    object Signup : Route("signup", null)
+
+    object Home : Route("home", Icons.Default.Home)
+    object Cart : Route("cart", Icons.Default.ShoppingCart)
+    object Profile : Route("profile", Icons.Default.Person)
 }

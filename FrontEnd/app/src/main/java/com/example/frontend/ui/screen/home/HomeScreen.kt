@@ -1,4 +1,4 @@
-package com.example.frontend.ui.home
+package com.example.frontend.ui.screen.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.BottomNavigation
 import androidx.compose.material.icons.Icons
 
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -22,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
@@ -30,18 +32,35 @@ import com.example.frontend.Controller.ProductController
 import com.example.frontend.ViewModel.UserViewModel
 import com.example.frontend.data.model.ProductData
 import com.example.frontend.ui.compon.HomeChange
+import com.example.frontend.ui.navigation.Route
+import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.icons.filled.Warning
+import com.example.frontend.ui.navigation.BottomNavHost
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomePageScreen(
-    navController: NavHostController,
+fun HomeScreen(
+
 ) {
-    var searchText by remember { mutableStateOf("") }
+    val bottomNavController = rememberNavController()
+    Scaffold(
+        containerColor = Color.White,
+        bottomBar = {
+            BottomNavBar(navController = bottomNavController)
+        }
+    ) { innerPadding ->
+        BottomNavHost(bottomNavController, innerPadding)
+    }
+}
+
+@Composable
+fun HomeScreenContent(innerPadding: PaddingValues){
     var productList by remember { mutableStateOf<List<ProductData>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMsg by remember { mutableStateOf("") }
+    var searchText by remember { mutableStateOf("") }
 
-    // Gọi API để lấy danh sách sản phẩm
     LaunchedEffect(Unit) {
         ProductController.getAllProducts { success, products, msg ->
             if (success && products != null) {
@@ -59,99 +78,71 @@ fun HomePageScreen(
                 it.brand.contains(searchText, ignoreCase = true)
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    OutlinedTextField(
-                        value = searchText,
-                        onValueChange = { searchText = it },
-                        placeholder = { Text("Search...", color = Color.Black) },
-                        singleLine = true,
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                    )
-                },
-                actions = {
-                    IconButton(onClick = { /* TODO: */ }) {
-                        Box {
-                            Icon(
-                                imageVector = Icons.Filled.ShoppingCart,
-                                contentDescription = "Cart",
-                                tint = Color.White
-                            )
+                Row{
+                        OutlinedTextField(
+                            value = searchText,
+                            onValueChange = { searchText = it },
+                            placeholder = { Text("Search...", color = Color.Black) },
+                            singleLine = true,
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                        )
                         }
-                    }
 
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFFFF7043),
-                    titleContentColor = Color.White,
-                    actionIconContentColor = Color.White
-                )
-            )
-        },
-        containerColor = Color.White,
-        bottomBar = {
-            HomeChange(navController = navController)
-        }
-    ) { innerPadding ->
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+            .padding(horizontal = 16.dp)
+    ) {
+        Spacer(modifier = Modifier.height(16.dp))
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 16.dp)
+        Text(
+            text = "Categories",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            CategoryChip("Abc")
+            CategoryChip("def")
+            CategoryChip("gdads")
+            CategoryChip("grtdá")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = "Categories",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                CategoryChip("Abc")
-                CategoryChip("def")
-                CategoryChip("gdads")
-                CategoryChip("grtdá")
+        when {
+            isLoading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = Color(0xFFFF7043))
+                }
             }
-            Spacer(modifier = Modifier.height(16.dp))
-
-            when {
-                isLoading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = Color(0xFFFF7043))
-                    }
+            errorMsg.isNotEmpty() -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = errorMsg, color = Color.Red)
                 }
-                errorMsg.isNotEmpty() -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = errorMsg, color = Color.Red)
-                    }
-                }
-                else -> {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        contentPadding = PaddingValues(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        items(filteredProducts) { product ->
-                            ProductCard(product)
-                        }
+            }
+            else -> {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(filteredProducts) { product ->
+                        ProductCard(product)
                     }
                 }
             }
@@ -159,6 +150,22 @@ fun HomePageScreen(
     }
 }
 
+@Composable
+fun BottomNavBar(navController: NavController) {
+    BottomNavigation {
+        val items = listOf(
+            Route.Home, Route.Cart, Route.Profile
+        )
+        items.forEach { screen ->
+            BottomNavigationItem(
+                icon = { Icon(imageVector = screen.icon ?: Icons.Default.Warning, contentDescription = null) },
+                label = { Text(screen.route) },
+                selected = false,
+                onClick = { navController.navigate(screen.route) }
+            )
+        }
+    }
+}
 @Composable
 fun CategoryChip(label: String) {
     Box(
@@ -274,9 +281,9 @@ fun ProductCard(product: ProductData) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewHomePageScreen() {
-    val navController = rememberNavController()
-    HomePageScreen(navController)
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewHomePageScreen() {
+//    val navController = rememberNavController()
+//    HomePageScreen(navController)
+//}

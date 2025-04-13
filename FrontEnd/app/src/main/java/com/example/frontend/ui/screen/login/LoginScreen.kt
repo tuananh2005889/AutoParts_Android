@@ -1,4 +1,4 @@
-package com.example.frontend.ui.LoginSignup
+package com.example.frontend.ui.screen.login
 
 import android.os.Handler
 import android.os.Looper

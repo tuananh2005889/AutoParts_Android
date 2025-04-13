@@ -1,6 +1,5 @@
-package com.example.frontend.ui.home
+package com.example.frontend.ui.screen.home
 
-import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,12 +25,6 @@ import com.example.frontend.Controller.ProductController
 import com.example.frontend.Controller.ProductController.Companion.getAllProducts
 import com.example.frontend.data.model.ProductData
 import com.example.frontend.ui.compon.HomeChange
-import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody.Companion.asRequestBody
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 
 @Composable
 fun AddProductScreen(navController: NavController) {
