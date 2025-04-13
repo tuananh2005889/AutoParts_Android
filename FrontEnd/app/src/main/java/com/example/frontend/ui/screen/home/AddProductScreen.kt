@@ -24,7 +24,6 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.frontend.Controller.ProductController
 import com.example.frontend.Controller.ProductController.Companion.getAllProducts
 import com.example.frontend.data.model.ProductData
-import com.example.frontend.ui.compon.HomeChange
 
 @Composable
 fun AddProductScreen(navController: NavController) {
@@ -298,12 +297,7 @@ fun AddProductScreen(navController: NavController) {
             }
         }
 
-        HomeChange(
-            navController = navController,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-        )
+
     }
 }
 fun generateProductId(): String {
