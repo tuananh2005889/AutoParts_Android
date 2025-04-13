@@ -43,16 +43,14 @@ fun AppNavHost(
                     navController.navigate(Route.Login.route)
                 },
                 onSignupSuccess = {
-//                    Handler(Looper.getMainLooper()).post {
                         navController.navigate(Route.Login.route) {
                             popUpTo("signup") { inclusive = true }
-//                        }
                     }
                 }
             )
         }
         // Main Screens
-        composable(Route.Home.route) { HomeScreen() }
+        composable(Route.Home.route) { HomeScreen(rootNavController = navController) }
 
     }
 }

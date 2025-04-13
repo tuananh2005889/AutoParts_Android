@@ -7,10 +7,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.icons.Icons
-
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,11 +15,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
@@ -31,26 +25,30 @@ import com.example.frontend.Controller.OrderController
 import com.example.frontend.Controller.ProductController
 import com.example.frontend.ViewModel.UserViewModel
 import com.example.frontend.data.model.ProductData
-import com.example.frontend.ui.compon.HomeChange
-import com.example.frontend.ui.navigation.Route
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.icons.filled.Warning
+import com.example.frontend.ui.navigation.BottomNavBar
 import com.example.frontend.ui.navigation.BottomNavHost
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-
+    rootNavController: NavHostController,
+    modifier: Modifier = Modifier
 ) {
+
     val bottomNavController = rememberNavController()
     Scaffold(
+        modifier = modifier.padding(WindowInsets.systemBars.asPaddingValues()), // or modifier.safeDrawingPadding()
         containerColor = Color.White,
         bottomBar = {
             BottomNavBar(navController = bottomNavController)
         }
     ) { innerPadding ->
-        BottomNavHost(bottomNavController, innerPadding)
+        BottomNavHost(
+            bottomNavController =  bottomNavController,
+            rootNavController = rootNavController,
+            innerPadding =  innerPadding,
+            )
     }
 }
 
@@ -150,22 +148,7 @@ fun HomeScreenContent(innerPadding: PaddingValues){
     }
 }
 
-@Composable
-fun BottomNavBar(navController: NavController) {
-    BottomNavigation {
-        val items = listOf(
-            Route.Home, Route.Cart, Route.Profile
-        )
-        items.forEach { screen ->
-            BottomNavigationItem(
-                icon = { Icon(imageVector = screen.icon ?: Icons.Default.Warning, contentDescription = null) },
-                label = { Text(screen.route) },
-                selected = false,
-                onClick = { navController.navigate(screen.route) }
-            )
-        }
-    }
-}
+
 @Composable
 fun CategoryChip(label: String) {
     Box(
@@ -281,9 +264,4 @@ fun ProductCard(product: ProductData) {
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewHomePageScreen() {
-//    val navController = rememberNavController()
-//    HomePageScreen(navController)
-//}
+
