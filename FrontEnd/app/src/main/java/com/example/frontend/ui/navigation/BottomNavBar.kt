@@ -13,8 +13,8 @@ import androidx.navigation.NavController
 @Composable
 fun BottomNavBar(navController: NavController) {
     BottomNavigation(
-        backgroundColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface
+        backgroundColor = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground
     ) {
         val items = listOf(
             Route.Home, Route.Cart, Route.Profile

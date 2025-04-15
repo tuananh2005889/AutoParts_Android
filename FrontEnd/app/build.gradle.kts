@@ -77,7 +77,7 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
     // Hilt cho ViewModel
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
-
+    // convert url to image
     implementation("io.coil-kt:coil-compose:2.2.2")
 
     //google font

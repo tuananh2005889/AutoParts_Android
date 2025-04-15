@@ -1,5 +1,7 @@
 package com.example.frontend.data.model
 
+import com.google.gson.annotations.SerializedName
+
 
 data class ProductData(
     val productId: String,
@@ -12,7 +14,7 @@ data class ProductData(
     val size: String = "",
     val material: String = "",
     val weight: Double? = null,
-    val images: List<String> = emptyList(),
+    @SerializedName("images") val imageUrlList: List<String> = emptyList(),
     val discount: Double? = null,
     val warranty: String = "",
     val price: Double? = null,

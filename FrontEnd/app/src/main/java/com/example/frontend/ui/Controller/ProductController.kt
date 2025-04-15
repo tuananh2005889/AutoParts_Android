@@ -85,7 +85,7 @@ class ProductController {
 
             uploadImage(file) { success, uploadedUrl ->
                 if (success) {
-                    val productWithImage = product.copy(images = listOf(uploadedUrl))
+                    val productWithImage = product.copy(imageUrlList = listOf(uploadedUrl))
 
                     addProduct(productWithImage) { addSuccess, msg ->
                         onResult(addSuccess, msg)
