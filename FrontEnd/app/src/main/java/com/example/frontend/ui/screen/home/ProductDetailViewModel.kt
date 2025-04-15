@@ -15,6 +15,8 @@ class ProductDetailViewModel @Inject constructor (private val repository: Produc
     private val _productState = mutableStateOf<ApiResponse<ProductData>>(ApiResponse.Loading)
     val productState  = _productState
 
+
+
     fun getProductById(productId: String){
         viewModelScope.launch{
           _productState.value = ApiResponse.Loading
