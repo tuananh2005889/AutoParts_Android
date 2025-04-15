@@ -6,7 +6,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -54,7 +56,7 @@ fun HomeScreen(
 
 @Composable
 fun HomeScreenContent(
-    viewModel: ProductViewModel = hiltViewModel(),
+    viewModel: HomeViewModel = hiltViewModel(),
     innerPadding: PaddingValues,
     onProductClick: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -74,7 +76,10 @@ fun HomeScreenContent(
         }
         is ApiResponse.Success -> {
             val products = (state as ApiResponse.Success<List <ProductData>>).data
-            Column(modifier = modifier.padding(innerPadding)) {
+            Column(
+                modifier = modifier
+                .padding(innerPadding)
+            ) {
                 SearchBar(
                     value = searchText,
                     onValueChange = {text -> searchText = text}
