@@ -8,8 +8,9 @@ import androidx.compose.runtime.remember
 import androidx.navigation.compose.rememberNavController
 import com.example.frontend.ui.navigation.AppNavHost
 import com.example.frontend.ui.theme.FrontEndTheme
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,23 +19,9 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val isLoggedIn = remember { mutableStateOf(false)}
                 AppNavHost(navController, isLoggedIn)
-//                AppNavigator()
             }
-
-
         }
     }
 }
 
-//@Composable
-//fun AppNavigator() {
-//    val navController = rememberNavController()
-//
-//    NavHost(navController = navController, startDestination = "login") {
-//        composable("login") { LoginScreen(navController) }
-//        composable("signup") { SignUpScreen(navController) }
-//        composable("homepage") { HomePageScreen(navController) }
-//        composable("addProduct") { AddProductScreen(navController) }
-//    }
-//}
 

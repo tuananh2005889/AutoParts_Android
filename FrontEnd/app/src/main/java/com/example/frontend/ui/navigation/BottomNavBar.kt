@@ -9,12 +9,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
-import com.example.frontend.ui.theme.backgroundDark
 
 @Composable
 fun BottomNavBar(navController: NavController) {
     BottomNavigation(
         backgroundColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface
     ) {
         val items = listOf(
             Route.Home, Route.Cart, Route.Profile
