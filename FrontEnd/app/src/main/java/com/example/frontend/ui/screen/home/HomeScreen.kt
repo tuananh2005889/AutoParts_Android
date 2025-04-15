@@ -174,7 +174,7 @@ fun ProductCard(
     Card(
         modifier = Modifier
             .size(width = 150.dp, height = 270.dp)
-            .clickable(onClick = { onClick()}),
+            .clickable(onClick =  onClick),
 
         elevation =  CardDefaults.cardElevation(15.dp),
     ) {
