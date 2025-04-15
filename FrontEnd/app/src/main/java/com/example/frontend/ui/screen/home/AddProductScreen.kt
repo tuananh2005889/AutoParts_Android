@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -21,8 +20,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.example.frontend.Controller.ProductController
-import com.example.frontend.Controller.ProductController.Companion.getAllProducts
+import com.example.frontend.ui.Controller.ProductController
+import com.example.frontend.ui.Controller.ProductController.Companion.getAllProducts
 import com.example.frontend.data.model.ProductData
 
 @Composable

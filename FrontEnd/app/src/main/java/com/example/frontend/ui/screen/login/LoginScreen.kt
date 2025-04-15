@@ -28,9 +28,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.frontend.R
-import com.example.frontend.ViewModel.UserViewModel
 import com.example.frontend.data.model.LoginData
 import com.example.frontend.data.saveUserData
+import com.example.frontend.ui.screen.UserViewModel
 import com.google.gson.Gson
 import okhttp3.Call
 import okhttp3.Callback
@@ -124,11 +124,7 @@ fun LoginScreen(
                         saveUserData(context, loggedInUser)
                         // Nếu sử dụng ViewModel, cập nhật trạng thái người dùng đăng nhập
                         userViewModel.setCurrentUser(loggedInUser)
-
                         onLoginSuccess()
-//                        navController.navigate("homepage") {
-//                            popUpTo("login") { inclusive = true }
-//                        }
                     } else {
                         errorMessage = message
                     }
@@ -143,7 +139,6 @@ fun LoginScreen(
         }
 
         Spacer(modifier = Modifier.height(10.dp))
-//        TextButton(onClick = { navController.navigate("signup") }) {
         TextButton(onClick = { onSignupClick() }) {
             Text(
                 text = "You don’t have an account? Register now",
@@ -208,10 +203,3 @@ fun LoginField(
     )
 }
 
-
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewLoginScreen() {
-//    val navController = rememberNavController()
-//    LoginScreen(navController)
-//}

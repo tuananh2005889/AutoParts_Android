@@ -1,12 +1,18 @@
 package com.example.frontend.ui.screen.home
 
+import android.R.attr.data
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.lazy.grid.*
+import com.example.frontend.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,17 +20,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
-import com.example.frontend.Controller.OrderController
-import com.example.frontend.Controller.ProductController
-import com.example.frontend.ViewModel.UserViewModel
+import coil.compose.rememberImagePainter
 import com.example.frontend.data.model.ProductData
+import com.example.frontend.data.remote.ApiResponse
+import com.example.frontend.data.repository.ProductRepository
+import com.example.frontend.ui.Controller.ProductController
 import com.example.frontend.ui.navigation.BottomNavBar
 import com.example.frontend.ui.navigation.BottomNavHost
 
@@ -53,101 +63,83 @@ fun HomeScreen(
 }
 
 @Composable
-fun HomeScreenContent(innerPadding: PaddingValues){
+fun HomeScreenContent(
+    viewModel: ProductViewModel = hiltViewModel(),
+    innerPadding: PaddingValues,
+    onProductClick: (String) -> Unit,
+){
+    val state by viewModel.productState.collectAsState()
+
     var productList by remember { mutableStateOf<List<ProductData>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(true) }
-    var errorMsg by remember { mutableStateOf("") }
     var searchText by remember { mutableStateOf("") }
 
-    LaunchedEffect(Unit) {
-        ProductController.getAllProducts { success, products, msg ->
-            if (success && products != null) {
-                productList = products
-            } else {
-                errorMsg = msg
-            }
-            isLoading = false
+
+
+//     Bộ lọc sản phẩm theo từ khóa tìm kiếm
+//    val filteredProducts = productList.filter {
+//        it.name.contains(searchText, ignoreCase = true) ||
+//                it.brand.contains(searchText, ignoreCase = true)
+//    }
+
+
+
+    when(state){
+        is ApiResponse.Loading -> {
+            CircularProgressIndicator()
         }
-    }
+        is ApiResponse.Success -> {
+            val products = (state as ApiResponse.Success<List <ProductData>>).data
+            Column {
+                SearchBar(
+                    value = searchText,
+                    onValueChange = {text -> searchText = text}
+                )
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
 
-    // Bộ lọc sản phẩm theo từ khóa tìm kiếm
-    val filteredProducts = productList.filter {
-        it.name.contains(searchText, ignoreCase = true) ||
-                it.brand.contains(searchText, ignoreCase = true)
-    }
-
-                Row{
-                        OutlinedTextField(
-                            value = searchText,
-                            onValueChange = { searchText = it },
-                            placeholder = { Text("Search...", color = Color.Black) },
-                            singleLine = true,
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp),
-                        )
-                        }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)
-            .padding(horizontal = 16.dp)
-    ) {
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Categories",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            CategoryChip("Abc")
-            CategoryChip("def")
-            CategoryChip("gdads")
-            CategoryChip("grtdá")
+                ProductGrid(products)
+            }
         }
-        Spacer(modifier = Modifier.height(16.dp))
-
-        when {
-            isLoading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = Color(0xFFFF7043))
-                }
-            }
-            errorMsg.isNotEmpty() -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = errorMsg, color = Color.Red)
-                }
-            }
-            else -> {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(filteredProducts) { product ->
-                        ProductCard(product)
-                    }
-                }
-            }
+        is ApiResponse.Error -> {
+            val error = (state as ApiResponse.Error).message
+            Text(
+                text = "Error: ${error}",
+                color = MaterialTheme.colorScheme.error
+                )
         }
     }
 }
 
+@Composable
+fun SearchBar(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    ){
+    Row(
+        modifier = modifier.padding(horizontal = dimensionResource(R.dimen.padding_small))
+    ){
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            placeholder = {
+                Text(stringResource(R.string.placeholder_search)) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = null,
+                )
+            },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.surfaceDim,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurface,
+                cursorColor = MaterialTheme.colorScheme.onSurface,
+            ),
+        )
+    }
+}
 
 @Composable
 fun CategoryChip(label: String) {
@@ -161,107 +153,100 @@ fun CategoryChip(label: String) {
         Text(text = label, color = Color.White, fontSize = 14.sp)
     }
 }
+
 @Composable
-fun ProductCard(product: ProductData) {
-    val userViewModel: UserViewModel = viewModel()
-    val currentUser by userViewModel.currentUser.collectAsState()
-    var errorMessage by remember { mutableStateOf("") }
-    val username by remember { mutableStateOf("") }
+fun ProductGrid(products: List<ProductData>) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        contentPadding = PaddingValues(8.dp),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium)),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource((R.dimen.padding_medium))),
+        modifier = Modifier.fillMaxSize()
+    ) {
+        items(items = products) { product ->
+            ProductCard(
+                product = product,
+                onClick = { /* Handle click */ }
+            )
+        }
+    }
+}
+@Composable
+fun ProductCard(
+    product: ProductData ,
+    productImage: String ? = null,
+    onClick: () -> Unit
+){
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(260.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            .size(width = 150.dp, height = 250.dp)
+            .clickable(onClick = onClick),
+
+        elevation =  CardDefaults.cardElevation(15.dp),
     ) {
-        Column(modifier = Modifier.padding(8.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+//                .padding(16.dp)
+        ) {
+            // Product image
+//            Image(
+//                painter = rememberAsyncImagePainter(data),
+//                contentDescription = null,
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(150.dp)
+//                    .clip(RoundedCornerShape(8.dp)),
+//                contentScale = ContentScale.Crop
+//            )
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp)
-            ) {
-                if (product.images.isNotEmpty()) {
-                    Image(
-                        painter = rememberAsyncImagePainter(product.images.first()),
-                        contentDescription = product.name,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                } else {
-                    Box(
                         modifier = Modifier
-                            .fillMaxSize()
+                            .fillMaxWidth()
+                            .height(150.dp)
                             .background(Color.Gray),
                         contentAlignment = Alignment.Center
                     ) {
                         Text("No Image", color = Color.White)
                     }
+
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Product name
+            Card(  border = BorderStroke(2.dp,Color.Red),){
+                Column(
+                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+                ) {
+                    Text(
+                        text = product.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    // Product price
+                    Text(
+                        text = product.price.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = product.name,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-                maxLines = 1
-            )
-            Text(
-                text = product.brand,
-                fontSize = 12.sp,
-                color = Color.DarkGray,
-                maxLines = 1
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "$${product.price}",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF1E88E5)
-            )
-            Text(
-                text = "Quantity: ${product.quantity}",
-                fontSize = 12.sp,
-                color = Color.Gray
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
 
-                Button(
-                    onClick = {
-
-                        OrderController.addToCart(
-                            userName = currentUser!!.userName,
-                            productId = product.productId,
-                            quantity = 1
-                        ) { success, message ->
-                            errorMessage = message
-                        }
-
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E88E5)),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Add to Cart", fontSize = 12.sp, color = Color.White)
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                // Nút "Buy Now"
-                Button(
-                    onClick = {
-
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF15D43)),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Buy Now", fontSize = 12.sp, color = Color.White)
-                }
-            }
         }
     }
 }
+//
+//@Composable
+//@Preview( showBackground = true)
+//fun ProductCardPreview(){
+////    ProductCardd()
+//    ProductCardd(
+//        productName = "Apple iPhone 14",
+//        productPrice = "$999.99",
+//        productImage = "https://example.com/iphone14.jpg",
+//        onClick = {}
+//    )
+//}
+
 
 

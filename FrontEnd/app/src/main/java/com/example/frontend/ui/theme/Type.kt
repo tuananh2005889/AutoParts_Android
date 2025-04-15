@@ -49,4 +49,22 @@ val AppTypography = Typography(
     labelMedium = baseline.labelMedium.copy(fontFamily = bodyFontFamily),
     labelSmall = baseline.labelSmall.copy(fontFamily = bodyFontFamily),
 )
+//Các giá trị fontSize mặc định trong Typography() của Material 3:
+
+//Style	        Font Size (sp)	Font Weight
+//displayLarge	57.sp	        Normal (400)
+//displayMedium	45.sp	        Normal (400)
+//displaySmall	36.sp	        Normal (400)
+//headlineLarge	32.sp	        Normal (400)
+//headlineMedium28.sp	        Normal (400)
+//headlineSmall	24.sp	        Normal (400)
+//titleLarge	22.sp	        Medium (500)
+//titleMedium	16.sp	        Medium (500)
+//titleSmall	14.sp	        Medium (500)
+//bodyLarge	    16.sp	        Normal (400)
+//bodyMedium	14.sp	        Normal (400)
+//bodySmall	    12.sp	        Normal (400)
+//labelLarge	14.sp	        Medium (500)
+//labelMedium	12.sp	        Medium (500)
+//labelSmall	11.sp	        Medium (500)
 
