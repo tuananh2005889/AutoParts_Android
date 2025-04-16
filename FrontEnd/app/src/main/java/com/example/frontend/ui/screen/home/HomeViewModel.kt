@@ -14,9 +14,9 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(private val repository: ProductRepository) : ViewModel() {
 
-    private val _productState =
-        MutableStateFlow<ApiResponse<List<ProductData>>>(ApiResponse.Loading)
-    val productState: StateFlow<ApiResponse<List<ProductData>>> = _productState
+    private val _homeUiState =
+        MutableStateFlow<HomeUiState>(HomeUiState())
+    val homeUiState: StateFlow<HomeUiState> = _homeUiState
 
     init{
         getAllProducts()
@@ -24,16 +24,18 @@ class HomeViewModel @Inject constructor(private val repository: ProductRepositor
 
     fun getAllProducts(){
         viewModelScope.launch {
-            _productState.value = ApiResponse.Loading
+            _homeUiState.value = HomeUiState()
 
             when(val result = repository.getAllProducts()){
                 is ApiResponse.Success -> {
-                    _productState.value = ApiResponse.Success(result.data)
+                    _homeUiState.value = HomeUiState(products = result.data, isLoading = false)
                 }
                 is ApiResponse.Error -> {
-                    _productState.value = ApiResponse.Error(result.message)
+                    _homeUiState.value = HomeUiState(errorMessage = result.message, isLoading = false)
                 }
-                ApiResponse.Loading -> {}
+                is ApiResponse.Loading -> {
+                    _homeUiState.value = HomeUiState(isLoading = true)
+                }
             }
         }
     }

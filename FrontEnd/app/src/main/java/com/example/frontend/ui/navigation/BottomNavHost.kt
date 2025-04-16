@@ -34,7 +34,10 @@ fun BottomNavHost(bottomNavController : NavHostController, rootNavController: Na
             arguments = listOf(navArgument("productId") { type = NavType.StringType })
         ) { backStackEntry ->
             val productId = backStackEntry.arguments?.getString("productId") ?: return@composable
-            DetailProductScreen(productId = productId, innerPadding = innerPadding)
+            DetailProductScreen(
+                productId = productId, innerPadding = innerPadding,
+                clickBack = {bottomNavController.popBackStack()}
+                )
         }
 
         composable(Route.Profile.route) { ProfileScreen(
