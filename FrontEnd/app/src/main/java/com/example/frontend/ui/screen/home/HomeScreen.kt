@@ -6,9 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -27,7 +25,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.frontend.data.model.ProductData
-import com.example.frontend.data.remote.ApiResponse
 import com.example.frontend.ui.common.CloudinaryImage
 import com.example.frontend.ui.navigation.BottomNavBar
 import com.example.frontend.ui.navigation.BottomNavHost
@@ -61,7 +58,7 @@ fun HomeScreenContent(
     onProductClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ){
-    val state by viewModel.productState.collectAsState()
+    val homeUiState by viewModel.homeUiState.collectAsState()
     var productList by remember { mutableStateOf<List<ProductData>>(emptyList()) }
     var searchText by remember { mutableStateOf("") }
 
@@ -70,12 +67,12 @@ fun HomeScreenContent(
 //        it.name.contains(searchText, ignoreCase = true) ||
 //                it.brand.contains(searchText, ignoreCase = true)
 //    }
-   when(state){
-        is ApiResponse.Loading -> {
+   when{
+         homeUiState.isLoading -> {
             CircularProgressIndicator(modifier = modifier.padding(innerPadding))
         }
-        is ApiResponse.Success -> {
-            val products = (state as ApiResponse.Success<List <ProductData>>).data
+        homeUiState.products.isNotEmpty() -> {
+            val products = homeUiState.products
             Column(
                 modifier = modifier
                 .padding(innerPadding)
@@ -91,8 +88,8 @@ fun HomeScreenContent(
                     )
             }
         }
-        is ApiResponse.Error -> {
-            val error = (state as ApiResponse.Error).message
+           homeUiState.errorMessage != null  -> {
+            val error = homeUiState.errorMessage
             Text(
                 text = "Error: ${error}",
                 color = MaterialTheme.colorScheme.error
