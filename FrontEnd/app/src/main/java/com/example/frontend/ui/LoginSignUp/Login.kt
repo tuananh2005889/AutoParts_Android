@@ -2,6 +2,7 @@ package com.example.frontend.ui.LoginSignUp
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -32,9 +33,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.frontend.R
 import com.example.frontend.ViewModel.UserViewModel
+import com.example.frontend.data.UserPreferences.getUserData
+import com.example.frontend.data.UserPreferences.saveUserData
 import com.example.frontend.data.model.LoginData
-import com.example.frontend.data.model.UserData
-import com.example.frontend.data.saveUserData
 import com.google.gson.Gson
 import okhttp3.Call
 import okhttp3.Callback
@@ -55,7 +56,7 @@ import java.io.IOException
 //}
 
 @Composable
-fun LoginScreen(navController: NavHostController) {
+fun LoginScreen(navController: NavHostController, userViewModel: UserViewModel) {
     var userName by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 //    val fullName by remember { mutableStateOf("") }
@@ -63,7 +64,6 @@ fun LoginScreen(navController: NavHostController) {
 //    val phone by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
     var loginSuccess by remember { mutableStateOf(false) }
-    val userViewModel: UserViewModel = viewModel()
     val context = LocalContext.current
 
     Column(
@@ -130,9 +130,9 @@ fun LoginScreen(navController: NavHostController) {
                             userName = user.userName,
                             password = user.password,
                         )
-                        // Lưu thông tin vào SharedPreferences
                         saveUserData(context, loggedInUser)
-                        // Nếu sử dụng ViewModel, cập nhật trạng thái người dùng đăng nhập
+                        val savedUser = getUserData(context)
+                        Log.d("Login", "Saved user: $savedUser")
                         userViewModel.setCurrentUser(loggedInUser)
 
                         navController.navigate("homepage") {
@@ -147,7 +147,7 @@ fun LoginScreen(navController: NavHostController) {
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF15D43)),
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier.width(200.dp)
-        ) { 
+        ) {
             Text(text = "LogIn", fontSize = 18.sp, color = Color.White)
         }
 
@@ -217,9 +217,9 @@ fun LoginField(
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewLoginScreen() {
-    val navController = rememberNavController()
-    LoginScreen(navController)
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewLoginScreen() {
+//    val navController = rememberNavController()
+//    LoginScreen(navController)
+//}

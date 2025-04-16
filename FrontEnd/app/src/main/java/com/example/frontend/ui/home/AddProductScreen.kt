@@ -152,7 +152,7 @@ fun AddProductScreen(navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp)
-                        .heightIn(max = 500.dp) // giới hạn chiều cao, dễ thao tác hơn
+                        .heightIn(max = 500.dp)
                 ) {
                     item {
                         TextField(

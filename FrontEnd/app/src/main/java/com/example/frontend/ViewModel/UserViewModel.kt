@@ -12,4 +12,8 @@ class UserViewModel : ViewModel() {
     fun setCurrentUser(user: LoginData) {
         _currentUser.value = user
     }
+
+    fun logout() {
+        _currentUser.value = null
+    }
 }

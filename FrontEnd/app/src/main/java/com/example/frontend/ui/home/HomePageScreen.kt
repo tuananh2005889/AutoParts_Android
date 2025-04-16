@@ -1,5 +1,6 @@
 package com.example.frontend.ui.home
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -8,6 +9,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
 
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
@@ -17,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,13 +37,12 @@ import com.example.frontend.ui.compon.HomeChange
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomePageScreen(navController: NavHostController) {
+fun HomePageScreen(navController: NavHostController, userViewModel: UserViewModel = viewModel()) {
     var searchText by remember { mutableStateOf("") }
     var productList by remember { mutableStateOf<List<ProductData>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMsg by remember { mutableStateOf("") }
 
-    // Gọi API để lấy danh sách sản phẩm
     LaunchedEffect(Unit) {
         ProductController.getAllProducts { success, products, msg ->
             if (success && products != null) {
@@ -51,7 +54,6 @@ fun HomePageScreen(navController: NavHostController) {
         }
     }
 
-    // Bộ lọc sản phẩm theo từ khóa tìm kiếm
     val filteredProducts = productList.filter {
         it.name.contains(searchText, ignoreCase = true) ||
                 it.brand.contains(searchText, ignoreCase = true)
@@ -66,67 +68,19 @@ fun HomePageScreen(navController: NavHostController) {
                         onValueChange = { searchText = it },
                         placeholder = { Text("Search...", color = Color.Black) },
                         singleLine = true,
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
                     )
                 },
                 actions = {
-                    // Icon Camera
-                    IconButton(onClick = {  }) {
-//                        Icon(
-//                            imageVector = Icons.Filled.CameraAlt,
-//                            contentDescription = "Camera",
-//                            tint = Color.White
-//                        )
-                    }
-                    // Icon Giỏ hàng với badge "99+"
-                    IconButton(onClick = { /* TODO: */ }) {
-                        Box {
-                            Icon(
-                                imageVector = Icons.Filled.ShoppingCart,
-                                contentDescription = "Cart",
-                                tint = Color.White
-                            )
-//                            Box(
-//                                modifier = Modifier
-//                                    .align(Alignment.TopEnd)
-//                                    .offset(x = 6.dp, y = (-4).dp)
-//                                    .clip(CircleShape)
-//                                    .background(Color.Red)
-//                                    .padding(horizontal = 4.dp, vertical = 2.dp)
-//                            ) {
-//                                Text(
-//                                    text = "99+",
-//                                    color = Color.White,
-//                                    fontSize = 8.sp
-//                                )
-//                            }
-                        }
-                    }
-                    // Icon Chat với badge "4"
-                    IconButton(onClick = { /* TODO: Xử lý chat */ }) {
-                        Box {
-//                            Icon(
-//                                imageVector = Icons.Filled.Chat,
-//                                contentDescription = "Chat",
-//                                tint = Color.White
-//                            )
-//                            Box(
-//                                modifier = Modifier
-//                                    .align(Alignment.TopEnd)
-//                                    .offset(x = 6.dp, y = (-4).dp)
-//                                    .clip(CircleShape)
-//                                    .background(Color.Red)
-//                                    .padding(horizontal = 4.dp, vertical = 2.dp)
-//                            ) {
-//                                Text(
-//                                    text = "4",
-//                                    color = Color.White,
-//                                    fontSize = 8.sp
-//                                )
-//                            }
-                        }
+                    IconButton(onClick = {
+                        navController.navigate("cart")
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.ShoppingCart,
+                            contentDescription = "Cart",
+                            tint = Color.White
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -136,13 +90,11 @@ fun HomePageScreen(navController: NavHostController) {
                 )
             )
         },
-
         containerColor = Color.White,
         bottomBar = {
             HomeChange(navController = navController)
         }
     ) { innerPadding ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -150,7 +102,6 @@ fun HomePageScreen(navController: NavHostController) {
                 .padding(horizontal = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-
             Text(
                 text = "Categories",
                 fontSize = 20.sp,
@@ -168,7 +119,6 @@ fun HomePageScreen(navController: NavHostController) {
                 CategoryChip("grtdá")
             }
             Spacer(modifier = Modifier.height(16.dp))
-
             when {
                 isLoading -> {
                     Box(
@@ -195,7 +145,10 @@ fun HomePageScreen(navController: NavHostController) {
                         modifier = Modifier.fillMaxSize()
                     ) {
                         items(filteredProducts) { product ->
-                            ProductCard(product)
+                            ProductCard(
+                                product,
+                                userViewModel = userViewModel
+                            )
                         }
                     }
                 }
@@ -216,16 +169,19 @@ fun CategoryChip(label: String) {
         Text(text = label, color = Color.White, fontSize = 14.sp)
     }
 }
+
 @Composable
-fun ProductCard(product: ProductData) {
-    val userViewModel: UserViewModel = viewModel()
+fun ProductCard(product: ProductData, userViewModel: UserViewModel) {
     val currentUser by userViewModel.currentUser.collectAsState()
     var errorMessage by remember { mutableStateOf("") }
-    val username by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    var selectedQuantity by remember { mutableStateOf(1) }
+    val availableStock = product.quantity ?: 0
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(260.dp),
+            .height(320.dp),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -276,27 +232,61 @@ fun ProductCard(product: ProductData) {
                 color = Color(0xFF1E88E5)
             )
             Text(
-                text = "Quantity: ${product.quantity}",
+                text = "Stock: $availableStock",
                 fontSize = 12.sp,
                 color = Color.Gray
             )
+            Spacer(modifier = Modifier.height(8.dp))
+            // Hiển thị UI chọn số lượng
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Select:", fontSize = 14.sp, color = Color.Black)
+                Spacer(modifier = Modifier.width(8.dp))
+                IconButton(
+                    onClick = {
+                        if (selectedQuantity > 1) {
+                            selectedQuantity--
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Clear,
+                        contentDescription = "Decrease"
+                    )
+                }
+                Text(text = selectedQuantity.toString(), fontSize = 14.sp)
+                IconButton(
+                    onClick = {
+                        if (selectedQuantity < availableStock) {
+                            selectedQuantity++
+                        } else {
+                            Toast.makeText(context, "Không còn hàng!", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = "Increase"
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-
                 Button(
                     onClick = {
-
                         OrderController.addToCart(
                             userName = currentUser!!.userName,
                             productId = product.productId,
-                            quantity = 1
+                            quantity = selectedQuantity
                         ) { success, message ->
+                            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                             errorMessage = message
                         }
-
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E88E5)),
                     modifier = Modifier.weight(1f)
@@ -304,10 +294,9 @@ fun ProductCard(product: ProductData) {
                     Text("Add to Cart", fontSize = 12.sp, color = Color.White)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                // Nút "Buy Now"
                 Button(
                     onClick = {
-
+                        // Xử lý nút "Buy Now" nếu cần
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF15D43)),
                     modifier = Modifier.weight(1f)
