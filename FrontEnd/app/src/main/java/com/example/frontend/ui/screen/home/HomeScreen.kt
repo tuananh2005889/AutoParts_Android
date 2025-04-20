@@ -28,12 +28,14 @@ import com.example.frontend.data.model.ProductData
 import com.example.frontend.ui.common.CloudinaryImage
 import com.example.frontend.ui.navigation.BottomNavBar
 import com.example.frontend.ui.navigation.BottomNavHost
+import com.example.frontend.ui.screen.login.LoginViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     rootNavController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    loginViewModel: LoginViewModel
 ) {
     val bottomNavController = rememberNavController()
     Scaffold(
@@ -44,6 +46,7 @@ fun HomeScreen(
         }
     ) { innerPadding ->
         BottomNavHost(
+            loginViewModel = loginViewModel,
             bottomNavController =  bottomNavController,
             rootNavController = rootNavController,
             innerPadding =  innerPadding,

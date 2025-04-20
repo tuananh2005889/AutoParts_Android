@@ -9,13 +9,39 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.runtime.*
+import com.example.frontend.data.model.ProductData
+
+data class ProductDetailUiState(
+    val isLoading: Boolean = true,
+    val product: ProductData? = null,
+    val errorMessage: String? = null,
+    val quantity: Int = 1,
+    val initialPrice: Double = 0.0,
+    val totalPrice: Double = 0.0,
+)
 
 @HiltViewModel
 class ProductDetailViewModel @Inject constructor (private val repository: ProductRepository) : ViewModel(){
     private val _productDetailState = mutableStateOf<ProductDetailUiState>(ProductDetailUiState())
     val productDetailState: State<ProductDetailUiState>  = _productDetailState
 
-    fun getProductById(productId: String){
+    val quantity  = mutableStateOf(1)
+    val totalPrice: State<Double> = derivedStateOf {
+        val initialPrice = _productDetailState.value.product?.price ?: 0.0
+        initialPrice * quantity.value
+
+    }
+
+    fun increaseQuantity(){
+        quantity.value++
+    }
+    fun decreaseQuantity(){
+        if(quantity.value > 1){
+            quantity.value--
+        }
+    }
+
+    fun getProductById(productId: Long){
         viewModelScope.launch{
           _productDetailState.value = ProductDetailUiState()
             when(val result = repository.getProductById(productId)){
@@ -34,3 +60,4 @@ class ProductDetailViewModel @Inject constructor (private val repository: Produc
     }
 
 }
+

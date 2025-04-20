@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <title>Add Próduct</title>
+</head>
+<body>
+
+<h2 class="w-screen bg-gray-800 text-center text-gray-200 text-[30px] font-bold ">Add Product </h2>
+
+<!--lay thuoc tinh successMessage,errro tu ham addProduct cua
+WebProductController-->
+<div th:if="${successMessage}" class="alert alert-success">
+  <p th:text="${successMessage}"></p>
+</div>
+<div th:if="${error}" class="alert alert-danger">
+  <p th:text="${error}"></p>
+</div>
+
+<form action="#" th:action="@{/web/product/add}" th:object="${productDTO}"
+      method="post" enctype="multipart/form-data"
+      class="space-y-6 px-[5%] pt-[2%]">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+
+    <div class="flex flex-col">
+      <label for="name" class="font-bold">Name</label>
+      <input type="text" id="name" th:field="*{name}" placeholder="Tên sản phẩm" required class="border p-2 rounded"/>
+    </div>
+
+    <div class="flex flex-col">
+      <label for="brand" class="font-bold">Brand:</label>
+      <input type="text" id="brand" th:field="*{brand}" placeholder="Thương hiệu" required class="border p-2 rounded"/>
+    </div>
+
+    <div class="flex flex-col">
+      <label for="category" class="font-bold">Category</label>
+      <input type="text" id="category" th:field="*{category}" placeholder="Danh mục" required class="border p-2 rounded"/>
+    </div>
+
+    <div class="flex flex-col">
+      <label for="price" class="font-bold">Price</label>
+      <input type="number" id="price" th:field="*{price}" placeholder="Giá sản phẩm" required class="border p-2 rounded"/>
+    </div>
+
+    <div class="flex flex-col">
+      <label for="quantity" class="font-bold">Quantity</label>
+      <input type="number" id="quantity" th:field="*{quantity}" placeholder="Số lượng" required class="border p-2 rounded"/>
+    </div>
+
+    <div class="flex flex-col">
+      <label for="description" class="font-bold">Description</label>
+      <textarea id="description" th:field="*{description}" placeholder="Mô tả" required class="border p-2 rounded"></textarea>
+    </div>
+
+    <div class="flex flex-col">
+      <label for="compatible_vehicles" class="font-bold">Compatible Vehicles</label>
+      <input type="text" id="compatible_vehicles" th:field="*{compatibleVehicles}" placeholder="" required class="border p-2 rounded"/>
+    </div>
+
+    <div class="flex flex-col">
+      <label for="year_of_manufacture" class="font-bold">Year of Manufacture</label>
+      <input type="number" id="year_of_manufacture" th:field="*{yearOfManufacture}" placeholder="" required class="border p-2 rounded"/>
+    </div>
+
+    <div class="flex flex-col">
+      <label for="size" class="font-bold">Size</label>
+      <input type="text" id="size" th:field="*{size}" placeholder="" required class="border p-2 rounded"/>
+    </div>
+
+    <div class="flex flex-col">
+      <label for="material" class="font-bold">Material</label>
+      <input type="text" id="material" th:field="*{material}" placeholder="" required class="border p-2 rounded"/>
+    </div>
+
+    <div class="flex flex-col">
+      <label for="weight" class="font-bold">Weight</label>
+      <input type="number" id="weight" th:field="*{weight}" placeholder="" required class="border p-2 rounded"/>
+    </div>
+
+    <div class="flex flex-col">
+      <label for="discount" class="font-bold">Discount</label>
+      <input type="number" id="discount" th:field="*{discount}" placeholder="" required class="border p-2 rounded"/>
+    </div>
+
+    <div class="flex flex-col">
+      <label for="warranty" class="font-bold">Warranty</label>
+      <select id="warranty" th:field="*{warranty}" required
+              class="border p-2 rounded">
+        <option value="" disabled selected>-- Chọn bảo hành --</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </div>
+
+    <div class="flex flex-col">
+      <label for="images" class="font-bold">Choose Product Images</label>
+      <input
+         type="file" id="images" name="images" accept="image/*" multiple
+              onchange="previewImages(event)" required class="border p-2 rounded"/>
+    </div>
+  </div>
+
+  <div id="imagePreview" style="display: flex; flex-wrap: wrap;"></div>
+
+  <div class="w-screen flex justify-center pb-[5%]">
+    <button type="submit" class="mt-4 px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600">Add Product</button>
+  </div>
+</form>
+
+<script>
+  function previewImages(event) {
+    const files = event.target.files;
+    const previewContainer = document.getElementById('imagePreview');
+
+    // previewContainer.innerHTML = ''; // Xóa ảnh cũ trong preview
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        const imgElement = document.createElement('img');
+        imgElement.src = e.target.result; // Đặt URL ảnh từ FileReader
+        imgElement.style.width = "100px";
+        imgElement.style.height = "100px";
+        imgElement.style.objectFit = "cover";
+        imgElement.style.margin = "5px";
+        previewContainer.appendChild(imgElement);
+      };
+
+      reader.readAsDataURL(file);
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -15,6 +15,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 
+/*
+- primary: Màu chính cho ứng dụng, thường là màu chủ đạo của chủ đề.
+    Dùng cho các thành phần nổi bật như Button, FAB, TopAppBar, v.v.
+- primaryContainer: Phiên bản nhạt hơn của primary dùng cho nền hoặc vùng nổi bật nhẹ
+    Dùng cho thẻ Card, Surface, hoặc vùng chứa dữ liệu
+- secondary: Màu phụ (hỗ trợ primary, bổ sung thông tin)
+ Màu phụ cho ứng dụng, thường là màu trung gian giữa primary và background.
+    Các chi tiết phụ như chip, badge, filter tag
+- tertiary: Màu bổ sung thứ ba (phong phú UI)
+ Dùng khi có nhiều loại thông tin khác nhau
+ Màu trung gian cho ứng dụng, thường là màu trung gian giữa primary và background.
+- ontertiary: Màu nhẹ của tertiary
+    Nền phụ
+
+- background: Màu nền chung của app (background tổng thể)
+    Nền app
+- surface: Màu dùng cho thành phần nổi (card, dialog, bottom sheet)
+    Card, Sheet, AppBar
+- surfaceVarient: Phiên bản phụ của surface để phân biệt nhiều thẻ
+    UI có nhiều layer
+* */
 
 private val LightColors = lightColorScheme(
     primary = md_theme_light_primary,

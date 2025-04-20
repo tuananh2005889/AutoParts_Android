@@ -1,17 +1,13 @@
 package com.example.frontend.ui.screen.login
 
-import android.os.Handler
-import android.os.Looper
+import android.R.attr.password
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,42 +15,33 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.frontend.R
 import com.example.frontend.data.model.LoginData
-import com.example.frontend.data.saveUserData
-import com.example.frontend.ui.screen.UserViewModel
-import com.google.gson.Gson
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
-import java.io.IOException
-
+import com.example.frontend.ui.common.AuthPreferencesKeys.userName
 
 
 @Composable
 fun LoginScreen(
-//    navController: NavHostController,
     onLoginSuccess: () -> Unit = {},
     onSignupClick: () -> Unit = {},
+    loginViewModel: LoginViewModel,
+//    onLoginClick: ()->Unit
 ) {
-    var userName by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf("") }
-    var loginSuccess by remember { mutableStateOf(false) }
-    val userViewModel: UserViewModel = viewModel()
-    val context = LocalContext.current
+    var userName = loginViewModel.loginTextFieldState.value.userName
+    var password = loginViewModel.loginTextFieldState.value.password
+    var loginState = loginViewModel.loginState.value
+
+    LaunchedEffect(loginState.loginSuccess) { // Launched Effect co argument, se chay moi khi argument change
+        if (loginState.loginSuccess) {
+            onLoginSuccess()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -98,38 +85,49 @@ fun LoginScreen(
                     .shadow(8.dp, shape = RoundedCornerShape(10.dp))
             )
         }
+
         Spacer(modifier = Modifier.height(120.dp))
-        LoginField("Enter your user name", value = userName, onValueChange = {userName = it})
+
+        LoginField("Enter your user name", value = userName.toString(), onValueChange = {loginViewModel.onUserNameChange(it)})
+
         Spacer(modifier = Modifier.height(10.dp))
-        LoginField("Enter your password", isPassword = true, value = password, onValueChange = {password = it})
+
+        LoginField(
+            "Enter your password",
+            isPassword = true,
+            value = password.toString(),
+            onValueChange = {loginViewModel.onPasswordChange(it)}
+        )
+
         Spacer(modifier = Modifier.height(20.dp))
 
-        if (errorMessage.isNotEmpty()) {
-            Text(text = errorMessage, color = Color.Red, fontSize = 14.sp)
+        if (loginState.errorMessage != null) {
+            Text(text = loginState.errorMessage, color = Color.Red, fontSize = 14.sp)
             Spacer(modifier = Modifier.height(10.dp))
         }
         Button(
             onClick = {
-                val user = LoginData(userName, password)
+//                onLoginClick()
+                val user = LoginData(userName.toString(), password.toString())
 
+                loginViewModel.login(user)
 
-                loginAccount(user) { success, message ->
-                    if (success) {
-
-                        val loggedInUser = LoginData(
-                            userName = user.userName,
-                            password = user.password,
-                        )
-                        // Lưu thông tin vào SharedPreferences
-                        saveUserData(context, loggedInUser)
-                        // Nếu sử dụng ViewModel, cập nhật trạng thái người dùng đăng nhập
-                        userViewModel.setCurrentUser(loggedInUser)
-                        onLoginSuccess()
-                    } else {
-                        errorMessage = message
-                    }
-                }
-
+//                loginAccount(user) { success, message ->
+//                    if (success) {
+//
+//                        val loggedInUser = LoginData(
+//                            userName = user.userName,
+//                            password = user.password,
+//                        )
+//                        // Lưu thông tin vào SharedPreferences
+//                        saveUserData(context, loggedInUser)
+//                        // Nếu sử dụng ViewModel, cập nhật trạng thái người dùng đăng nhập
+//                        userViewModel.setCurrentUser(loggedInUser)
+//                        onLoginSuccess()
+//                    } else {
+//                        errorMessage = message
+//                    }
+//                }
             },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF15D43)),
             shape = RoundedCornerShape(16.dp),
@@ -157,29 +155,29 @@ fun LoginScreen(
     }
 }
 
-fun loginAccount(user: LoginData, onResult: (Boolean, String) -> Unit) {
-    val url = "http://10.0.2.2:8080/auth/login"
-    val client = OkHttpClient()
-    val json = Gson().toJson(user)
-    val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
-
-    val request = Request.Builder().url(url).post(requestBody).build()
-
-    client.newCall(request).enqueue(object: Callback {
-        override fun onFailure(call: Call, e: IOException) {
-             Handler(Looper.getMainLooper()).post {
-                    onResult(false,"Failed to connect to server")
-             }
-        }
-
-        override fun onResponse(call: Call, response: Response) {
-            Handler(Looper.getMainLooper()).post {
-                if (response.isSuccessful) onResult(true, "Login successful")
-                else onResult(false, "User name or password incorrect")
-            }
-        }
-    })
-}
+//fun loginAccount(user: LoginData, onResult: (Boolean, String) -> Unit) {
+//    val url = "http://10.0.2.2:8080/auth/login"
+//    val client = OkHttpClient()
+//    val json = Gson().toJson(user)
+//    val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
+//
+//    val request = Request.Builder().url(url).post(requestBody).build()
+//
+//    client.newCall(request).enqueue(object: Callback {
+//        override fun onFailure(call: Call, e: IOException) {
+//             Handler(Looper.getMainLooper()).post {
+//                    onResult(false,"Failed to connect to server")
+//             }
+//        }
+//
+//        override fun onResponse(call: Call, response: Response) {
+//            Handler(Looper.getMainLooper()).post {
+//                if (response.isSuccessful) onResult(true, "Login successful")
+//                else onResult(false, "User name or password incorrect")
+//            }
+//        }
+//    })
+//}
 
 @Composable
 fun LoginField(

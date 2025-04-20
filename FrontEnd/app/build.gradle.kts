@@ -5,13 +5,12 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     //serialization
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.10"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.1.0"
     //hilt
-//    id("kotlin-kapt")
-//    id("com.google.dagger.hilt.android")
-
     id("com.google.dagger.hilt.android") // Plugin Hilt
     kotlin("kapt") // Kích hoạt kapt (Kotlin Annotation Processing)
+
+
 }
 
 android {
@@ -97,9 +96,15 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     // Firebase
     implementation("com.google.firebase:firebase-firestore-ktx:25.1.2")
-    implementation("com.squareup.okhttp3:okhttp:4.9.3")
     // Lib used to convert json to kotlin object
     implementation("com.google.code.gson:gson:2.10.1")
+    // Lib used to duyệt phần tử in Data Class
+    implementation ("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+    // Data store
+    implementation("androidx.datastore:datastore-preferences:1.1.4")
+    implementation("androidx.datastore:datastore:1.1.4")
+    // Help retrofit xu ly primitive types
+    implementation("com.squareup.retrofit2:converter-scalars:2.11.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

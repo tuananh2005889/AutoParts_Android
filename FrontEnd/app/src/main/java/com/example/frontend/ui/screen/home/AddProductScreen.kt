@@ -25,7 +25,8 @@ import com.example.frontend.ui.Controller.ProductController.Companion.getAllProd
 import com.example.frontend.data.model.ProductData
 
 @Composable
-fun AddProductScreen(navController: NavController) {
+fun AddProductScreen(
+) {
     // Form state
     var showForm by remember { mutableStateOf(false) }
     var name by remember { mutableStateOf("") }
@@ -60,9 +61,9 @@ fun AddProductScreen(navController: NavController) {
     }
 
     fun confirmAddProduct() {
-        val productIds = generateProductId()
-        val product = ProductData(
-            productId = productIds,
+//        val productIds = generateProductId()
+//        val productIdLong = productIds.replace("[^0-9]".toRegex(), "").toLong()
+        val product = Product(
             name = name,
             brand = brand,
             description = description,
@@ -270,36 +271,36 @@ fun AddProductScreen(navController: NavController) {
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                "Product list",
-                color = Color.White,
-                style = MaterialTheme.typography.titleMedium
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-
-            LazyColumn {
-                items(productList) { product ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFCEAE5))
-                    ) {
-                        Column(Modifier.padding(12.dp)) {
-                            Text("Name: ${product.name}", color = Color.Black)
-                            Text("Brand: ${product.brand}", color = Color.Black)
-                            Text("Category: ${product.category}", color = Color.Black)
-                            Text("Price: ${product.price}", color = Color.Black)
-                        }
-                    }
-                }
-            }
+//            Text(
+//                "Product list",
+//                color = Color.White,
+//                style = MaterialTheme.typography.titleMedium
+//            )
+//            Spacer(modifier = Modifier.height(8.dp))
+//
+//            LazyColumn {
+//                items(productList) { product ->
+//                    Card(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(vertical = 4.dp),
+//                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFCEAE5))
+//                    ) {
+//                        Column(Modifier.padding(12.dp)) {
+//                            Text("Name: ${product.name}", color = Color.Black)
+//                            Text("Brand: ${product.brand}", color = Color.Black)
+//                            Text("Category: ${product.category}", color = Color.Black)
+//                            Text("Price: ${product.price}", color = Color.Black)
+//                        }
+//                    }
+//                }
+//            }
         }
 
 
     }
 }
-fun generateProductId(): String {
-    val randomDigits = (1000..9999).random()
-    return "PR$randomDigits"
-}
+//fun generateProductId(): String {
+//    val randomDigits = (1000..9999).random()
+//    return "PR$randomDigits"
+//}

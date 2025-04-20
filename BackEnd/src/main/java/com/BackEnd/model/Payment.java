@@ -14,11 +14,14 @@ import java.time.LocalDateTime;
 public class Payment {
 
     @Id
+    @Column(name = "payment_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long paymentId;
 
     @OneToOne
-    @JoinColumn(name = "order_id", referencedColumnName = "order_id", unique = true, nullable = false)
+    @JoinColumn(name = "order_id",
+            referencedColumnName = "order_id",
+            unique = true, nullable = false)
     private Order order;
 
     @Column(nullable = false, length = 100)
@@ -29,4 +32,7 @@ public class Payment {
 
     @Column(nullable = false, length = 50)
     private String paymentStatus = "Pending";
+
+    @Column(nullable = false)
+    private double amount; // Số tiền thanh toán
 }

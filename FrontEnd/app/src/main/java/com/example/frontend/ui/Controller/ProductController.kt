@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import com.example.frontend.data.model.ProductData
+import com.example.frontend.ui.screen.home.Product
 import com.google.gson.Gson
 import okhttp3.Call
 import okhttp3.Callback
@@ -68,7 +69,7 @@ class ProductController {
         // Hàm confirmAddProduct trong Controller
         fun confirmAddProduct(
             context: Context,
-            product: ProductData,
+            product: Product,
             imageUri: Uri?,
             onResult: (Boolean, String) -> Unit
         ) {
@@ -96,7 +97,7 @@ class ProductController {
             }
         }
 
-        fun addProduct(product: ProductData, onResult: (Boolean, String) -> Unit) {
+        fun addProduct(product: Product, onResult: (Boolean, String) -> Unit) {
             val url = "http://10.0.2.2:8080/product/add"
             val client = OkHttpClient()
             val json = Gson().toJson(product)
