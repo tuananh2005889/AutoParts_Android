@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Just The Add Product Page">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <title>Product List</title>
+</head>
+
+<body>
+<h1 class="w-screen text-[30px] text-center text-white font-bold h-[10%] bg-gray-700">Product List</h1>
+<a th:href="@{/web/product/add}">Add New Product</a>
+
+<table class="w-full  border-collapse  border ">
+  <thead class="">
+  <tr class="divide-x  divide-y ">
+    <th class="w-1/20 bg-red-500 ">ID</th>
+    <th class="w-2/7 ">Name</th>
+    <th class="w-1/7 ">Brand</th>
+    <th class="w-1/7 ">Category</th>
+    <th class="w-1/7 ">Price</th>
+    <th class="w-1/7 ">Quantity</th>
+    <th class="w-1/7   ">Xóa</th>
+  </tr>
+  </thead>
+
+  <tbody class="divide-x divide-black">
+  <tr
+      th:onclick="'window.location.href=\'/web/product/detail/' + ${product.productId} + '\';'"
+      class="divide-x divide-y hover:bg-gray-400  duration-600"
+      th:each="product : ${products}"
+  >
+    <td th:text="${product.productId}"></td>
+    <td th:text="${product.name}"></td>
+    <td th:text="${product.brand}"></td>
+    <td th:text="${product.category}"></td>
+    <td th:text="${product.price}"></td>
+    <td th:text="${product.quantity}"></td>
+    <td>
+      <a class="cursor-pointer"
+         th:href="@{/web/product/edit/{id}(id=${product.productId})}"
+      >
+        Edit
+      </a>
+      <a class="cursor-pointer"
+              th:href="@{/web/product/delete/{id}(id=${product.productId})}"
+          onclick="return confirm('Are you sure you want to delete this product?')">
+        Delete
+      </a>
+    </td>
+  </tr>
+  </tbody>
+</table>
+</body>
+</html>

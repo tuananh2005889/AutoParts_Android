@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Detail</title>
+</head>
+<body>
+  <h1>Product Detail</h1>
+    <p th:text="${product.getName()}"></p>
+
+  <div>
+      <h3>Images</h3>
+      <div th:each="base64Image : ${base64s}">
+          <img th:src="'data:image/jpeg;base64,' + ${base64Image}" alt="Product Image" width="200" />
+      </div>
+  </div>
+</body>
+</html>

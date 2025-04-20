@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class Route(val route: String, val icon: ImageVector? = null) {
+    object Splash: Route("splash", null)
     object Login: Route("login", null)
     object Signup : Route("signup", null)
 
@@ -19,5 +20,4 @@ sealed class Route(val route: String, val icon: ImageVector? = null) {
             return "detailProduct/${productId}"
         }
     }
-
 }

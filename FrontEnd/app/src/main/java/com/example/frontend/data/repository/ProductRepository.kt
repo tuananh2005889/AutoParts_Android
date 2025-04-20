@@ -21,7 +21,7 @@ class ProductRepository @Inject constructor(private val productApiService: Produ
         }
     }
 
-    suspend fun getProductById(productId: String): ApiResponse<ProductData> {
+    suspend fun getProductById(productId: Long): ApiResponse<ProductData> {
         return try{
             val response = productApiService.getProductById(productId)
             if(response.isSuccessful){

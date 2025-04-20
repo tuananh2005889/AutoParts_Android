@@ -11,6 +11,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class HomeUiState(
+    val isLoading: Boolean = true,
+    val products: List<ProductData> = emptyList(),
+    val errorMessage: String? = null
+)
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(private val repository: ProductRepository) : ViewModel() {
 

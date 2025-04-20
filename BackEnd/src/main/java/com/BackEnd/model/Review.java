@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Review")
+@Table(name = "review")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,11 +19,11 @@ public class Review {
     private Long reviewId;
 
     @ManyToOne
-    @JoinColumn(name = "productId", referencedColumnName = "productId", nullable = false)
+    @JoinColumn(name = "product_id", referencedColumnName = "product_id", nullable = false)
     private Product product;
 
     @ManyToOne
-    @JoinColumn(name = "userID", referencedColumnName = "userID", nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
     private User user;
 
     @Column(nullable = false)

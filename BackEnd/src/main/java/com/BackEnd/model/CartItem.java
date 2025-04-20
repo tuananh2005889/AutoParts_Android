@@ -2,15 +2,35 @@ package com.BackEnd.model;
 
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
-@Getter
+@Entity
+@Table(name = "cart_item")
 @Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class CartItem {
-    private String productId;
-    private String productName;
+    public CartItem(Product product, int quantity, Cart cart){
+        this.product = product;
+        this.quantity = quantity;
+        this.cart = cart;
+    }
+    @Id
+    @Column(name = "cart_item_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long cartItemId;
+
+    @ManyToOne
+    @JoinColumn(name = "cart_id",  referencedColumnName = "cart_id", nullable = false)
+    private Cart cart;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id",  referencedColumnName = "product_id", nullable = false)
+    private Product product;
+
+    @Column(nullable = false)
     private int quantity;
-    private double price;
-    private String imageUrl;
+
 }

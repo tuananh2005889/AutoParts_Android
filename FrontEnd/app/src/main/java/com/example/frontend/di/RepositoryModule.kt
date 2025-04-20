@@ -1,6 +1,8 @@
 package com.example.frontend.di
 
+import com.example.frontend.data.remote.LoginApiService
 import com.example.frontend.data.remote.ProductApiService
+import com.example.frontend.data.repository.LoginRepository
 import com.example.frontend.data.repository.ProductRepository
 import dagger.Module
 import dagger.Provides
@@ -14,7 +16,14 @@ import javax.inject.Singleton
 object RepositoryModule {
     @Provides
     @Singleton
-    fun provideProductRepository(apiService: ProductApiService): ProductRepository {
-        return ProductRepository(apiService)
+    fun provideProductRepository(productApiService: ProductApiService): ProductRepository {
+        return ProductRepository(productApiService)
     }
+
+    @Provides
+    @Singleton
+    fun productLoginRepository(loginApiService: LoginApiService): LoginRepository {
+        return LoginRepository(loginApiService)
+    }
+
 }
