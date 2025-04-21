@@ -2,6 +2,7 @@ package com.BackEnd.controller;
 
 
 import com.BackEnd.dto.AddToCartRequest;
+import com.BackEnd.dto.CartBasicInfoDTO;
 import com.BackEnd.dto.CartItemDTO;
 import com.BackEnd.service.CartService;
 import com.BackEnd.dto.CartDTO;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/cart")
+@RequestMapping("/app/cart")
 @RequiredArgsConstructor
 public class CartController {
     private final CartService cartService;
@@ -31,18 +32,30 @@ public class CartController {
     }
     //done. create/get cart
     @PostMapping("/active")
-    public ResponseEntity<CartDTO> getOrCreateCart(@RequestParam String userName) {
-        CartDTO cartDTO = cartService.getOrCreateActiveCartDTO(userName);
-        return ResponseEntity.ok(cartDTO);
+    public ResponseEntity<CartBasicInfoDTO> getOrCreateCart(@RequestParam String userName) {
+        try{
+            CartBasicInfoDTO dto = cartService.getOrCreateActiveCartDTO(userName);
+            return ResponseEntity.ok(dto);
+        }catch(RuntimeException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
     //done. add item to cart
     @PostMapping("/add")
-    public ResponseEntity<CartDTO> addItemToCart(@RequestBody AddToCartRequest addToCartRequest) {
+    public ResponseEntity<String> addItemToCart(@RequestBody AddToCartRequest addToCartRequest) {
         try {
-            CartDTO cartDTO = cartService.addItemToCart(addToCartRequest);
-            return ResponseEntity.ok(cartDTO);  // Trả về giỏ hàng sau khi thêm
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+             cartService.addItemToCart(addToCartRequest);
+            return ResponseEntity.ok("Add product successfully");
+
+        }catch(IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    "Invalid quantity " + e.getMessage());
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    "Server error " + e.getMessage());
         }
     }
 

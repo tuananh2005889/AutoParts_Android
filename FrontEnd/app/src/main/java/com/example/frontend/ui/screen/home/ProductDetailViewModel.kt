@@ -24,9 +24,9 @@ data class ProductDetailUiState(
 
 @HiltViewModel
 class ProductDetailViewModel @Inject constructor(
-    private val repository: ProductRepository,
+    private val productRepo: ProductRepository,
     private val authManager: AuthManager,
-    private val cartRepository: CartRepository,
+    private val cartRepo: CartRepository,
 ) : ViewModel(){
 
     private val _productDetailState = mutableStateOf<ProductDetailUiState>(ProductDetailUiState())
@@ -51,7 +51,7 @@ class ProductDetailViewModel @Inject constructor(
     fun getProductById(productId: Long){
         viewModelScope.launch{
           _productDetailState.value = ProductDetailUiState()
-            when(val result = repository.getProductById(productId)){
+            when(val result = productRepo.getProductById(productId)){
                 is ApiResponse.Success -> {
                     _productDetailState.value = ProductDetailUiState(product = result.data, isLoading = false)
                 }
@@ -68,7 +68,7 @@ class ProductDetailViewModel @Inject constructor(
 
      fun addToCart(){
         viewModelScope.launch {
-            cartRepository.addProductToCart(authManager.getCartIdOnce()!!.toLong(),
+            cartRepo.addProductToCart(authManager.getCartIdOnce()!!.toLong(),
                 productDetailState.value.product!!.productId.toLong(), quantity.value)
         }
     }

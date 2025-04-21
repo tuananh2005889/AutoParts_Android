@@ -20,7 +20,7 @@ fun CartScreen(
 
     val cart by cartViewModel.cart
 
-    Text(text = "${cart?.status}")
+    Text(text = "${cart?.cartId}")
    }
 
 

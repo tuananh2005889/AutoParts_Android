@@ -1,5 +1,6 @@
 package com.BackEnd.utils;
 
+import com.BackEnd.dto.CartBasicInfoDTO;
 import com.BackEnd.dto.CartDTO;
 import com.BackEnd.dto.CartItemDTO;
 import com.BackEnd.model.Cart;
@@ -28,6 +29,11 @@ public class DTOConverter {
                 cartItemDTOs,
                 cart.getStatus().name()
         );
+    }
+    public static CartBasicInfoDTO toCartBasicInfoDTO(Cart cart) {
+        Long cartId = cart.getCartId();
+        String status = cart.getStatus().name();
+        return new CartBasicInfoDTO(cartId, status);
     }
 
 

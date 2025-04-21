@@ -1,6 +1,7 @@
 package com.example.frontend.data.repository
 
 import com.example.frontend.data.dto.AddToCartRequest
+import com.example.frontend.data.dto.CartBasicInfoDTO
 import com.example.frontend.data.dto.CartDTO
 import com.example.frontend.data.model.Cart
 import com.example.frontend.data.remote.ApiResponse
@@ -10,17 +11,23 @@ import javax.inject.Inject
 
 class CartRepository @Inject constructor(private val cartApiService: CartApiService){
 
-   suspend fun getOrCreateCart(username: String): ApiResponse<Cart> {
-       try {
+   suspend fun getOrCreateCart(username: String): ApiResponse<CartBasicInfoDTO> {
+       return try {
            val response = cartApiService.getOrCreateCart(username)
+
            if (response.isSuccessful) {
-               val cart = response.body() ?: Cart(0, 0, emptyList(), "ACTIVE")
-               return ApiResponse.Success(cart)
+               val body = response.body()
+               if (body != null) {
+                   ApiResponse.Success(body)
+               } else {
+                   ApiResponse.Error("Empty response body", response.code())
+               }
            } else {
-               return ApiResponse.Error("Failed to fetch cart", response.code())
+               val errorMsg = response.errorBody()?.string() ?: "Failed to fetch cart"
+               ApiResponse.Error(errorMsg, response.code())
            }
        } catch (e: Exception) {
-           return ApiResponse.Error(e.message ?: "Unknown error")
+           ApiResponse.Error(e.localizedMessage ?: "Unknown error")
        }
 
    }

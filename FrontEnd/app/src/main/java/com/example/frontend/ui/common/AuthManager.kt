@@ -39,6 +39,7 @@ class AuthManager @Inject constructor(@ApplicationContext private val context: C
     suspend fun saveLoginStatus(isLoggedIn: Boolean, userName: String?,  cartId: String? = null) {
         context.dataStore.edit { preferences ->
             preferences[AuthPreferencesKeys.isLoggedIn] = isLoggedIn
+
             userName?.let {
                 preferences[AuthPreferencesKeys.userName] = it
             }

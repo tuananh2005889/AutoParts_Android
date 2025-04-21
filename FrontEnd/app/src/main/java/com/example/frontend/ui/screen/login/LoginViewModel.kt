@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.viewModelScope
 import com.example.frontend.data.model.LoginData
 import com.example.frontend.data.remote.ApiResponse
+import com.example.frontend.data.repository.CartRepository
 import com.example.frontend.ui.common.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -24,9 +25,12 @@ data class LoginTextFieldUiState(
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val repository: LoginRepository,
-    private val authManager: AuthManager
+    private val loginRepo: LoginRepository,
+    private val authManager: AuthManager,
+    private val cartRepo: CartRepository,
     ): ViewModel() {
+
+
 
     private val _loginState =  mutableStateOf<LoginUiState>(LoginUiState())
     val loginState: State<LoginUiState> = _loginState
@@ -40,11 +44,6 @@ class LoginViewModel @Inject constructor(
     fun onPasswordChange(password: String){
         _loginTextFieldState.value = _loginTextFieldState.value.copy(password = password)
     }
-
-    fun getUserName(): String? {
-        return _loginTextFieldState.value.userName
-    }
-
 
     fun setLoginTextField(userName: String, password: String){
         _loginTextFieldState.value = _loginTextFieldState.value.copy(userName = userName, password = password)
@@ -71,7 +70,7 @@ class LoginViewModel @Inject constructor(
         _loginState.value = LoginUiState(isLoading = true)
 
         viewModelScope.launch{
-         val result = repository.login(user)
+         val result = loginRepo.login(user)
             _loginState.value = when(result){
                 is ApiResponse.Success -> {
                     authManager.saveLoginStatus(true, user.userName)
