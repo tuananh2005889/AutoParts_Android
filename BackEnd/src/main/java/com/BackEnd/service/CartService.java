@@ -2,6 +2,7 @@ package com.BackEnd.service;
 
 
 import com.BackEnd.dto.AddToCartRequest;
+import com.BackEnd.dto.CartBasicInfoDTO;
 import com.BackEnd.dto.CartItemDTO;
 import com.BackEnd.model.Product;
 import com.BackEnd.repository.CartItemRepository;
@@ -52,10 +53,10 @@ public class CartService {
 //    }
 // ->
 //      gop 2 method tren thanh 1, giup controller, frontend do rac roi
-    public CartDTO getOrCreateActiveCartDTO(String userName){
+    public CartBasicInfoDTO getOrCreateActiveCartDTO(String userName){
         User user = userRepo.findByUserName(userName)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        Cart initalCart = cartRepo.findByUserAndStatus(user, Cart.CartStatus.ACTIVE)
+    Cart initalCart = cartRepo.findCartByUserAndStatus(user, Cart.CartStatus.ACTIVE)
                 .orElse(null);
         if(initalCart == null){
             initalCart = new Cart();
@@ -63,7 +64,7 @@ public class CartService {
             initalCart.setStatus(Cart.CartStatus.ACTIVE);
            cartRepo.save(initalCart);
         }
-        return DTOConverter.toCartDTO(initalCart);
+        return DTOConverter.toCartBasicInfoDTO(initalCart);
     }
 
     // cartId -> getCart -> getItems in Cart
@@ -85,7 +86,7 @@ public class CartService {
         cartRepo.save(cart);  // Lưu lại trạng thái mới của giỏ hàng
     }
 
-    public CartDTO addItemToCart(AddToCartRequest addToCartRequest){
+    public void addItemToCart(AddToCartRequest addToCartRequest){
         if (addToCartRequest.getQuantity() <= 0) {
             throw new IllegalArgumentException("Quantity must be greater than 0");
         }
@@ -111,7 +112,6 @@ public class CartService {
         }
 
         cartRepo.save(cart);
-        return DTOConverter.toCartDTO(cart);
     }
 
 

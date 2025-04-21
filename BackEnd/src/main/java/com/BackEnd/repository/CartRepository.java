@@ -10,7 +10,7 @@ import java.util.Optional;
 // Optional --> tìm tối đa 1 bảng ghi, nếu không có thì trả về rỗng
 @Repository
 public interface CartRepository extends JpaRepository<Cart, Long> {
-    Optional<Cart> findByUserAndStatus(User user, Cart.CartStatus status);
+    Optional<Cart> findCartByUserAndStatus(User user, Cart.CartStatus status);
 //    Optional<Cart> findByCartId
 
 }

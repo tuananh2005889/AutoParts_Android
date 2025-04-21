@@ -49,3 +49,17 @@
 cd backend
 ./mvnw spring-boot:run
 
+
+
+## API cho Web admin và Android App
+
+### Web
+/web/product/all
+/web/product/add
+...
+### App
+/app/product/all
+/app/cart/active/
+/app/cart/add
+...
+
