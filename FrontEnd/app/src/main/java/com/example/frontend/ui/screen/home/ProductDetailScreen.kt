@@ -43,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.frontend.ui.common.CloudinaryImage
+import com.example.frontend.ui.screen.cart.CartViewModel
 
 @Composable
 fun DetailProductScreen(
@@ -50,6 +51,7 @@ fun DetailProductScreen(
     innerPadding: PaddingValues ? = null,
     productDetailViewModel: ProductDetailViewModel = hiltViewModel(),
     clickBack: () -> Unit,
+
 ){
     LaunchedEffect(productId) {
         productDetailViewModel.getProductById(productId)
@@ -406,7 +408,7 @@ fun DetailProductScreen(
 
                                     }
                                     Button (
-                                        onClick = {},
+                                        onClick = {productDetailViewModel.addToCart()},
                                         colors = ButtonDefaults.buttonColors(
                                             contentColor = MaterialTheme.colorScheme.error,
                                             backgroundColor = MaterialTheme.colorScheme.surface,

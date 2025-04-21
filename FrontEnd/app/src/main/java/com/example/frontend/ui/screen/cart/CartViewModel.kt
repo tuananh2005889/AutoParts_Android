@@ -9,7 +9,6 @@ import com.example.frontend.ui.common.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.*
-import coil.util.CoilUtils.result
 import com.example.frontend.data.remote.ApiResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,14 +29,14 @@ class CartViewModel @Inject constructor(
     private val _userName = MutableStateFlow<String?>(null)
     val userName: StateFlow<String?> = _userName
 
+
+
     init {
         viewModelScope.launch {
             _userName.value = authManager.getUserNameOnce()
 
             _userName.value?.let { name ->
-                // Gọi API lấy cart
                 val cart = cartRepository.getOrCreateCart(name)
-                // xử lý cart...
                 when(cart){
                     is ApiResponse.Success -> {
                         _cart.value = cart.data
@@ -51,6 +50,7 @@ class CartViewModel @Inject constructor(
             }
         }
     }
+
 
     fun loadOrCreateCart() {
         viewModelScope.launch {

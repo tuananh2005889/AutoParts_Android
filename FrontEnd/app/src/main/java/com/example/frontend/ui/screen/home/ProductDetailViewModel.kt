@@ -10,6 +10,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.runtime.*
 import com.example.frontend.data.model.ProductData
+import com.example.frontend.data.repository.CartRepository
+import com.example.frontend.ui.common.AuthManager
 
 data class ProductDetailUiState(
     val isLoading: Boolean = true,
@@ -21,7 +23,12 @@ data class ProductDetailUiState(
 )
 
 @HiltViewModel
-class ProductDetailViewModel @Inject constructor (private val repository: ProductRepository) : ViewModel(){
+class ProductDetailViewModel @Inject constructor(
+    private val repository: ProductRepository,
+    private val authManager: AuthManager,
+    private val cartRepository: CartRepository,
+) : ViewModel(){
+
     private val _productDetailState = mutableStateOf<ProductDetailUiState>(ProductDetailUiState())
     val productDetailState: State<ProductDetailUiState>  = _productDetailState
 
@@ -56,6 +63,13 @@ class ProductDetailViewModel @Inject constructor (private val repository: Produc
                     _productDetailState.value = ProductDetailUiState()
                 }
             }
+        }
+    }
+
+     fun addToCart(){
+        viewModelScope.launch {
+            cartRepository.addProductToCart(authManager.getCartIdOnce()!!.toLong(),
+                productDetailState.value.product!!.productId.toLong(), quantity.value)
         }
     }
 

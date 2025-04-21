@@ -20,6 +20,7 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "au
 object AuthPreferencesKeys {
     val isLoggedIn = booleanPreferencesKey("is_logged_in")
     val userName = stringPreferencesKey("user_name")
+    val cartId = stringPreferencesKey("cart_id")
 }
 
 @Singleton
@@ -32,12 +33,17 @@ class AuthManager @Inject constructor(@ApplicationContext private val context: C
         .map { preferences ->
             preferences[AuthPreferencesKeys.userName]
         }
+    val cartIdFlow: Flow<String?> = context.dataStore.data
+        .map { preferences -> preferences[AuthPreferencesKeys.cartId] }
 
-    suspend fun saveLoginStatus(isLoggedIn: Boolean, userName: String?) {
+    suspend fun saveLoginStatus(isLoggedIn: Boolean, userName: String?,  cartId: String? = null) {
         context.dataStore.edit { preferences ->
             preferences[AuthPreferencesKeys.isLoggedIn] = isLoggedIn
-            if (userName != null) {
-                preferences[AuthPreferencesKeys.userName] = userName
+            userName?.let {
+                preferences[AuthPreferencesKeys.userName] = it
+            }
+            cartId?.let {
+                preferences[AuthPreferencesKeys.cartId] = it
             }
         }
     }
@@ -46,6 +52,7 @@ suspend fun clearLoginStatus() {
     context.dataStore.edit { preferences ->
         preferences.remove(AuthPreferencesKeys.isLoggedIn)
         preferences.remove(AuthPreferencesKeys.userName)
+        preferences.remove(AuthPreferencesKeys.cartId)
     }
 }
 
@@ -55,5 +62,15 @@ suspend fun isLoggedInOnce(): Boolean {
 
     suspend fun getUserNameOnce(): String? {
         return context.dataStore.data.first()[AuthPreferencesKeys.userName]
+    }
+
+//    cart
+    suspend fun getCartIdOnce(): String? {
+        return context.dataStore.data.first()[AuthPreferencesKeys.cartId]
+    }
+    suspend fun saveCartId(cartId: String) {
+        context.dataStore.edit { preferences ->
+            preferences[AuthPreferencesKeys.cartId] = cartId
+        }
     }
 }
