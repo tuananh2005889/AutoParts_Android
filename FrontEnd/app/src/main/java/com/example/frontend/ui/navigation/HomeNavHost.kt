@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.frontend.ui.common.AuthPreferencesKeys.userName
 import com.example.frontend.ui.screen.cart.CartScreen
+import com.example.frontend.ui.screen.cart.CartViewModel
 import com.example.frontend.ui.screen.home.DetailProductScreen
 import com.example.frontend.ui.screen.home.HomeScreenContent
 import com.example.frontend.ui.screen.login.LoginViewModel
@@ -25,6 +26,7 @@ fun BottomNavHost(
     bottomNavController : NavHostController,
     rootNavController: NavController,
     innerPadding: PaddingValues,
+    cartViewModel: CartViewModel = hiltViewModel()
     )
 {
     NavHost(
@@ -48,8 +50,10 @@ fun BottomNavHost(
             val productIdLong = productId.toLongOrNull() ?: return@composable
             DetailProductScreen(
                 productId =productIdLong , innerPadding = innerPadding,
-                clickBack = {bottomNavController.popBackStack()}
-                )
+                clickBack = {bottomNavController.popBackStack()},
+            )
+
+
         }
         composable(Route.Profile.route) {
             ProfileScreen(

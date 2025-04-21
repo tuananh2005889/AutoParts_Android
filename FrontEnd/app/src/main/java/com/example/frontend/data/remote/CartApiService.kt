@@ -1,6 +1,8 @@
 package com.example.frontend.data.remote
 
 import com.example.frontend.data.dto.AddToCartRequest
+import com.example.frontend.data.dto.CartBasicInfoDTO
+import com.example.frontend.data.dto.CartDTO
 import com.example.frontend.data.dto.CartItemDTO
 import com.example.frontend.data.model.Cart
 import com.example.frontend.data.model.CartItem
@@ -13,16 +15,16 @@ import retrofit2.http.Query
 
 
 interface CartApiService {
-    @GET("/cart/items")
+    @GET("/app/cart/items")
     suspend fun getCartItems(
         @Query("cartId") cartId: Long
     ): Response<List<CartItemDTO>>
 
-    @POST("/cart/add")
-    suspend fun addItemToCart(
+    @POST("/app/cart/add")
+    suspend fun addProductToCart(
         @Body addToCartRequest: AddToCartRequest
-    ): Response<Cart>
+    ): Response<String>
 
-    @POST("/cart/active")
-    suspend fun getOrCreateCart(@Query("userName") userName: String): Response<Cart>
+    @POST("/app/cart/active")
+    suspend fun getOrCreateCart(@Query("userName") userName: String): Response<CartBasicInfoDTO>
 }

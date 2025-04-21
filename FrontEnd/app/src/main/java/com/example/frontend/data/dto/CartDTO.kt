@@ -1,7 +1,7 @@
 package com.example.frontend.data.dto
 
 data class CartDTO(
-    val userName: String,
-    val productId: Long,
-    val quantity: Int
+    val cartId: Long,
+    val cartItemDTO: List<CartItemDTO>,
+    val status: String
 )
