@@ -87,6 +87,7 @@ public class CartService {
     }
 
     public CartItemDTO addItemToCart(AddToCartRequest addToCartRequest){
+        // check quantity request
         if (addToCartRequest.getQuantity() <= 0) {
             throw new IllegalArgumentException("Quantity must be greater than 0");
         }
@@ -96,6 +97,7 @@ public class CartService {
 
         Product product = productRepo.findByProductId(addToCartRequest.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
+
 
         Optional<CartItem> existingCartItem = cart.getCartItems().stream()
                 .filter(
@@ -117,15 +119,9 @@ public class CartService {
     }
 
 
-
-    // API kiểm tra trạng thái giỏ hàng của người dùng
     public Cart getCartStatus(Long cartId) {
         return cartRepo.findById(cartId).orElseThrow(() -> new RuntimeException("Cart not found"));
     }
-
-
-
-
 
 
 

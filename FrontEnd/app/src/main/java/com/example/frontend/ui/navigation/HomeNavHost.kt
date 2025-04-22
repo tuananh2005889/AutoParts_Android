@@ -20,7 +20,7 @@ import com.example.frontend.ui.screen.profile.ProfileViewModel
 import kotlin.math.log
 
 @Composable
-fun BottomNavHost(
+fun HomeNavHost(
     loginViewModel: LoginViewModel,
     profileViewModel: ProfileViewModel = hiltViewModel(),
     bottomNavController : NavHostController,
