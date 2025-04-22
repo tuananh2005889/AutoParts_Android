@@ -1,10 +1,11 @@
 package com.example.frontend.ui.screen.home
 
+import androidx.compose.foundation.layout.Box
+
 import androidx.compose.foundation.lazy.items
 import com.example.frontend.R
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -14,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -35,15 +35,15 @@ import androidx.compose.ui.Modifier
 import  androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.frontend.ui.common.CloudinaryImage
-import com.example.frontend.ui.screen.cart.CartViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun DetailProductScreen(
@@ -58,8 +58,21 @@ fun DetailProductScreen(
     }
     val state by  productDetailViewModel.productDetailState
 
+    var isVisible by remember {mutableStateOf(false)}
+    val notificationDuration = 2000L
 
-    Column(modifier = Modifier.fillMaxSize()){
+    LaunchedEffect(isVisible){
+        if(isVisible){
+           delay(2000L)
+            isVisible = false
+        }
+    }
+
+
+
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ){
         Button(
             modifier = Modifier.size(width = 70.dp, height = 50.dp),
             colors = ButtonDefaults.buttonColors(
@@ -353,6 +366,10 @@ fun DetailProductScreen(
                                 }
                             }
 
+                        if(isVisible){
+                            Notification(modifier = Modifier.align(Alignment.TopCenter))
+                        }
+
                         // Add to cart and +/- quantity
                         Row(
                             modifier = Modifier
@@ -408,7 +425,8 @@ fun DetailProductScreen(
 
                                     }
                                     Button (
-                                        onClick = {productDetailViewModel.addToCart()},
+                                        onClick = {productDetailViewModel.addToCart()
+                                                  isVisible = true },
                                         colors = ButtonDefaults.buttonColors(
                                             contentColor = MaterialTheme.colorScheme.error,
                                             backgroundColor = MaterialTheme.colorScheme.surface,
@@ -432,4 +450,26 @@ fun DetailProductScreen(
     }
     }
 
+@Composable
+fun Notification(modifier: Modifier = Modifier){
+    Box(
+        modifier = Modifier
+            .padding(16.dp) // Khoảng cách giữa thông báo và các thành phần khác
+    ) {
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            ),
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                modifier = Modifier.padding(16.dp),
+                text = "Added to cart successfully!",
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
 
