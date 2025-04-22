@@ -7,6 +7,7 @@ import com.example.frontend.data.dto.CartItemDTO
 import com.example.frontend.data.model.Cart
 import com.example.frontend.data.model.CartItem
 import com.example.frontend.ui.common.AuthPreferencesKeys.userName
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -23,8 +24,8 @@ interface CartApiService {
     @POST("/app/cart/add")
     suspend fun addProductToCart(
         @Body addToCartRequest: AddToCartRequest
-    ): Response<String>
+    ): Response<CartItemDTO>
 
     @POST("/app/cart/active")
-    suspend fun getOrCreateCart(@Query("userName") userName: String): Response<CartBasicInfoDTO>
+    suspend fun getOrCreateActiveCart(@Query("userName") userName: String): Response<CartBasicInfoDTO>
 }

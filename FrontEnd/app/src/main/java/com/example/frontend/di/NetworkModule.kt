@@ -17,9 +17,7 @@ import kotlin.jvm.java
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-//    val gson = GsonBuilder()
-//        .setLenient()
-//        .create()
+val gson = GsonBuilder().setLenient().create()
     @Provides
     @Singleton
     fun provideRetrofit(): Retrofit {
@@ -27,7 +25,7 @@ object NetworkModule {
             .baseUrl("http://10.0.2.2:8080/")
             // Json.asConverterFactory("application/json".toMediaType())
             .addConverterFactory(ScalarsConverterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
 

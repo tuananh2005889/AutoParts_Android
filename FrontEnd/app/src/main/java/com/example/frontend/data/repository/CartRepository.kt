@@ -1,19 +1,22 @@
 package com.example.frontend.data.repository
 
+import android.util.Log
 import com.example.frontend.data.dto.AddToCartRequest
 import com.example.frontend.data.dto.CartBasicInfoDTO
 import com.example.frontend.data.dto.CartDTO
+import com.example.frontend.data.dto.CartItemDTO
 import com.example.frontend.data.model.Cart
 import com.example.frontend.data.remote.ApiResponse
 import com.example.frontend.data.remote.CartApiService
+import com.google.gson.Gson
 import javax.inject.Inject
 
 
 class CartRepository @Inject constructor(private val cartApiService: CartApiService){
 
-   suspend fun getOrCreateCart(username: String): ApiResponse<CartBasicInfoDTO> {
+   suspend fun getOrCreateActiveCart(username: String): ApiResponse<CartBasicInfoDTO> {
        return try {
-           val response = cartApiService.getOrCreateCart(username)
+           val response = cartApiService.getOrCreateActiveCart(username)
 
            if (response.isSuccessful) {
                val body = response.body()
@@ -32,23 +35,25 @@ class CartRepository @Inject constructor(private val cartApiService: CartApiServ
 
    }
 
-    suspend fun addProductToCart(cartId: Long, productId: Long, quantity: Int): ApiResponse<String> {
+    suspend fun addProductToCart(cartId: Long, productId: Long, quantity: Int): ApiResponse<CartItemDTO> {
+        Log.d("HomeViewModel", "addProductToCart called")
         try {
             val addToCartRequest = AddToCartRequest(cartId, productId, quantity)
             val response = cartApiService.addProductToCart(addToCartRequest)
 
             if (response.isSuccessful) {
-                return ApiResponse.Success(response.body() ?: "Product added to cart successfully")
+                Log.d("HomeViewModel", "API call successful")
+                return ApiResponse.Success(response.body() ?: throw Exception("Empty response body"))
             } else {
-                return ApiResponse.Error(
-                    message = response.errorBody()?.string() ?: "Unknown error",
-                    statusCode = response.code()
-                )
+                val errorMessage = response.errorBody()?.string() ?: "Unknown error"
+                Log.e("API Error", "Error: $errorMessage")
+                return ApiResponse.Error("Error: $errorMessage", response.code())
             }
-
         } catch (e: Exception) {
-            return ApiResponse.Error(e.message ?: "Error occurred")
+            Log.e("API Exception", "Exception: ${e.message}")
+            return ApiResponse.Error("Exception: ${e.message ?: "Unknown error"}")
         }
     }
+
 
 }
