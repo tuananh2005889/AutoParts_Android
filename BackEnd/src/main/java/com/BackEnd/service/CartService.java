@@ -86,7 +86,7 @@ public class CartService {
         cartRepo.save(cart);  // Lưu lại trạng thái mới của giỏ hàng
     }
 
-    public void addItemToCart(AddToCartRequest addToCartRequest){
+    public CartItemDTO addItemToCart(AddToCartRequest addToCartRequest){
         if (addToCartRequest.getQuantity() <= 0) {
             throw new IllegalArgumentException("Quantity must be greater than 0");
         }
@@ -104,6 +104,7 @@ public class CartService {
         if(existingCartItem.isPresent()){
             existingCartItem.get().setQuantity(existingCartItem.get().getQuantity() + addToCartRequest.getQuantity());
             cartItemRepo.save(existingCartItem.get());
+
         }else{
             CartItem cartItem = new CartItem(product, addToCartRequest.getQuantity(), cart);
             cartItemRepo.save(cartItem);
@@ -112,93 +113,16 @@ public class CartService {
         }
 
         cartRepo.save(cart);
+        return DTOConverter.toCartItemDTO(existingCartItem.get());
     }
 
 
-
-//    public Cart getActiveCart(String userName){
-//      User user = userRepo.findByUserName(userName)
-//              .orElseThrow(() -> new RuntimeException("User not found"));
-//      Cart cart = cartRepo.findByUserAndStatus(user, Cart.CartStatus.ACTIVE)
-//              .orElseThrow(()->new RuntimeException("Cart not found"));
-//        return cart;
-//    }
-//
-//
-//
-//    public Cart createActiveCart(String userName){
-//        User user = userRepo.findByUserName(userName)
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-//        Cart newCart = new Cart();
-//        newCart.setUser(user);
-//        newCart.setStatus(Cart.CartStatus.ACTIVE);
-//
-//        cartRepo.save(newCart);
-//
-//        return  newCart;
-//    }
-
-   //tim hieu.
-//    public Cart getActiveCartIfDontHaveWeCreate (String username) {
-//        User user = userRepo.findByUserName(username)
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-//
-//        return cartRepo.findByUserAndStatus(user, Cart.CartStatus.ACTIVE)
-//                .orElseGet(() -> {
-//                    Cart newCart = new Cart();
-//                    newCart.setUser(user);
-//                    newCart.setStatus(Cart.CartStatus.ACTIVE);
-//                    return cartRepo.save(newCart);
-//                });
-//    }
-    //tim.hieu
-//    public Cart createCart(String userName) {
-//        User user = userRepo.findByUserName(userName)
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-//
-//        Cart existingCart = cartRepo.findByUserAndStatus(user, Cart.CartStatus.ACTIVE)
-//                .orElse(null);
-//
-//        if (existingCart != null) {
-//            return existingCart;
-//        } else {
-//            Cart newCart = new Cart();
-//            newCart.setUser(user);
-//            return cartRepo.save(newCart);
-//        }
-//    }
 
     // API kiểm tra trạng thái giỏ hàng của người dùng
     public Cart getCartStatus(Long cartId) {
         return cartRepo.findById(cartId).orElseThrow(() -> new RuntimeException("Cart not found"));
     }
 
-//    public Cart addItemToCart(AddToCartRequest request) {
-//        User user = userRepo.findByUserName(request.getUserName())
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-//
-//        Product product = productRepo.findByProductId(request.getProductId())
-//                .orElseThrow(() -> new RuntimeException("Product not found"));
-//
-//        Cart cart = getActiveCartIfDontHaveWeCreate(user.getUserName());
-//
-//        Optional<CartItem> existingItemOpt = cart.getCartItems().stream()
-//                .filter(item -> item.getProduct().getProductId().equals(product.getProductId()))
-//                .findFirst();
-//
-//        if (existingItemOpt.isPresent()) {
-//            CartItem existingItem = existingItemOpt.get();
-//            existingItem.setQuantity(existingItem.getQuantity() + request.getQuantity());
-//        } else {
-//            CartItem newItem = new CartItem();
-//            newItem.setCart(cart);
-//            newItem.setProduct(product);
-//            newItem.setQuantity(request.getQuantity());
-//            cart.getCartItems().add(newItem);
-//        }
-//
-//        return cartRepo.save(cart);
-//    }
 
 
 

@@ -26,7 +26,8 @@ fun BottomNavHost(
     bottomNavController : NavHostController,
     rootNavController: NavController,
     innerPadding: PaddingValues,
-    cartViewModel: CartViewModel = hiltViewModel()
+    cartViewModel: CartViewModel = hiltViewModel(),
+    onShowSnackBar: (String) -> Unit,
     )
 {
     NavHost(
@@ -39,6 +40,7 @@ fun BottomNavHost(
                 onProductClick = { id ->
                     bottomNavController.navigate(Route.DetailProduct.createRouteById(id))
                 },
+                onShowSnackBar = onShowSnackBar
 
             )
         }

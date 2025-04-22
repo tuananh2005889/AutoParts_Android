@@ -1,6 +1,8 @@
 package com.example.frontend.ui.screen.home
 
 import android.R.attr.onClick
+import android.R.id.message
+import android.util.Log
 import androidx.compose.foundation.lazy.grid.*
 import com.example.frontend.R
 import androidx.compose.foundation.background
@@ -25,11 +27,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.frontend.data.dto.CartItemDTO
 import com.example.frontend.data.model.ProductData
 import com.example.frontend.ui.common.CloudinaryImage
 import com.example.frontend.ui.navigation.BottomNavBar
 import com.example.frontend.ui.navigation.BottomNavHost
 import com.example.frontend.ui.screen.login.LoginViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,18 +43,29 @@ fun HomeScreen(
     loginViewModel: LoginViewModel
 ) {
     val bottomNavController = rememberNavController()
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
     Scaffold(
         modifier = modifier.safeDrawingPadding(),// or .padding(WindowInsets.systemBars.asPaddingValues())
-        containerColor = Color.White,
         bottomBar = {
             BottomNavBar(navController = bottomNavController)
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+
     ) { innerPadding ->
         BottomNavHost(
             loginViewModel = loginViewModel,
             bottomNavController =  bottomNavController,
             rootNavController = rootNavController,
             innerPadding =  innerPadding,
+            onShowSnackBar = { message ->
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar(
+                        message
+                    )
+                }
+            }
             )
     }
 }
@@ -60,7 +75,8 @@ fun HomeScreenContent(
     viewModel: HomeViewModel = hiltViewModel(),
     innerPadding: PaddingValues,
     onProductClick: (Long) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onShowSnackBar: (String) -> Unit,
 ){
     val homeUiState by viewModel.homeUiState.collectAsState()
     var productList by remember { mutableStateOf<List<ProductData>>(emptyList()) }
@@ -90,6 +106,7 @@ fun HomeScreenContent(
                     products,
                     onProductClick = onProductClick,
                     homeViewModel = viewModel,
+                    onShowSnackBar = onShowSnackBar,
                     )
             }
         }
@@ -103,57 +120,18 @@ fun HomeScreenContent(
     }
 }
 
-@Composable
-fun SearchBar(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    ){
-    Row(
-        modifier = modifier.padding(horizontal = dimensionResource(R.dimen.padding_small))
-    ){
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            placeholder = {
-                Text(stringResource(R.string.placeholder_search)) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = null,
-                )
-            },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.surfaceDim,
-                unfocusedBorderColor = MaterialTheme.colorScheme.onSurface,
-                cursorColor = MaterialTheme.colorScheme.onSurface,
-            ),
-        )
-    }
-}
 
-@Composable
-fun CategoryChip(label: String) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFFFF7043))
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = label, color = Color.White, fontSize = 14.sp)
-    }
-}
+
+
 
 @Composable
 fun ProductGrid(
     products: List<ProductData>,
     onProductClick: (Long) -> Unit,
     homeViewModel: HomeViewModel,
+    onShowSnackBar: (String) -> Unit,
     ) {
+    val coroutineScope = rememberCoroutineScope()
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(8.dp),
@@ -164,8 +142,19 @@ fun ProductGrid(
         items(items = products) { product ->
             ProductCard(
                 product = product,
-                onClick = { onProductClick(product.productId)},
-                onAddToCartClick = {homeViewModel.addOneProductToCart(product.productId)}
+                onProductClick = { onProductClick(product.productId)},
+                onAddToCartClick = {
+                    coroutineScope.launch{
+                        val cartItemDTO =  homeViewModel.addOneProductToCart(product.productId)
+                        if(cartItemDTO != null){
+                            onShowSnackBar("Added ${cartItemDTO.quantity} ${cartItemDTO.productName} to cart")
+                            Log.d("CartDebug", "Added to cart: ${cartItemDTO.quantity} ${cartItemDTO.productName}")
+                        }else{
+                            onShowSnackBar("Failed to add product to cart.")
+                            Log.d("CartDebug", "Failed to add to cart: Product ID: ${product.productId}")
+                        }
+                    }
+                                   },
             )
         }
     }
@@ -173,13 +162,13 @@ fun ProductGrid(
 @Composable
 fun ProductCard(
     product: ProductData ,
-    onClick: () -> Unit,
+    onProductClick: () -> Unit,
     onAddToCartClick: ()->Unit,
 ){
     Card(
         modifier = Modifier
             .size(width = 150.dp, height = 270.dp)
-            .clickable(onClick =  onClick),
+            .clickable(onClick =  onProductClick),
 
         elevation =  CardDefaults.cardElevation(15.dp),
     ) {
@@ -242,12 +231,16 @@ fun ProductCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ){
 
+
                     OutlinedButton(
                         modifier = Modifier
                             .height(40.dp)
                             .width(75.dp)
                         ,
-                        onClick = {onAddToCartClick()}
+                        onClick = {
+                            onAddToCartClick()
+//                            onShowSnackBar("hello")
+                        }
                     ) {
                         Icon(
                             modifier = Modifier.size(30.dp),
@@ -268,5 +261,51 @@ fun ProductCard(
                 }
             }
         }
+    }
+}
+
+
+@Composable
+fun SearchBar(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+){
+    Row(
+        modifier = modifier.padding(horizontal = dimensionResource(R.dimen.padding_small))
+    ){
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            placeholder = {
+                Text(stringResource(R.string.placeholder_search)) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = null,
+                )
+            },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.surfaceDim,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurface,
+                cursorColor = MaterialTheme.colorScheme.onSurface,
+            ),
+        )
+    }
+}
+
+@Composable
+fun CategoryChip(label: String) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color(0xFFFF7043))
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = label, color = Color.White, fontSize = 14.sp)
     }
 }

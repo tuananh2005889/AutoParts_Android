@@ -35,7 +35,7 @@ class CartViewModel @Inject constructor(
             val userName = authManager.getUserNameOnce()
             Log.d("CartViewModel", "userName: $userName")
             if (userName != null) {
-                val response = cartRepo.getOrCreateCart(userName)
+                val response = cartRepo.getOrCreateActiveCart(userName)
                 if (response is ApiResponse.Success) {
                     _cart.value = response.data
                 }

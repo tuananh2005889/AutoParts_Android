@@ -1,15 +1,13 @@
 package com.BackEnd.controller;
 
 
-import com.BackEnd.dto.AddToCartRequest;
-import com.BackEnd.dto.CartBasicInfoDTO;
-import com.BackEnd.dto.CartItemDTO;
+import com.BackEnd.dto.*;
 import com.BackEnd.service.CartService;
-import com.BackEnd.dto.CartDTO;
 import com.BackEnd.model.Cart;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,7 +32,7 @@ public class CartController {
     }
     //done. create/get cart
     @PostMapping("/active")
-    public ResponseEntity<CartBasicInfoDTO> getOrCreateCart(@RequestParam String userName) {
+    public ResponseEntity<CartBasicInfoDTO> getOrCreateActiveCart(@RequestParam String userName) {
         try{
             CartBasicInfoDTO dto = cartService.getOrCreateActiveCartDTO(userName);
             return ResponseEntity.ok(dto);
@@ -46,21 +44,23 @@ public class CartController {
     }
     //done. add item to cart
     @PostMapping("/add")
-    public ResponseEntity<String> addItemToCart(@RequestBody AddToCartRequest addToCartRequest) {
+    public ResponseEntity<CartItemDTO> addItemToCart(@RequestBody AddToCartRequest addToCartRequest) {
         try {
-             cartService.addItemToCart(addToCartRequest);
-            return ResponseEntity.ok("Add product successfully");
+            // Call service to add product to cart
+            CartItemDTO dto = cartService.addItemToCart(addToCartRequest);
 
-        }catch(IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    "Invalid quantity " + e.getMessage());
-        }
-        catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    "Server error: " + e.getMessage());
+            // Return response with ItemDTO
+            return ResponseEntity.ok(dto);
+
+        } catch (IllegalArgumentException e) {
+            // Handle specific errors
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+
+        } catch (Exception e) {
+            // Handle other errors
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
 
 
 

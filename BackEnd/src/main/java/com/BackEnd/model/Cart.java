@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,14 +29,9 @@ public class Cart {
     Neu muon fetch cart ma khong load user(chi getUser luc can thiet), ta dung FetchType.Lazy
     */
 
-    //@ManyToOne(optional = false) if user is deleted, JPA throw exception
-    //@OnDelete(action = OnDeleteAction.CASCADE) automatically delete cart if user is deleted
-//    @ManyToOne
-//    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-//    private User user;
-
     @ManyToOne()
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @OnDelete(action = OnDeleteAction.CASCADE) //automatically delete cart if user is deleted
     private User user;
 
     /*

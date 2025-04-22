@@ -3,6 +3,7 @@ package com.example.frontend.ui.screen.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.frontend.data.dto.CartItemDTO
 import com.example.frontend.data.model.ProductData
 import com.example.frontend.data.remote.ApiResponse
 import com.example.frontend.data.repository.CartRepository
@@ -49,7 +50,7 @@ class HomeViewModel @Inject constructor(
 
     fun createCart(userName: String) {
         viewModelScope.launch {
-            when (val response = cartRepo.getOrCreateCart(userName)) {
+            when (val response = cartRepo.getOrCreateActiveCart(userName)) {
                 is ApiResponse.Success -> {
                     val cartId = response.data.cartId
                     Log.d("HomeViewModel-create cart", "Cart created with ID: $cartId")
@@ -66,13 +67,36 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    public fun addOneProductToCart(productId: Long){
-        viewModelScope.launch{
+    suspend fun addOneProductToCart(productId: Long
+    ): CartItemDTO? {
             val cartId: Long? = authManager.getCartIdOnce()
-            val result = cartRepo.addProductToCart(productId = productId, quantity = 1, cartId = cartId!! )
-            Log.d("HomeViewModel", "addOneProductToCart: $result")
-        }
+
+            if (cartId == null) {
+                Log.e("HomeViewModel", "Cannot get cartId to add product to cart")
+                return null
+            }
+
+            val result = cartRepo.addProductToCart(
+                productId = productId,
+                quantity = 1,
+                cartId = cartId
+            )
+
+            return when (result) {
+                is ApiResponse.Success -> {
+                    Log.d("HomeViewModel - addOneProductToCart", "Add to cart successfully: ${result.data}")
+                     result.data
+                }
+                is ApiResponse.Error -> {
+                    Log.e("HomeViewModel - addOneProductToCart", "Error when add item to cart: ${result.message}")
+                    null  
+                }
+
+                ApiResponse.Loading -> null
+            }
+
     }
+
 
     fun getAllProducts(){
         viewModelScope.launch {
