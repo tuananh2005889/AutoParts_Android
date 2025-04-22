@@ -30,13 +30,21 @@ class LoginViewModel @Inject constructor(
     private val cartRepo: CartRepository,
     ): ViewModel() {
 
-
-
     private val _loginState =  mutableStateOf<LoginUiState>(LoginUiState())
     val loginState: State<LoginUiState> = _loginState
 
     private val _loginTextFieldState = mutableStateOf<LoginTextFieldUiState>(LoginTextFieldUiState())
     val loginTextFieldState: State<LoginTextFieldUiState> = _loginTextFieldState
+
+    private val _isInitialCheckDone = mutableStateOf<Boolean>(false)
+    val isInitialCheckDone: State<Boolean> = _isInitialCheckDone
+
+    private val _isLoggedIn = mutableStateOf<Boolean>(false)
+    val isLoggedIn: State<Boolean> = _isLoggedIn
+
+    init {
+        checkInitialLoginStatus()
+    }
 
     fun onUserNameChange(userName: String){
         _loginTextFieldState.value = _loginTextFieldState.value.copy(userName = userName)
@@ -47,16 +55,6 @@ class LoginViewModel @Inject constructor(
 
     fun setLoginTextField(userName: String, password: String){
         _loginTextFieldState.value = _loginTextFieldState.value.copy(userName = userName, password = password)
-    }
-
-    private val _isInitialCheckDone = mutableStateOf<Boolean>(false)
-    val isInitialCheckDone: State<Boolean> = _isInitialCheckDone
-
-    private val _isLoggedIn = mutableStateOf<Boolean>(false)
-    val isLoggedIn: State<Boolean> = _isLoggedIn
-
-    init {
-        checkInitialLoginStatus()
     }
 
     private fun checkInitialLoginStatus() {
@@ -75,7 +73,7 @@ class LoginViewModel @Inject constructor(
                 is ApiResponse.Success -> {
                     authManager.saveLoginStatus(true, user.userName)
                     _isLoggedIn.value= true
-                    LoginUiState(loginSuccess = true, isLoading = false)
+                    LoginUiState(loginSuccess = true)
                 }
                 is ApiResponse.Error -> LoginUiState(errorMessage = result.message, isLoading = false)
                 is ApiResponse.Loading -> LoginUiState(isLoading = true)

@@ -1,5 +1,6 @@
 package com.example.frontend.ui.screen.home
 
+import android.R.attr.onClick
 import androidx.compose.foundation.lazy.grid.*
 import com.example.frontend.R
 import androidx.compose.foundation.background
@@ -58,7 +59,7 @@ fun HomeScreen(
 fun HomeScreenContent(
     viewModel: HomeViewModel = hiltViewModel(),
     innerPadding: PaddingValues,
-    onProductClick: (String) -> Unit,
+    onProductClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ){
     val homeUiState by viewModel.homeUiState.collectAsState()
@@ -87,7 +88,8 @@ fun HomeScreenContent(
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
                 ProductGrid(
                     products,
-                    onProductClick = onProductClick
+                    onProductClick = onProductClick,
+                    homeViewModel = viewModel,
                     )
             }
         }
@@ -149,7 +151,8 @@ fun CategoryChip(label: String) {
 @Composable
 fun ProductGrid(
     products: List<ProductData>,
-    onProductClick: (String) -> Unit
+    onProductClick: (Long) -> Unit,
+    homeViewModel: HomeViewModel,
     ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -161,7 +164,8 @@ fun ProductGrid(
         items(items = products) { product ->
             ProductCard(
                 product = product,
-                onClick = { onProductClick(product.productId)}
+                onClick = { onProductClick(product.productId)},
+                onAddToCartClick = {homeViewModel.addOneProductToCart(product.productId)}
             )
         }
     }
@@ -169,7 +173,8 @@ fun ProductGrid(
 @Composable
 fun ProductCard(
     product: ProductData ,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onAddToCartClick: ()->Unit,
 ){
     Card(
         modifier = Modifier
@@ -242,7 +247,7 @@ fun ProductCard(
                             .height(40.dp)
                             .width(75.dp)
                         ,
-                        onClick = {}
+                        onClick = {onAddToCartClick()}
                     ) {
                         Icon(
                             modifier = Modifier.size(30.dp),

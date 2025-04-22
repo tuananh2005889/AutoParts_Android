@@ -15,6 +15,7 @@ import com.example.frontend.ui.screen.login.LoginScreen
 import com.example.frontend.ui.screen.signup.SignupScreen
 import com.example.frontend.ui.screen.home.HomeScreen
 import com.example.frontend.ui.screen.login.LoginViewModel
+import com.google.firebase.firestore.auth.User
 
 @Composable
 fun AppNavHost(
@@ -23,6 +24,8 @@ fun AppNavHost(
 ) {
     val isLoggedIn by loginViewModel.isLoggedIn
     val isInitialCheckDone by loginViewModel.isInitialCheckDone
+
+
 
     NavHost(
         navController = navController,

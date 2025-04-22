@@ -16,7 +16,7 @@ sealed class Route(val route: String, val icon: ImageVector? = null) {
     object Profile : Route("profile", Icons.Default.Person)
 
     object DetailProduct: Route(route = "detailProduct/{productId}", null){
-        fun createRouteById(productId: String): String {
+        fun createRouteById(productId: Long): String {
             return "detailProduct/${productId}"
         }
     }
