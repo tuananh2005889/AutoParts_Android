@@ -25,7 +25,7 @@ class ProductRepository @Inject constructor(private val productApiService: Produ
         return try{
             val response = productApiService.getProductById(productId)
             if(response.isSuccessful){
-                val product = response.body() ?: ProductData("0")
+                val product = response.body() ?: ProductData(1L)
                 ApiResponse.Success(product)
             }else{
                 ApiResponse.Error("Failed to fetch product by id", response.code())

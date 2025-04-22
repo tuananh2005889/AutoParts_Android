@@ -11,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.frontend.data.repository.CartRepository
-import com.example.frontend.ui.screen.home.AddProductScreen
 
 @Composable
 fun CartScreen(

@@ -15,7 +15,6 @@ class LoginRepository @Inject constructor(private val loginApiService: LoginApiS
                 Log.d("LoginResponse", "Success: ${response.body()}")
                 val string = response.body() ?: "Login successful"
                 ApiResponse.Success(string)
-
             }else{
                ApiResponse.Error(response.errorBody().toString(), response.code())
             }

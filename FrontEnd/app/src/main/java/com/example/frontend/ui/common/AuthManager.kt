@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -20,7 +21,7 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "au
 object AuthPreferencesKeys {
     val isLoggedIn = booleanPreferencesKey("is_logged_in")
     val userName = stringPreferencesKey("user_name")
-    val cartId = stringPreferencesKey("cart_id")
+    val cartId = longPreferencesKey("cart_id")
 }
 
 @Singleton
@@ -33,10 +34,10 @@ class AuthManager @Inject constructor(@ApplicationContext private val context: C
         .map { preferences ->
             preferences[AuthPreferencesKeys.userName]
         }
-    val cartIdFlow: Flow<String?> = context.dataStore.data
-        .map { preferences -> preferences[AuthPreferencesKeys.cartId] }
+    val cartIdFlow: Flow<Long?> = context.dataStore.data
+        .map { preferences -> preferences[AuthPreferencesKeys.cartId]  }
 
-    suspend fun saveLoginStatus(isLoggedIn: Boolean, userName: String?,  cartId: String? = null) {
+    suspend fun saveLoginStatus(isLoggedIn: Boolean, userName: String?,  cartId: Long? = null) {
         context.dataStore.edit { preferences ->
             preferences[AuthPreferencesKeys.isLoggedIn] = isLoggedIn
 
@@ -65,11 +66,10 @@ suspend fun isLoggedInOnce(): Boolean {
         return context.dataStore.data.first()[AuthPreferencesKeys.userName]
     }
 
-//    cart
-    suspend fun getCartIdOnce(): String? {
+    suspend fun getCartIdOnce(): Long? {
         return context.dataStore.data.first()[AuthPreferencesKeys.cartId]
     }
-    suspend fun saveCartId(cartId: String) {
+    suspend fun saveCartId(cartId: Long) {
         context.dataStore.edit { preferences ->
             preferences[AuthPreferencesKeys.cartId] = cartId
         }

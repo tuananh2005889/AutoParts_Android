@@ -1,14 +1,12 @@
 package com.example.frontend.ui.screen.home
 
-import androidx.compose.runtime.collectAsState
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import coil.util.CoilUtils.result
 import com.example.frontend.data.model.ProductData
 import com.example.frontend.data.remote.ApiResponse
 import com.example.frontend.data.repository.CartRepository
 import com.example.frontend.data.repository.ProductRepository
-import com.example.frontend.ui.Controller.ProductController.Companion.getAllProducts
 import com.example.frontend.ui.common.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,29 +37,40 @@ class HomeViewModel @Inject constructor(
     }
 
 
-//
-//   private val _userName = MutableStateFlow<String?>(null)
-//    val userName: StateFlow<String?> = _userName
-
     private fun observeUserName(){
         viewModelScope.launch {
             val userName= authManager.getUserNameOnce()
-
-            if(userName != null){
+            Log.d("HomeViewModel-obserUserName", "userName: $userName")
+                if(userName != null){
                 createCart(userName)
+                }
             }
-            }
-
-
-
     }
 
     fun createCart(userName: String) {
         viewModelScope.launch {
-            val response = cartRepo.getOrCreateCart(userName)
-            if (response is ApiResponse.Success) {
-                authManager.saveLoginStatus(true, userName, response.data.cartId.toString())
+            when (val response = cartRepo.getOrCreateCart(userName)) {
+                is ApiResponse.Success -> {
+                    val cartId = response.data.cartId
+                    Log.d("HomeViewModel-create cart", "Cart created with ID: $cartId")
+                    if (cartId != null) {
+                        authManager.saveLoginStatus(true, userName, cartId)
+                    }
+                }
+                is ApiResponse.Error -> {
+                    Log.d("HomeViewModel-create cart", "Error creating cart: ${response.message}")
+                }
+                is ApiResponse.Loading -> {
+                }
             }
+        }
+    }
+
+    public fun addOneProductToCart(productId: Long){
+        viewModelScope.launch{
+            val cartId: Long? = authManager.getCartIdOnce()
+            val result = cartRepo.addProductToCart(productId = productId, quantity = 1, cartId = cartId!! )
+            Log.d("HomeViewModel", "addOneProductToCart: $result")
         }
     }
 

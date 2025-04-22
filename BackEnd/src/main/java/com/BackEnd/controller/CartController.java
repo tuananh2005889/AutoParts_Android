@@ -16,9 +16,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/app/cart")
-@RequiredArgsConstructor
 public class CartController {
     private final CartService cartService;
+    public CartController(CartService cartService) {
+        this.cartService = cartService;
+    }
 
     //done. fetch items tu cart
     @GetMapping("/items")
@@ -55,7 +57,7 @@ public class CartController {
         }
         catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    "Server error " + e.getMessage());
+                    "Server error: " + e.getMessage());
         }
     }
 

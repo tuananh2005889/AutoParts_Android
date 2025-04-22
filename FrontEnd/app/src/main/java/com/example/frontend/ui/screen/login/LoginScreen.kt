@@ -31,7 +31,6 @@ fun LoginScreen(
     onLoginSuccess: () -> Unit = {},
     onSignupClick: () -> Unit = {},
     loginViewModel: LoginViewModel,
-//    onLoginClick: ()->Unit
 ) {
     var userName = loginViewModel.loginTextFieldState.value.userName
     var password = loginViewModel.loginTextFieldState.value.password
