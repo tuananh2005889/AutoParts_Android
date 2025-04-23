@@ -1,9 +1,9 @@
 package com.example.frontend.data.repository
 
 import com.example.frontend.data.model.ProductData
-import javax.inject.Inject
 import com.example.frontend.data.remote.ApiResponse
 import com.example.frontend.data.remote.ProductApiService
+import javax.inject.Inject
 
 class ProductRepository @Inject constructor(private val productApiService: ProductApiService) {
 
@@ -32,6 +32,20 @@ class ProductRepository @Inject constructor(private val productApiService: Produ
             }
         }catch(e: Exception){
             ApiResponse.Error(e.message ?: "Unknown error")
+        }
+    }
+
+    suspend fun getImageUrls(productId: Long): ApiResponse<List<String>>{
+        return try{
+            val response = productApiService.getImageUrls(productId)
+            if(response.isSuccessful){
+                val imageUrls = response.body() ?: emptyList()
+                ApiResponse.Success(imageUrls)
+            }else{
+                ApiResponse.Error("Failed to fetch image urls", response.code());
+            }
+        }catch(e: Exception){
+           ApiResponse.Error(e.message ?: "Unknown error")
         }
     }
 }

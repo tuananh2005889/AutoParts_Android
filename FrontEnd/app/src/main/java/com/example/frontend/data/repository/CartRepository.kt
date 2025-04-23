@@ -3,12 +3,9 @@ package com.example.frontend.data.repository
 import android.util.Log
 import com.example.frontend.data.dto.AddToCartRequest
 import com.example.frontend.data.dto.CartBasicInfoDTO
-import com.example.frontend.data.dto.CartDTO
 import com.example.frontend.data.dto.CartItemDTO
-import com.example.frontend.data.model.Cart
 import com.example.frontend.data.remote.ApiResponse
 import com.example.frontend.data.remote.CartApiService
-import com.google.gson.Gson
 import javax.inject.Inject
 
 
@@ -53,6 +50,19 @@ class CartRepository @Inject constructor(private val cartApiService: CartApiServ
             Log.e("API Exception", "Exception: ${e.message}")
             return ApiResponse.Error("Exception: ${e.message ?: "Unknown error"}")
         }
+    }
+
+    suspend fun getCartItems(cartId: Long): ApiResponse<List<CartItemDTO>>{
+       return try{
+           val response = cartApiService.getCartItems(cartId)
+           if(response.isSuccessful){
+               ApiResponse.Success(response.body() ?: emptyList())
+           }else{
+               ApiResponse.Error("Failed to fetch cart items", response.code())
+           }
+       }catch(e: Exception){
+           ApiResponse.Error(e.message ?: "Unknown error")
+       }
     }
 
 

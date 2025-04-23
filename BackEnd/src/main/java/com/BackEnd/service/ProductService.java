@@ -6,6 +6,7 @@ import com.BackEnd.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +22,15 @@ public class ProductService {
 
     public List<Product> getAllProducts() {
         return productRepository.findAll();
+    }
+
+    public List<String> getImageUrls(Long productId){
+        List<String> imageUrls;
+        imageUrls = productRepository.findImageByProductId(productId)
+                .orElseThrow(() -> new RuntimeException("No image urls found " +
+                        "for product id " + productId));
+        return imageUrls;
+
     }
 
     public Optional<Product> getProductById(Long id) {

@@ -1,8 +1,10 @@
 package com.BackEnd.controller;
 
+import com.BackEnd.repository.ProductRepository;
 import com.BackEnd.service.ProductService;
 import com.BackEnd.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,9 +18,12 @@ public class ProductController {
 
 
     private final ProductService productService;
+    private final ProductRepository productRepo;
 
-    public ProductController(ProductService productService){
+    public ProductController(ProductService productService,
+                             ProductRepository productRepo){
         this.productService = productService;
+        this.productRepo = productRepo;
     }
 
     @PostMapping("/add")
@@ -33,6 +38,21 @@ public class ProductController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/imageUrls")
+    public ResponseEntity<List<String>> getImageUrls(
+            @RequestParam("productId") Long productId
+    ){
+        try{
+          Optional <List<String>> imageUrls =
+                   productRepo.findImageByProductId(productId);
+            return imageUrls
+                    .map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+       }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
