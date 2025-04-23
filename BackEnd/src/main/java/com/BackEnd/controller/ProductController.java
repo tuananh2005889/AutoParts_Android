@@ -13,26 +13,41 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/app/product")
-//@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*")
 public class ProductController {
-
 
     private final ProductService productService;
     private final ProductRepository productRepo;
 
     public ProductController(ProductService productService,
-                             ProductRepository productRepo){
+            ProductRepository productRepo) {
         this.productService = productService;
         this.productRepo = productRepo;
     }
 
+    // @PostMapping("/add")
+    // public ResponseEntity<String> addProduct(
+    // @RequestBody Product product,
+    // @RequestParam("imageUrls") List<String> imageUrls
+    // ) {
+    // try {
+    // System.out.println("Received product: " + product.toString());
+    // productService.saveProduct(product);
+    // return ResponseEntity.ok("Product added successfully");
+    // } catch (Exception e) {
+    // e.printStackTrace();
+    // return ResponseEntity.status(500).body("Error: " + e.getMessage());
+    // }
+    // }
     @PostMapping("/add")
-    public ResponseEntity<String> addProduct(
-            @RequestBody Product product,
-            @RequestParam("imageUrls") List<String> imageUrls
-            ) {
+    public ResponseEntity<String> addProduct(@RequestBody ProductRequest request) {
         try {
-            System.out.println("Received product: " + product.toString());
+            Product product = request.getProduct();
+            List<String> imageUrls = request.getImageUrls();
+
+            // Nếu Product entity của bạn có field `images`, set vào:
+            product.setImages(imageUrls);
+
             productService.saveProduct(product);
             return ResponseEntity.ok("Product added successfully");
         } catch (Exception e) {
@@ -43,15 +58,13 @@ public class ProductController {
 
     @GetMapping("/imageUrls")
     public ResponseEntity<List<String>> getImageUrls(
-            @RequestParam("productId") Long productId
-    ){
-        try{
-          Optional <List<String>> imageUrls =
-                   productRepo.findImageByProductId(productId);
+            @RequestParam("productId") Long productId) {
+        try {
+            Optional<List<String>> imageUrls = productRepo.findImageByProductId(productId);
             return imageUrls
                     .map(ResponseEntity::ok)
                     .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-       }catch(Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -70,7 +83,8 @@ public class ProductController {
     @GetMapping("/get/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
         Optional<Product> product = productService.getProductById(id);
-        return product.map(p -> ResponseEntity.ok(p)) //or .map(Response::ok) _method reference:lambda expression rut gon
+        return product.map(p -> ResponseEntity.ok(p)) // or .map(Response::ok) _method reference:lambda expression rut
+                                                      // gon
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -87,14 +101,14 @@ public class ProductController {
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }
-//
-//    @DeleteMapping("/delete/{id}")
-//    public ResponseEntity<String> deleteProduct(@PathVariable String id) {
-//        boolean deleted = productService.deleteProduct(id);
-//        if (deleted) {
-//            return ResponseEntity.ok("Product deleted successfully");
-//        } else {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
+    //
+    // @DeleteMapping("/delete/{id}")
+    // public ResponseEntity<String> deleteProduct(@PathVariable String id) {
+    // boolean deleted = productService.deleteProduct(id);
+    // if (deleted) {
+    // return ResponseEntity.ok("Product deleted successfully");
+    // } else {
+    // return ResponseEntity.notFound().build();
+    // }
+    // }
 }
