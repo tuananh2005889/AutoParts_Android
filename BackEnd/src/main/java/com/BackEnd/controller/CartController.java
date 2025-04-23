@@ -24,10 +24,11 @@ public class CartController {
     @GetMapping("/items")
     public ResponseEntity<List<CartItemDTO>> getAllCartItems(@RequestParam Long cartId) {
         try {
-            List<CartItemDTO> items = cartService.getAllItemsInActiveCart(cartId);
+            List<CartItemDTO> items =
+                    cartService.getCartItemsInActiveCart(cartId);
             return ResponseEntity.ok(items);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
     //done. create/get cart

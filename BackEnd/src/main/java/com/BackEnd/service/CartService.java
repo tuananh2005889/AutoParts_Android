@@ -68,16 +68,23 @@ public class CartService {
     }
 
     // cartId -> getCart -> getItems in Cart
-    public List<CartItemDTO> getAllItemsInActiveCart(Long cartId){
+    public List<CartItemDTO> getCartItemsInActiveCart(Long cartId) {
+        // Tìm cart theo cartId
         Cart cart = cartRepo.findById(cartId)
-                .orElseThrow(()-> new RuntimeException("Cart not found"));
-        List<CartItemDTO> cartItemDTOs =
-                Collections.emptyList();
-        new ArrayList<CartItemDTO>(null);
-        cart.getCartItems().stream().map(cartItem -> DTOConverter.toCartItemDTO(cartItem)
-        );
-        return  cartItemDTOs;
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
+
+        // Khởi tạo danh sách DTO trống
+        List<CartItemDTO> cartItemDTOs = new ArrayList<>();
+
+        // Chuyển đổi các CartItem thành CartItemDTO và thêm vào danh sách
+        cart.getCartItems().stream()
+                .map(cartItem -> DTOConverter.toCartItemDTO(cartItem))
+                .forEach(cartItemDTOs::add);
+
+        // Trả về danh sách các CartItemDTO
+        return cartItemDTOs;
     }
+
 
     // Phương thức thanh toán giỏ hàng, cập nhật trạng thái giỏ hàng thành PAID
     public void checkoutCart(Long cartId) {
