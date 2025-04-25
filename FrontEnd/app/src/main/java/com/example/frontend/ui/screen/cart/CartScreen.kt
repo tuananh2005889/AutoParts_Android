@@ -1,5 +1,6 @@
 package com.example.frontend.ui.screen.cart
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -66,7 +67,12 @@ fun CartItemsList(
 ) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(items = cartItemDTOs) { cartItemDTO ->
+            if (!cartViewModel.imageUrlMap.containsKey(cartItemDTO.productId)) {
+                cartViewModel.getImageUrl(cartItemDTO.productId)
+            }
+
             val imageUrl = cartViewModel.imageUrlMap[cartItemDTO.productId]
+            Log.d("lazy column", "${imageUrl}")
             CartItemRow(
                 cartItemDTO =  cartItemDTO,
                 imageUrl = imageUrl ?: "",

@@ -36,17 +36,36 @@ class CartViewModel @Inject constructor(
         getCartItems()
     }
 
+
     fun getImageUrl(productId: Long) {
         if (_imageUrlMap.containsKey(productId)) return
 
+
         viewModelScope.launch {
-            val response = productRepo.getImageUrls(productId)
+            val response = productRepo.getImageUrl(productId)
             if (response is ApiResponse.Success) {
-                val url = response.data.firstOrNull()
-                if (url != null) _imageUrlMap[productId] = url
+                val url = response.data
+                if (url.isNotBlank()) {
+                    _imageUrlMap[productId] = url
+                }
+            } else if (response is ApiResponse.Error) {
+                Log.e("CartViewModel", "Error fetching image URL: ${response.message}")
             }
         }
     }
+
+
+//    fun getImageUrs(productId: Long) {
+//        if (_imageUrlMap.containsKey(productId)) return
+//
+//        viewModelScope.launch {
+//            val response = productRepo.getImageUrl(productId)
+//            if (response is ApiResponse.Success) {
+//                val url = response.data.firstOrNull()
+//                if (url != null) _imageUrlMap[productId] = url
+//            }
+//        }
+//    }
 
 
         fun getCart() {

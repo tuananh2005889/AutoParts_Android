@@ -14,4 +14,7 @@ interface ProductApiService {
 
     @GET("/app/product/imageUrls")
     suspend fun getImageUrls(@Path("productId") productId: Long): Response<List<String>>
+
+    @GET("/app/product/imageUrl")
+    suspend fun getImageUrl(@Path("id") productId: Long): Response<String>
 }

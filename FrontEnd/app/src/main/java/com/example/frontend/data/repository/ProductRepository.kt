@@ -48,4 +48,19 @@ class ProductRepository @Inject constructor(private val productApiService: Produ
            ApiResponse.Error(e.message ?: "Unknown error")
         }
     }
+
+    suspend fun getImageUrl(productId: Long): ApiResponse<String> {
+        return try {
+            val response = productApiService.getImageUrl(productId)
+
+            if (response.isSuccessful) {
+                val imageUrl = response.body() ?: ""
+                ApiResponse.Success(imageUrl)
+            } else {
+                ApiResponse.Error("Failed to fetch image url", response.code())
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(e.message ?: "Unknown error")
+        }
+    }
 }
