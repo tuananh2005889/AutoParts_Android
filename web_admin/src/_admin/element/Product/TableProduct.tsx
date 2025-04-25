@@ -4,7 +4,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { Search, Trash2 } from "lucide-react";
 
-const API_GET_ALL = "http://localhost:8080/product/all";
+const API_GET_ALL = "http://localhost:8080/app/product/all";
 
 interface Product {
   productId: number;
@@ -62,7 +62,7 @@ const ProductGrid = ({ refresh }: ProductGridProps) => {
   const handleDeleteProduct = async (productId: number) => {
     setLoading(true);
     try {
-      await axios.delete(`http://localhost:8080/product/delete/${productId}`);
+      await axios.delete(`http://localhost:8080/app/product/delete/${productId}`);
       toast.success("Delete product success!");
       await handleGetAllProducts();
     } catch (err) {

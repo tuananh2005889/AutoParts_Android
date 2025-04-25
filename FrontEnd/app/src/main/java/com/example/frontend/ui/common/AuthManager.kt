@@ -15,63 +15,80 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "auth_settings")
-
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "auth_settings")
 object AuthPreferencesKeys {
-    val isLoggedIn = booleanPreferencesKey("is_logged_in")
-    val userName = stringPreferencesKey("user_name")
-    val cartId = longPreferencesKey("cart_id")
+    val isLoggedIn  = booleanPreferencesKey("is_logged_in")
+    val userName    = stringPreferencesKey("user_name")
+    val cartId      = longPreferencesKey("cart_id")
+    val authToken   = stringPreferencesKey("auth_token")
 }
 
 @Singleton
-class AuthManager @Inject constructor(@ApplicationContext private val context: Context) {
+class AuthManager @Inject constructor(
+    @ApplicationContext private val context: Context
+) {
+    // Flows hiện có
     val isLoggedInFlow: Flow<Boolean> = context.dataStore.data
-        .map { preferences ->
-            preferences[AuthPreferencesKeys.isLoggedIn] ?: false
-        }
+        .map { it[AuthPreferencesKeys.isLoggedIn] ?: false }
+
     val userNameFlow: Flow<String?> = context.dataStore.data
-        .map { preferences ->
-            preferences[AuthPreferencesKeys.userName]
-        }
+        .map { it[AuthPreferencesKeys.userName] }
+
     val cartIdFlow: Flow<Long?> = context.dataStore.data
-        .map { preferences -> preferences[AuthPreferencesKeys.cartId]  }
+        .map { it[AuthPreferencesKeys.cartId] }
 
-    suspend fun saveLoginStatus(isLoggedIn: Boolean, userName: String?,  cartId: Long? = null) {
-        context.dataStore.edit { preferences ->
-            preferences[AuthPreferencesKeys.isLoggedIn] = isLoggedIn
+    // 2) Flow cho JWT token
+    val authTokenFlow: Flow<String?> = context.dataStore.data
+        .map { it[AuthPreferencesKeys.authToken] }
 
-            userName?.let {
-                preferences[AuthPreferencesKeys.userName] = it
-            }
-            cartId?.let {
-                preferences[AuthPreferencesKeys.cartId] = it
-            }
+    // 3) Khi login thành công (Google hay username/password) sẽ gọi hàm này
+    //    lưu luôn isLoggedIn, userName, cartId (nếu có) và authToken (nếu truyền vào)
+    suspend fun saveLoginStatus(
+        isLoggedIn: Boolean,
+        userName: String?,
+        cartId: Long? = null,
+        authToken: String? = null      // ← nhận thêm token
+    ) {
+        context.dataStore.edit { prefs ->
+            prefs[AuthPreferencesKeys.isLoggedIn] = isLoggedIn
+            userName?.let { prefs[AuthPreferencesKeys.userName] = it }
+            cartId  ?.let { prefs[AuthPreferencesKeys.cartId]   = it }
+            authToken?.let { prefs[AuthPreferencesKeys.authToken] = it }
         }
     }
 
-suspend fun clearLoginStatus() {
-    context.dataStore.edit { preferences ->
-        preferences.remove(AuthPreferencesKeys.isLoggedIn)
-        preferences.remove(AuthPreferencesKeys.userName)
-        preferences.remove(AuthPreferencesKeys.cartId)
-    }
-}
-
-suspend fun isLoggedInOnce(): Boolean {
-    return context.dataStore.data.first()[AuthPreferencesKeys.isLoggedIn] ?: false
-}
-
-    suspend fun getUserNameOnce(): String? {
-        return context.dataStore.data.first()[AuthPreferencesKeys.userName]
+    // 4) Xoá hết khi logout
+    suspend fun clearLoginStatus() {
+        context.dataStore.edit { prefs ->
+            prefs.clear()  // xoá toàn bộ, bao gồm authToken
+        }
     }
 
-    suspend fun getCartIdOnce(): Long? {
-        return context.dataStore.data.first()[AuthPreferencesKeys.cartId]
+    // 5) Các hàm “once” vẫn hoạt động bình thường
+    suspend fun isLoggedInOnce(): Boolean =
+        context.dataStore.data.first()[AuthPreferencesKeys.isLoggedIn] ?: false
+
+    suspend fun getUserNameOnce(): String? =
+        context.dataStore.data.first()[AuthPreferencesKeys.userName]
+
+    suspend fun getCartIdOnce(): Long? =
+        context.dataStore.data.first()[AuthPreferencesKeys.cartId]
+
+    // Mới: lấy JWT lần đầu (nếu cần)
+    suspend fun getAuthTokenOnce(): String? =
+        context.dataStore.data.first()[AuthPreferencesKeys.authToken]
+
+    // Mới: chỉ lưu token riêng
+    suspend fun saveAuthToken(token: String) {
+        context.dataStore.edit { prefs ->
+            prefs[AuthPreferencesKeys.authToken] = token
+        }
     }
-    suspend fun saveCartId(cartId: Long) {
-        context.dataStore.edit { preferences ->
-            preferences[AuthPreferencesKeys.cartId] = cartId
+
+    // Mới: xoá riêng token
+    suspend fun clearAuthToken() {
+        context.dataStore.edit { prefs ->
+            prefs.remove(AuthPreferencesKeys.authToken)
         }
     }
 }
