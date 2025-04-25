@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">Autoparts Shop</string>
     <string name="placeholder_search">Search</string>
+    <string name="google_server_client_id">511667269915-ps5rce2htd7o9oj99edrmi65a1jqmtng.apps.googleusercontent.com</string>
+
 </resources>

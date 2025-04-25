@@ -8,7 +8,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "2.1.0"
     //hilt
     id("com.google.dagger.hilt.android") // Plugin Hilt
-    kotlin("kapt") // Kích hoạt kapt (Kotlin Annotation Processing)
+    kotlin("kapt")
+    alias(libs.plugins.google.gms.google.services) // Kích hoạt kapt (Kotlin Annotation Processing)
 
 
 }
@@ -73,6 +74,10 @@ dependencies {
     // Hilt
     implementation("com.google.dagger:hilt-android:2.51.1")
     implementation(libs.generativeai)
+    implementation(libs.firebase.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
     // Hilt cho ViewModel
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
@@ -96,6 +101,8 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     // Firebase
     implementation("com.google.firebase:firebase-firestore-ktx:25.1.2")
+    implementation("com.google.firebase:firebase-analytics")
+    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
     // Lib used to convert json to kotlin object
     implementation("com.google.code.gson:gson:2.10.1")
     // Lib used to duyệt phần tử in Data Class
@@ -105,6 +112,10 @@ dependencies {
     implementation("androidx.datastore:datastore:1.1.4")
     // Help retrofit xu ly primitive types
     implementation("com.squareup.retrofit2:converter-scalars:2.11.0")
+
+    // google login
+//    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

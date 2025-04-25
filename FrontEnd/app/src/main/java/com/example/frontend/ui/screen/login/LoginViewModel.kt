@@ -63,7 +63,32 @@ class LoginViewModel @Inject constructor(
             _isInitialCheckDone.value = true
         }
     }
-
+    fun loginWithGoogle(idToken: String) {
+        _loginState.value = LoginUiState(isLoading = true)
+        viewModelScope.launch {
+            when (val result = loginRepo.loginWithGoogle(idToken)) {
+                is ApiResponse.Success -> {
+                    // Lưu cả token và userName
+                    val data = result.data
+                    authManager.saveLoginStatus(
+                        isLoggedIn = true,
+                        userName   = data.userName,
+                        cartId     = null,
+                        authToken  = data.token
+                    )
+                    _isLoggedIn.value = true
+                    _loginState.value = LoginUiState(loginSuccess = true)
+                }
+                is ApiResponse.Error -> {
+                    _loginState.value = LoginUiState(
+                        errorMessage = result.message,
+                        isLoading    = false
+                    )
+                }
+                else -> {  }
+            }
+        }
+    }
     fun login(user: LoginData){
         _loginState.value = LoginUiState(isLoading = true)
 
