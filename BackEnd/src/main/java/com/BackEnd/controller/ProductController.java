@@ -2,6 +2,7 @@ package com.BackEnd.controller;
 
 import com.BackEnd.repository.ProductRepository;
 import com.BackEnd.service.ProductService;
+import com.BackEnd.dto.ProductRequest;
 import com.BackEnd.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
