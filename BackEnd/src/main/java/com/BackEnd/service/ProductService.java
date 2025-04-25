@@ -32,6 +32,16 @@ public class ProductService {
         return imageUrls;
 
     }
+    public String getImageUrl(Long productId) {
+        List<String> imageUrls = productRepository.findImageByProductId(productId)
+                .orElseThrow(() -> new RuntimeException("No image urls found for product id " + productId));
+
+        if (imageUrls.isEmpty()) {
+            throw new RuntimeException("No image urls found for product id " + productId);
+        }
+        return imageUrls.get(0);
+    }
+
 
     public Optional<Product> getProductById(Long id) {
         return productRepository.findByProductId(id);

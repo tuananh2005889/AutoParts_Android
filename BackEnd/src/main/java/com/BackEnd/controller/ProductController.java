@@ -46,15 +46,29 @@ public class ProductController {
             @RequestParam("productId") Long productId
     ){
         try{
-          Optional <List<String>> imageUrls =
-                   productRepo.findImageByProductId(productId);
-            return imageUrls
-                    .map(ResponseEntity::ok)
-                    .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+          List<String> imageUrls =
+                  productService.getImageUrls(productId);
+            if (imageUrls != null && !imageUrls.isEmpty()) {
+                return ResponseEntity.ok(imageUrls);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
        }catch(Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @GetMapping("/imageUrl")
+    public ResponseEntity<String> getImageUrl(@RequestParam("productId") Long productId) {
+        try {
+            String imageUrl = productService.getImageUrl(productId);
+            return ResponseEntity.ok(imageUrl);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
 
     @GetMapping("/all")
     public ResponseEntity<List<Product>> getAllProducts() {
