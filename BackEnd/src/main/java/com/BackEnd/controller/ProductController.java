@@ -58,32 +58,48 @@ public class ProductController {
     }
 
     @GetMapping("/imageUrls")
-    public ResponseEntity<List<String>> getImageUrls(
-
-            @RequestParam("productId") Long productId
-    ){
-        try{
-          List<String> imageUrls =
-                  productService.getImageUrls(productId);
+    public ResponseEntity<List<String>> getImageUrls(@RequestParam("productId") Long productId) {
+        try {
+            List<String> imageUrls = productService.getImageUrls(productId);
             if (imageUrls != null && !imageUrls.isEmpty()) {
                 return ResponseEntity.ok(imageUrls);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
-
-       }catch(Exception e){
-
-            @RequestParam("productId") Long productId) {
-        try {
-            Optional<List<String>> imageUrls = productRepo.findImageByProductId(productId);
-            return imageUrls
-                    .map(ResponseEntity::ok)
-                    .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
         } catch (Exception e) {
-
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
+//    @GetMapping("/imageUrls")
+//    public ResponseEntity<List<String>> getImageUrls(
+//
+//            @RequestParam("productId") Long productId
+//    ){
+//        try{
+//          List<String> imageUrls =
+//                  productService.getImageUrls(productId);
+//            if (imageUrls != null && !imageUrls.isEmpty()) {
+//                return ResponseEntity.ok(imageUrls);
+//            } else {
+//                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+//            }
+//
+//       }catch(Exception e){
+//
+//            @RequestParam("productId") Long productId) {
+//        try {
+//            Optional<List<String>> imageUrls = productRepo.findImageByProductId(productId);
+//            return imageUrls
+//                    .map(ResponseEntity::ok)
+//                    .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+//        } catch (Exception e) {
+//
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
 
     @GetMapping("/imageUrl")
     public ResponseEntity<String> getImageUrl(@RequestParam("productId") Long productId) {
