@@ -134,6 +134,19 @@ fun HomeScreenContent(
                     modifier = modifier
                         .padding(innerPadding)
                 ) {
+                    SlideCarousel(
+                        images = listOf(
+                            R.drawable.hero1,
+                            R.drawable.hero2,
+                            R.drawable.hero3
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     SearchBar(
                         value = searchText,
                         onValueChange = {text -> searchText = text}
