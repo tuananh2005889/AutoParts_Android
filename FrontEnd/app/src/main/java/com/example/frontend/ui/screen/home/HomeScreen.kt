@@ -1,21 +1,10 @@
 package com.example.frontend.ui.screen.home
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -23,35 +12,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -63,7 +31,15 @@ import com.example.frontend.ui.common.CloudinaryImage
 import com.example.frontend.ui.navigation.BottomNavBar
 import com.example.frontend.ui.navigation.HomeNavHost
 import com.example.frontend.ui.screen.login.LoginViewModel
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
+
+private val DarkBackground = Color(0xFF30393E)
+private val SoftWhite = Color(0xFFFAEFEB)
+private val Accent = Color(0xFFF8BD97)
+private val SoftGray = Color(0xFF988F88)
+private val Cream = Color(0xFFF8E5D7)
+private val ElegantBrown = Color(0xFFD5C1B6)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,30 +49,31 @@ fun HomeScreen(
     loginViewModel: LoginViewModel
 ) {
     val bottomNavController = rememberNavController()
-
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
-    Scaffold(
-        modifier = modifier.safeDrawingPadding(),// or .padding(WindowInsets.systemBars.asPaddingValues())
-        bottomBar = {
-            BottomNavBar(navController = bottomNavController)
-        },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
 
+    Scaffold(
+        modifier = modifier.safeDrawingPadding().background(SoftWhite),
+        bottomBar = { BottomNavBar(navController = bottomNavController) },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         HomeNavHost(
             loginViewModel = loginViewModel,
-            bottomNavController =  bottomNavController,
+            bottomNavController = bottomNavController,
             rootNavController = rootNavController,
-            innerPadding =  innerPadding,
+            innerPadding = innerPadding,
             onShowSnackBar = { message ->
                 coroutineScope.launch {
-                    snackbarHostState.showSnackbar(
-                        message
-                    )
+                    snackbarHostState.showSnackbar(message)
                 }
             }
-            )
+        )
+    }
+    val systemUiController = rememberSystemUiController()
+    SideEffect {
+        systemUiController.setSystemBarsColor(
+            color = DarkBackground
+        )
     }
 }
 
@@ -107,213 +84,206 @@ fun HomeScreenContent(
     onProductClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     onShowSnackBar: (String) -> Unit,
-){
+) {
     val homeUiState by viewModel.homeUiState.collectAsState()
-    var productList by remember { mutableStateOf<List<ProductData>>(emptyList()) }
     var searchText by remember { mutableStateOf("") }
 
-//     Bộ lọc sản phẩm theo từ khóa tìm kiếm
-//    val filteredProducts = productList.filter {
-//        it.name.contains(searchText, ignoreCase = true) ||
-//                it.brand.contains(searchText, ignoreCase = true)
-//    }
-   when{
-         homeUiState.isLoading -> {
-            CircularProgressIndicator(modifier = modifier.padding(innerPadding))
-        }
-        homeUiState.products.isNotEmpty() -> {
-            val products = homeUiState.products
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-//                    contentColor = MaterialTheme.colorScheme.error,
-
-                )
-            ){
-                Column(
-                    modifier = modifier
-                        .padding(innerPadding)
-                ) {
-                    SlideCarousel(
-                        images = listOf(
-                            R.drawable.hero1,
-                            R.drawable.hero2,
-                            R.drawable.hero3
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    SearchBar(
-                        value = searchText,
-                        onValueChange = {text -> searchText = text}
-                    )
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
-                    ProductGrid(
-                        products,
-                        onProductClick = onProductClick,
-                        homeViewModel = viewModel,
-                        onShowSnackBar = onShowSnackBar,
-                    )
-                }
+    when {
+        homeUiState.isLoading -> {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = Accent)
             }
         }
-           homeUiState.errorMessage != null  -> {
-            val error = homeUiState.errorMessage
-            Text(
-                text = "Error: ${error}",
-                color = MaterialTheme.colorScheme.error
+
+        homeUiState.products.isNotEmpty() -> {
+            val products = homeUiState.products
+            Column(
+                modifier = modifier
+                    .padding(innerPadding)
+                    .background(DarkBackground)
+
+            ) {
+                Text(
+                    text = "Auto Parts Shop",
+                    style = MaterialTheme.typography.headlineSmall.copy(
+                        color = SoftWhite,
+                        fontSize = 24.sp
+                    ),
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
                 )
+
+                SearchBar(
+                    value = searchText,
+                    onValueChange = { searchText = it },
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                SlideCarousel(
+                    images = listOf(R.drawable.hero1, R.drawable.hero2, R.drawable.hero3),
+                    modifier = Modifier.fillMaxWidth().height(200.dp)
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                ProductGrid(
+                    products,
+                    onProductClick,
+                    viewModel,
+                    onShowSnackBar
+                )
+            }
+        }
+
+        homeUiState.errorMessage != null -> {
+            Text(
+                text = "Error: ${homeUiState.errorMessage}",
+                color = Color.Red,
+                modifier = Modifier.padding(16.dp)
+            )
         }
     }
 }
-
-
-
-
 
 @Composable
 fun ProductGrid(
     products: List<ProductData>,
     onProductClick: (Long) -> Unit,
     homeViewModel: HomeViewModel,
-    onShowSnackBar: (String) -> Unit,
-    ) {
+    onShowSnackBar: (String) -> Unit
+) {
     val coroutineScope = rememberCoroutineScope()
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium)),
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource((R.dimen.padding_medium))),
+        contentPadding = PaddingValues(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier.fillMaxSize()
     ) {
-        items(items = products) { product ->
+        items(products) { product ->
             ProductCard(
                 product = product,
-                onProductClick = { onProductClick(product.productId)},
+                onProductClick = { onProductClick(product.productId) },
                 onAddToCartClick = {
-                    coroutineScope.launch{
-                        val cartItemDTO =  homeViewModel.addOneProductToCart(product.productId)
-                        if(cartItemDTO != null){
-                            onShowSnackBar("Added ${cartItemDTO.quantity} ${cartItemDTO.productName} to cart")
-                            Log.d("CartDebug", "Added to cart: ${cartItemDTO.quantity} ${cartItemDTO.productName}")
-                        }else{
+                    coroutineScope.launch {
+                        val cartItem = homeViewModel.addOneProductToCart(product.productId)
+                        if (cartItem != null) {
+                            onShowSnackBar("Added ${cartItem.quantity} ${cartItem.productName}")
+                        } else {
                             onShowSnackBar("Failed to add product to cart.")
-                            Log.d("CartDebug", "Failed to add to cart: Product ID: ${product.productId}")
                         }
                     }
-                                   },
+                }
             )
         }
     }
 }
 @Composable
 fun ProductCard(
-    product: ProductData ,
+    product: ProductData,
     onProductClick: () -> Unit,
-    onAddToCartClick: ()->Unit,
-){
+    onAddToCartClick: () -> Unit
+) {
     Card(
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = SoftWhite),
+        elevation = CardDefaults.cardElevation(12.dp),
         modifier = Modifier
-            .size(width = 150.dp, height = 270.dp)
-            .clickable(onClick =  onProductClick),
-
-        elevation =  CardDefaults.cardElevation(15.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.background
-//            contentColor = MaterialTheme.colorScheme.onSurface
-        )
-
+            .width(180.dp)
+            .wrapContentHeight()
+            .clickable(onClick = onProductClick)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            if(product.imageUrlList.isNotEmpty()){
-                val productImage = product.imageUrlList.random()
+        Column(modifier = Modifier.padding(12.dp)) {
+            if (product.imageUrlList.isNotEmpty()) {
                 CloudinaryImage(
-                    url = productImage,
+                    url = product.imageUrlList.random(),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(150.dp)
-                        .clip(RoundedCornerShape(8.dp)),
+                        .height(140.dp)
+                        .clip(RoundedCornerShape(16.dp)),
                     contentScale = ContentScale.Crop
                 )
-            }else{
+            } else {
                 Box(
-                    modifier = Modifier
+                    Modifier
                         .fillMaxWidth()
-                        .height(150.dp)
-                        .background(Color.Gray),
+                        .height(140.dp)
+                        .background(SoftGray),
                     contentAlignment = Alignment.Center
                 ) {
                     Text("No Image", color = Color.White)
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(Modifier.height(10.dp))
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 8.dp)
-                ,
-               verticalArrangement = Arrangement.SpaceBetween,
-            ){
-                // Product name
-                Column(){
-                    Text(
-                        text = product.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+            Text(
+                text = product.name,
+                style = MaterialTheme.typography.titleMedium,
+                color = DarkBackground,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
 
-                    // Product price
-                    Text(
-                        text = "$ ${product.price}"
-                        ,
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+            if (product.brand.isNotBlank()) {
+                Text(
+                    text = product.brand,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            Spacer(Modifier.height(6.dp))
+
+            if (product.description.isNotBlank()) {
+                Text(
+                    text = product.description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Spacer(Modifier.height(10.dp))
+
+            product.price?.let {
+                Text(
+                    text = "$${"%.2f".format(it)}",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = ElegantBrown
+                )
+            }
+
+            Spacer(Modifier.height(10.dp))
+
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedButton(
+                    onClick = onAddToCartClick,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFF15D43)),
+                    border = BorderStroke(1.dp, Color(0xFFF15D43)),
+                    modifier = Modifier.height(36.dp)
+                ) {
+                    Icon(Icons.Default.ShoppingCart, contentDescription = null)
                 }
-                Row(
-                    modifier =  Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = dimensionResource(R.dimen.padding_small))
-                    ,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ){
 
-
-                    OutlinedButton(
-                        modifier = Modifier
-                            .height(40.dp)
-                            .width(75.dp)
-                        ,
-                        onClick = {
-                            onAddToCartClick()
-//                            onShowSnackBar("hello")
-                        }
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(30.dp),
-                            imageVector = Icons.Default.ShoppingCart,
-                            contentDescription = "Add to cart"
-                        )
-                    }
-                    Button(
-                        colors =  ButtonDefaults.buttonColors(),
-                        modifier = Modifier
-                            .height(40.dp)
-                            .width(75.dp)
-                        ,
-                        onClick = {}
-                    ) {
-                        Text(text = "Buy")
-                    }
+                Button(
+                    onClick = {},
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF15D43)),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.height(36.dp)
+                ) {
+                    Text("Buy", color = Color.White)
                 }
             }
         }
@@ -325,43 +295,21 @@ fun ProductCard(
 fun SearchBar(
     value: String,
     onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-){
-    Row(
-        modifier = modifier.padding(horizontal = dimensionResource(R.dimen.padding_small))
-    ){
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            placeholder = {
-                Text(stringResource(R.string.placeholder_search)) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = null,
-                )
-            },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.surfaceDim,
-                unfocusedBorderColor = MaterialTheme.colorScheme.onSurface,
-                cursorColor = MaterialTheme.colorScheme.onSurface,
-            ),
-        )
-    }
-}
-
-@Composable
-fun CategoryChip(label: String) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFFFF7043))
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = label, color = Color.White, fontSize = 14.sp)
-    }
+    modifier: Modifier = Modifier
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        leadingIcon = {
+            Icon(Icons.Default.Search, contentDescription = null, tint = SoftGray)
+        },
+        placeholder = { Text("Search products...", color = SoftGray) },
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Accent,
+            unfocusedBorderColor = SoftGray,
+            cursorColor = DarkBackground
+        ),
+        shape = RoundedCornerShape(16.dp),
+        modifier = modifier.fillMaxWidth()
+    )
 }

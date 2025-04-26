@@ -123,6 +123,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(platform("androidx.compose:compose-bom:1.6.0"))
-
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
     implementation("androidx.compose.foundation:foundation:1.5.4")
 }
