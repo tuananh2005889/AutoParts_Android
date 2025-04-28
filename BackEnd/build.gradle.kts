@@ -27,7 +27,7 @@ dependencies {
     // MySQL driver
     runtimeOnly("mysql:mysql-connector-java:8.0.33")
     implementation("org.springframework:spring-test:6.1.5")   
-    // Cloudinary & dotenv (nếu bạn vẫn dùng)
+    // Cloudinary & dotenv 
     implementation("com.cloudinary:cloudinary-http5:2.0.0")
     implementation("com.cloudinary:cloudinary-taglib:2.0.0")
     implementation("io.github.cdimascio:dotenv-java:2.2.4")

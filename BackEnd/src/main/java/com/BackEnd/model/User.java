@@ -1,52 +1,48 @@
 package com.BackEnd.model;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
-@Table(name = "user")
+// Nếu bạn giữ tên bảng là "user" (MySQL coi user là từ khóa), hãy quote nó lại
+// hoặc đổi tên bảng thành "users" trong database và ở đây thành @Table(name =
+// "users")
+@Table(name = "`users`")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
 
     @Id
-    @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id", nullable = false, updatable = false)
+    @EqualsAndHashCode.Include
     private Long userId;
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<Cart> carts = new ArrayList<>();
+
     @Column(name = "user_name", nullable = false, length = 100, unique = true)
     private String userName;
+
     @Column(nullable = false, length = 255)
     private String password;
-    @Column(nullable = false, length = 255)
+
+    @Column(name = "full_name", nullable = false, length = 255)
     private String fullName;
+
     @Column(name = "gmail", nullable = false, length = 255, unique = true)
     private String gmail;
+
     @Column(length = 50)
     private String role;
+
     @Column(columnDefinition = "TEXT")
     private String address;
+
     @Column(length = 15, unique = true)
     private String phone;
-//    @Column(name = "is_active")
-//    private boolean isActive = true;
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof User))
-            return false;
-        User user = (User) o;
-        return Objects.equals(getUserName(), user.getUserName());
-    }
-    @Override
-    public int hashCode() {
-        return Objects.hash(getUserName());
-    }
+
+    @Column(name = "avatar_url", columnDefinition = "TEXT")
+    private String avatarUrl;
+
 }

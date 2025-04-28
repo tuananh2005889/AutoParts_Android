@@ -67,9 +67,9 @@ public class LoginController {
     }
 
     @PostMapping("/google")
-    public ResponseEntity<?> loginWithGoogle(@RequestBody GoogleLoginRequest req) {
+    public ResponseEntity<GoogleLoginResponse> loginWithGoogle(@RequestBody GoogleLoginRequest req) {
         try {
-            System.out.println(">> google.clientId = " + googleClientId);
+            // Xác thực ID token với Google
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
                     new NetHttpTransport(),
                     GsonFactory.getDefaultInstance())
@@ -78,9 +78,12 @@ public class LoginController {
 
             GoogleIdToken idToken = verifier.verify(req.getIdToken());
             if (idToken == null) {
-                return ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED)
-                        .body("Invalid ID token");
+                // token không hợp lệ
+                return ResponseEntity
+                        .status(HttpStatus.SC_UNAUTHORIZED)
+                        .body(null);
             }
+
             GoogleIdToken.Payload payload = idToken.getPayload();
             String email = payload.getEmail();
             String name = (String) payload.get("name");
@@ -89,11 +92,19 @@ public class LoginController {
                     .orElseGet(() -> loginService.createUser(name, email));
 
             String jwt = jwtUtil.generateToken(user.getUserName(), user.getUserId());
-            return ResponseEntity.ok(new GoogleLoginResponse(jwt, user.getUserName()));
+
+            GoogleLoginResponse response = new GoogleLoginResponse(
+                    user.getUserId(),
+                    jwt,
+                    user.getUserName());
+            return ResponseEntity.ok(response);
+
         } catch (Exception e) {
+            // Bắt exception chung
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR)
-                    .body("Google login error: " + e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.SC_INTERNAL_SERVER_ERROR)
+                    .body(null);
         }
     }
 }

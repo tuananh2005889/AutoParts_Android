@@ -1,10 +1,12 @@
 package com.example.frontend.ui.navigation
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -21,73 +23,69 @@ fun AppNavHost(
     navController: NavHostController,
     loginViewModel: LoginViewModel = hiltViewModel()
 ) {
-    val isLoggedIn by loginViewModel.isLoggedIn
-    val isInitialCheckDone by loginViewModel.isInitialCheckDone
+
+    /* -------- Listen state từ ViewModel -------- */
+    val isLoggedIn          by loginViewModel.isLoggedIn       // State<Boolean>
+    val isInitialCheckDone  by loginViewModel.isInitialCheckDone
 
     NavHost(
         navController = navController,
         startDestination = Route.Splash.route
     ) {
-        composable(Route.Splash.route){
+
+        /* ---------- Splash ---------- */
+        composable(Route.Splash.route) {
             if (isInitialCheckDone) {
-                LaunchedEffect(navController) {
+                LaunchedEffect(isLoggedIn) {
                     if (isLoggedIn) {
                         navController.navigate(Route.Home.route) {
-                            popUpTo("splash") { inclusive = true }
+                            popUpTo(Route.Splash.route) { inclusive = true }
                         }
                     } else {
                         navController.navigate(Route.Login.route) {
-                            popUpTo("splash") { inclusive = true }
+                            popUpTo(Route.Splash.route) { inclusive = true }
                         }
                     }
                 }
             } else {
-                CircularProgressIndicator(modifier = Modifier.size(250.dp))
+                Box(Modifier.size(250.dp), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
         }
-        }
-        // Auth Screens
+
+        /* ---------- Login ---------- */
         composable(Route.Login.route) {
             LoginScreen(
                 loginViewModel = loginViewModel,
                 onLoginSuccess = {
                     navController.navigate(Route.Home.route) {
-                        popUpTo(Route.Login.route){ //default inclusive is false
-                            inclusive = true
-                        }
+                        popUpTo(Route.Login.route) { inclusive = true }
                     }
                 },
-                onSignupClick = {
-                    navController.navigate(Route.Signup.route)
-                },
-//                onLoginClick = {
-//                    val user = LoginData(
-//                        userName = loginViewModel.loginTextFieldState.value.userName.toString(),
-//                        password = loginViewModel.loginTextFieldState.value.password.toString()
-//                    )
-//
-//                    loginViewModel.login(user)
-//                }
+                onSignupClick = { navController.navigate(Route.Signup.route) }
             )
         }
+
+        /* ---------- Signup ---------- */
         composable(Route.Signup.route) {
             SignupScreen(
-                onBackToLogin = {
-                    navController.navigate(Route.Login.route)
-                },
+                onBackToLogin = { navController.navigate(Route.Login.route) },
                 onSignupSuccess = {
-                        navController.navigate(Route.Login.route) {
-                            popUpTo("signup") { inclusive = true }
+                    navController.navigate(Route.Login.route) {
+                        popUpTo(Route.Signup.route) { inclusive = true }
                     }
                 }
             )
         }
-        // Main Screen
+
+
+        /* ---------- Home ---------- */
         composable(Route.Home.route) {
             HomeScreen(
                 rootNavController = navController,
-                loginViewModel = loginViewModel
+                loginViewModel    = loginViewModel
             )
         }
-
     }
 }

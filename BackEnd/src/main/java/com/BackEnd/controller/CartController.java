@@ -1,6 +1,5 @@
 package com.BackEnd.controller;
 
-
 import com.BackEnd.dto.*;
 import com.BackEnd.repository.CartRepository;
 import com.BackEnd.service.CartService;
@@ -18,6 +17,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/app/cart")
 public class CartController {
+  
     private final CartService cartService;
     private final CartRepository cartRepo;
     public CartController(CartService cartService, CartRepository cartRepo) {
@@ -25,30 +25,31 @@ public class CartController {
         this.cartRepo = cartRepo;
     }
 
-    //done. fetch items tu cart
+    // done. fetch items tu cart
     @GetMapping("/items")
     public ResponseEntity<List<CartItemDTO>> getAllCartItems(@RequestParam Long cartId) {
         try {
-            List<CartItemDTO> items =
-                    cartService.getCartItemsInActiveCart(cartId);
+            List<CartItemDTO> items = cartService.getCartItemsInActiveCart(cartId);
             return ResponseEntity.ok(items);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
-    //done. create/get cart
+
+    // done. create/get cart
     @PostMapping("/active")
     public ResponseEntity<CartBasicInfoDTO> getOrCreateActiveCart(@RequestParam String userName) {
-        try{
+        try {
             CartBasicInfoDTO dto = cartService.getOrCreateActiveCartDTO(userName);
             return ResponseEntity.ok(dto);
-        }catch(RuntimeException e){
+        } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }catch(Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    //done. add item to cart
+
+    // done. add item to cart
     @PostMapping("/add")
     public ResponseEntity<CartItemDTO> addItemToCart(@RequestBody AddToCartRequest addToCartRequest) {
         try {
@@ -68,6 +69,7 @@ public class CartController {
         }
     }
 
+
     @GetMapping("/imageUrls")
     public ResponseEntity<List<String>> getImageUrlPerCartItem(@RequestParam Long cartId) {
         try{
@@ -83,9 +85,6 @@ public class CartController {
         }
     }
 
-
-
-
     // API thanh toán giỏ hàng (cập nhật trạng thái thành PAID)
     @PostMapping("/checkout")
     public ResponseEntity<?> checkout(@RequestParam Long cartId) {
@@ -93,11 +92,11 @@ public class CartController {
         return ResponseEntity.ok("Cart successfully checked out and paid.");
     }
 
-//    @GetMapping("/activate")
-//    public ResponseEntity<Cart> getActiveCart(@RequestParam String userName) {
-//        Cart cart = cartService.createCart(userName); // tạo mới nếu chưa có
-//        return ResponseEntity.ok(cart);
-//    }
+    // @GetMapping("/activate")
+    // public ResponseEntity<Cart> getActiveCart(@RequestParam String userName) {
+    // Cart cart = cartService.createCart(userName); // tạo mới nếu chưa có
+    // return ResponseEntity.ok(cart);
+    // }
     // API kiểm tra trạng thái giỏ hàng
     @GetMapping("/status")
     public ResponseEntity<Cart> getCartStatus(@RequestParam Long cartId) {
@@ -105,4 +104,3 @@ public class CartController {
         return ResponseEntity.ok(cart); // Trả về trạng thái giỏ hàng
     }
 }
-

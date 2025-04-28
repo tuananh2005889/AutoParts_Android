@@ -1,120 +1,123 @@
 package com.example.frontend.ui.screen.login
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.frontend.data.model.LoginData
+import com.example.frontend.data.model.UserData
 import com.example.frontend.data.remote.ApiResponse
+import com.example.frontend.data.remote.GoogleLoginResponse
 import com.example.frontend.data.repository.LoginRepository
 import com.example.frontend.ui.common.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/* ---------- UI state ---------- */
 data class LoginUiState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val loginSuccess: Boolean = false
 )
-
 data class LoginTextFieldUiState(
-    val userName: String? = "",
-    val password: String? = "",
+    val userName: String = "",
+    val password: String = "",
 )
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginRepo: LoginRepository,
-    private val authManager: AuthManager,
-    ): ViewModel() {
+    private val authManager: AuthManager
+) : ViewModel() {
 
-    private val _loginState =  mutableStateOf<LoginUiState>(LoginUiState())
-    val loginState: State<LoginUiState> = _loginState
 
-    private val _loginTextFieldState = mutableStateOf<LoginTextFieldUiState>(LoginTextFieldUiState())
-    val loginTextFieldState: State<LoginTextFieldUiState> = _loginTextFieldState
+    /* ---------- Compose states ---------- */
+    private val _ui   = mutableStateOf(LoginUiState())
+    val ui: State<LoginUiState> = _ui
 
-    private val _isInitialCheckDone = mutableStateOf<Boolean>(false)
-    val isInitialCheckDone: State<Boolean> = _isInitialCheckDone
+    private val _text = mutableStateOf(LoginTextFieldUiState())
+    val text: State<LoginTextFieldUiState> = _text
 
-    private val _isLoggedIn = mutableStateOf<Boolean>(false)
-    val isLoggedIn: State<Boolean> = _isLoggedIn
+    /* ---------- Global flags ---------- */
+    private val _isLoggedIn      = mutableStateOf(false)
+    private val _isInitDone      = mutableStateOf(false)
 
-    init {
-        checkInitialLoginStatus()
-    }
+    /** Đọc trạng thái login sẵn có trong DataStore */
+    init { viewModelScope.launch {
+        _isLoggedIn.value = authManager.isLoggedInOnce()
+        _isInitDone.value = true
+    }}
 
-    fun onUserNameChange(userName: String){
-        _loginTextFieldState.value = _loginTextFieldState.value.copy(userName = userName)
-    }
-    fun onPasswordChange(password: String){
-        _loginTextFieldState.value = _loginTextFieldState.value.copy(password = password)
-    }
+    /* ---------- Text change ---------- */
+    fun onUserNameChange(u: String) { _text.value = _text.value.copy(userName = u) }
+    fun onPasswordChange(p: String) { _text.value = _text.value.copy(password = p) }
 
-    fun setLoginTextField(userName: String, password: String){
-        _loginTextFieldState.value = _loginTextFieldState.value.copy(userName = userName, password = password)
-    }
-
-    private fun checkInitialLoginStatus() {
+    /* ---------- Google login ---------- */
+    fun loginWithGoogle(idToken: String, avatarUrl: String?) {
+        _ui.value = LoginUiState(isLoading = true)
         viewModelScope.launch {
-            _isLoggedIn.value = authManager.isLoggedInOnce()
-            _isInitialCheckDone.value = true
-        }
-    }
-    fun loginWithGoogle(idToken: String) {
-        _loginState.value = LoginUiState(isLoading = true)
-        viewModelScope.launch {
-            when (val result = loginRepo.loginWithGoogle(idToken)) {
+            when (val res = loginRepo.loginWithGoogle(idToken)) {
                 is ApiResponse.Success -> {
-                    // Lưu cả token và userName
-                    val data = result.data
-                    authManager.saveLoginStatus(
-                        isLoggedIn = true,
-                        userName   = data.userName,
-                        cartId     = null,
-                        authToken  = data.token
+                    val g: GoogleLoginResponse = res.data
+
+                    authManager.saveLoginStatus(true, g.userName, null, g.token)
+                    authManager.saveUserData(
+                        UserData(
+                            userId    = g.userId,
+                            userName  = g.userName,
+                            fullName  = g.userName,
+                            gmail     = "",
+                            phone     = "",
+                            password  = "",
+                            avatarUrl = avatarUrl
+                        )
                     )
+
                     _isLoggedIn.value = true
-                    _loginState.value = LoginUiState(loginSuccess = true)
+                    _ui.value = LoginUiState(loginSuccess = true)
                 }
-                is ApiResponse.Error -> {
-                    _loginState.value = LoginUiState(
-                        errorMessage = result.message,
-                        isLoading    = false
-                    )
-                }
-                else -> {  }
+                is ApiResponse.Error ->
+                    _ui.value = LoginUiState(errorMessage = res.message, isLoading = false)
+                ApiResponse.Loading -> {}
             }
         }
     }
-    fun login(){
-        _loginState.value = LoginUiState(isLoading = true)
 
-        val user = LoginData(loginTextFieldState.value.userName.toString(), loginTextFieldState.value.password.toString())
 
-        viewModelScope.launch{
-         val result = loginRepo.login(user)
-            _loginState.value = when(result){
+    /* ---------- Username / Password login ---------- */
+    fun login(user: LoginData) {
+        _ui.value = LoginUiState(isLoading = true)
+        viewModelScope.launch {
+            when (val res = loginRepo.login(user)) {
                 is ApiResponse.Success -> {
-                    authManager.saveLoginStatus(true, user.userName)
-                    _isLoggedIn.value= true
-                    LoginUiState(loginSuccess = true)
+                    val (token, userData) = res.data   // Pair<String, UserData?>
+                    authManager.saveLoginStatus(true, user.userName, null, token)
+                    userData?.let { authManager.saveUserData(it) }
+
+                    _isLoggedIn.value = true
+                    _ui.value = LoginUiState(loginSuccess = true)
                 }
-                is ApiResponse.Error -> LoginUiState(errorMessage = result.message, isLoading = false)
-                is ApiResponse.Loading -> LoginUiState(isLoading = true)
+                is ApiResponse.Error ->
+                    _ui.value = LoginUiState(errorMessage = res.message, isLoading = false)
+                ApiResponse.Loading -> {}
             }
         }
     }
 
-    fun logout(){
-        viewModelScope.launch{
-            _isLoggedIn.value = false
-            _loginState.value = LoginUiState(loginSuccess = false)
-            authManager.clearLoginStatus()
-        }
+    /* ---------- Logout ---------- */
+    fun logout() = viewModelScope.launch {
+        authManager.clearLoginStatus()
+        _isLoggedIn.value = false
+        _ui.value = LoginUiState(loginSuccess = false)
     }
 
+    /* ---------- Helpers cho Navigation ---------- */
+    val isLoggedIn: State<Boolean>         get() = _isLoggedIn
+    val isInitialCheckDone: State<Boolean> get() = _isInitDone
+
+    suspend fun getUserName(): String? = authManager.getUserNameOnce()
+
+    fun setLoginTextField(userName: String = "", password: String = "") {
+        _text.value = LoginTextFieldUiState(userName, password)
+    }
 }
-
-
