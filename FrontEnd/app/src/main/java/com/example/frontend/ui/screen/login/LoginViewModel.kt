@@ -30,6 +30,7 @@ class LoginViewModel @Inject constructor(
     private val authManager: AuthManager
 ) : ViewModel() {
 
+
     /* ---------- Compose states ---------- */
     private val _ui   = mutableStateOf(LoginUiState())
     val ui: State<LoginUiState> = _ui
@@ -81,6 +82,7 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
+
 
     /* ---------- Username / Password login ---------- */
     fun login(user: LoginData) {

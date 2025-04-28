@@ -1,6 +1,7 @@
 package com.BackEnd.controller;
 
 import com.BackEnd.dto.*;
+import com.BackEnd.repository.CartRepository;
 import com.BackEnd.service.CartService;
 import com.BackEnd.model.Cart;
 import lombok.RequiredArgsConstructor;
@@ -9,15 +10,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/app/cart")
 public class CartController {
+  
     private final CartService cartService;
-
-    public CartController(CartService cartService) {
+    private final CartRepository cartRepo;
+    public CartController(CartService cartService, CartRepository cartRepo) {
         this.cartService = cartService;
+        this.cartRepo = cartRepo;
     }
 
     // done. fetch items tu cart
@@ -60,6 +65,22 @@ public class CartController {
 
         } catch (Exception e) {
             // Handle other errors
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+    @GetMapping("/imageUrls")
+    public ResponseEntity<List<String>> getImageUrlPerCartItem(@RequestParam Long cartId) {
+        try{
+            List<String> imageUrls =
+                    cartService.getImageUrlPerCartItem(cartId);
+            if(imageUrls == null || imageUrls.isEmpty()){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            return ResponseEntity.ok(imageUrls);
+        }catch(Exception e){
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

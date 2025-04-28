@@ -3,8 +3,10 @@ package com.example.frontend.ui.navigation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.CircularProgressIndicator
+
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -21,6 +23,7 @@ fun AppNavHost(
     navController: NavHostController,
     loginViewModel: LoginViewModel = hiltViewModel()
 ) {
+
     /* -------- Listen state từ ViewModel -------- */
     val isLoggedIn          by loginViewModel.isLoggedIn       // State<Boolean>
     val isInitialCheckDone  by loginViewModel.isInitialCheckDone
@@ -75,6 +78,7 @@ fun AppNavHost(
                 }
             )
         }
+
 
         /* ---------- Home ---------- */
         composable(Route.Home.route) {

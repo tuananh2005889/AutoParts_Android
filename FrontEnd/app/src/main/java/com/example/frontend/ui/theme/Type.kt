@@ -1,13 +1,10 @@
 package com.example.frontend.ui.theme
 
-import com.example.frontend.R
 import androidx.compose.material3.Typography
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.text.googlefonts.Font
+import androidx.compose.ui.text.googlefonts.GoogleFont
+import com.example.frontend.R
 
 val provider = GoogleFont.Provider(
     providerAuthority = "com.google.android.gms.fonts",
@@ -18,6 +15,19 @@ val provider = GoogleFont.Provider(
 val bodyFontFamily = FontFamily(
     Font(
         googleFont = GoogleFont("Red Hat Text"),
+        fontProvider = provider,
+    )
+)
+
+val pixelFontFamily = FontFamily(
+    Font(
+        googleFont = GoogleFont("Coral Pixels"),
+        fontProvider = provider,
+    )
+)
+val specialGothicFontFamiLy = FontFamily(
+    Font(
+        googleFont = GoogleFont("Special Gothic Expanded One"),
         fontProvider = provider,
     )
 )
