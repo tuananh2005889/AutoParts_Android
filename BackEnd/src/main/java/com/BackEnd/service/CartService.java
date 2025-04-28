@@ -9,18 +9,15 @@ import com.BackEnd.repository.CartItemRepository;
 import com.BackEnd.repository.CartRepository;
 import com.BackEnd.repository.ProductRepository;
 import com.BackEnd.repository.UserRepository;
-import com.BackEnd.dto.CartDTO;
 import com.BackEnd.utils.DTOConverter;
+import java.util.stream.Collectors;
 import com.BackEnd.model.Cart;
 import com.BackEnd.model.CartItem;
 import com.BackEnd.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +26,8 @@ public class CartService {
     private final CartItemRepository cartItemRepo;
     private final ProductRepository productRepo;
     private final UserRepository userRepo;
-//
+
+    //
 //    public CartDTO getActiveCartDTO(String userName) {
 //        User user = userRepo.findByUserName(userName)
 //                .orElseThrow(() -> new RuntimeException("User not found"));
@@ -69,19 +67,15 @@ public class CartService {
 
     // cartId -> getCart -> getItems in Cart
     public List<CartItemDTO> getCartItemsInActiveCart(Long cartId) {
-        // Tìm cart theo cartId
         Cart cart = cartRepo.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
-        // Khởi tạo danh sách DTO trống
         List<CartItemDTO> cartItemDTOs = new ArrayList<>();
 
-        // Chuyển đổi các CartItem thành CartItemDTO và thêm vào danh sách
         cart.getCartItems().stream()
                 .map(cartItem -> DTOConverter.toCartItemDTO(cartItem))
                 .forEach(cartItemDTOs::add);
 
-        // Trả về danh sách các CartItemDTO
         return cartItemDTOs;
     }
 
@@ -89,9 +83,12 @@ public class CartService {
     // Phương thức thanh toán giỏ hàng, cập nhật trạng thái giỏ hàng thành PAID
     public void checkoutCart(Long cartId) {
         Cart cart = cartRepo.findById(cartId).orElseThrow(() -> new RuntimeException("Cart not found"));
-        cart.setStatus(Cart.CartStatus.PAID);  // Cập nhật trạng thái giỏ hàng thành đã thanh toán
-        cartRepo.save(cart);  // Lưu lại trạng thái mới của giỏ hàng
+        cart.setStatus(Cart.CartStatus.PAID);
+        cartRepo.save(cart);
     }
+
+
+
 
     public CartItemDTO addItemToCart(AddToCartRequest addToCartRequest){
         // check quantity request
@@ -128,6 +125,18 @@ public class CartService {
 
     public Cart getCartStatus(Long cartId) {
         return cartRepo.findById(cartId).orElseThrow(() -> new RuntimeException("Cart not found"));
+    }
+
+    public List<String> getImageUrlPerCartItem(Long cartId) {
+        try{
+            List<String> imageUrls = cartRepo.findImageUrlPerCartItem(cartId);
+             return imageUrls != null ? imageUrls : new ArrayList<>();
+        }catch(Exception e){
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+
+
     }
 
 

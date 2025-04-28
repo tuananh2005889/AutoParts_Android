@@ -1,16 +1,16 @@
 package com.example.frontend.ui.screen.login
 
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.frontend.data.repository.LoginRepository
-import javax.inject.Inject
-import androidx.compose.runtime.*
 import androidx.lifecycle.viewModelScope
 import com.example.frontend.data.model.LoginData
 import com.example.frontend.data.remote.ApiResponse
-import com.example.frontend.data.repository.CartRepository
+import com.example.frontend.data.repository.LoginRepository
 import com.example.frontend.ui.common.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class LoginUiState(
     val isLoading: Boolean = false,
@@ -27,7 +27,6 @@ data class LoginTextFieldUiState(
 class LoginViewModel @Inject constructor(
     private val loginRepo: LoginRepository,
     private val authManager: AuthManager,
-    private val cartRepo: CartRepository,
     ): ViewModel() {
 
     private val _loginState =  mutableStateOf<LoginUiState>(LoginUiState())
@@ -89,8 +88,10 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
-    fun login(user: LoginData){
+    fun login(){
         _loginState.value = LoginUiState(isLoading = true)
+
+        val user = LoginData(loginTextFieldState.value.userName.toString(), loginTextFieldState.value.password.toString())
 
         viewModelScope.launch{
          val result = loginRepo.login(user)

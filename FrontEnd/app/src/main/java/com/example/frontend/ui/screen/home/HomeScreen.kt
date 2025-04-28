@@ -1,10 +1,21 @@
 package com.example.frontend.ui.screen.home
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -12,13 +23,35 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,6 +64,7 @@ import com.example.frontend.ui.common.CloudinaryImage
 import com.example.frontend.ui.navigation.BottomNavBar
 import com.example.frontend.ui.navigation.HomeNavHost
 import com.example.frontend.ui.screen.login.LoginViewModel
+import com.example.frontend.ui.theme.specialGothicFontFamiLy
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 
@@ -100,7 +134,7 @@ fun HomeScreenContent(
             Column(
                 modifier = modifier
                     .padding(innerPadding)
-                    .background(DarkBackground)
+                    .background(MaterialTheme.colorScheme.background)
 
             ) {
                 Text(
@@ -109,6 +143,7 @@ fun HomeScreenContent(
                         color = SoftWhite,
                         fontSize = 24.sp
                     ),
+                    fontFamily = specialGothicFontFamiLy,
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 12.dp)
                 )
@@ -170,7 +205,7 @@ fun ProductGrid(
                     coroutineScope.launch {
                         val cartItem = homeViewModel.addOneProductToCart(product.productId)
                         if (cartItem != null) {
-                            onShowSnackBar("Added ${cartItem.quantity} ${cartItem.productName}")
+                            onShowSnackBar("Added 1 ${cartItem.productName} to cart")
                         } else {
                             onShowSnackBar("Failed to add product to cart.")
                         }
@@ -188,7 +223,10 @@ fun ProductCard(
 ) {
     Card(
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = SoftWhite),
+        colors = CardDefaults.cardColors(
+            containerColor =
+                Color(0xFF334F62),
+        ),
         elevation = CardDefaults.cardElevation(12.dp),
         modifier = Modifier
             .width(180.dp)
@@ -202,7 +240,7 @@ fun ProductCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(140.dp)
-                        .clip(RoundedCornerShape(16.dp)),
+                        .clip(RoundedCornerShape(12.dp)),
                     contentScale = ContentScale.Crop
                 )
             } else {
@@ -221,10 +259,12 @@ fun ProductCard(
 
             Text(
                 text = product.name,
-                style = MaterialTheme.typography.titleMedium,
-                color = DarkBackground,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.ExtraBold
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
 
             if (product.brand.isNotBlank()) {
@@ -237,26 +277,15 @@ fun ProductCard(
                 )
             }
 
-            Spacer(Modifier.height(6.dp))
-
-            if (product.description.isNotBlank()) {
-                Text(
-                    text = product.description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-
             Spacer(Modifier.height(10.dp))
 
             product.price?.let {
                 Text(
                     text = "$${"%.2f".format(it)}",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = ElegantBrown
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
 
@@ -270,7 +299,9 @@ fun ProductCard(
                 OutlinedButton(
                     onClick = onAddToCartClick,
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFF15D43)),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary
+                    ),
                     border = BorderStroke(1.dp, Color(0xFFF15D43)),
                     modifier = Modifier.height(36.dp)
                 ) {
@@ -279,11 +310,15 @@ fun ProductCard(
 
                 Button(
                     onClick = {},
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF15D43)),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                    ),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.height(36.dp)
                 ) {
-                    Text("Buy", color = Color.White)
+                    Text(
+                        "Buy",
+                    )
                 }
             }
         }

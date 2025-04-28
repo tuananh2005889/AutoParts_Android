@@ -1,11 +1,8 @@
 package com.example.frontend.ui.screen.home
 
-import androidx.compose.foundation.layout.Box
-
-import androidx.compose.foundation.lazy.items
-import com.example.frontend.R
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -16,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,24 +23,29 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedButton
-import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import  androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.*
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.frontend.R
 import com.example.frontend.ui.common.CloudinaryImage
+import com.example.frontend.ui.common.Notification
 import kotlinx.coroutines.delay
 
 @Composable
@@ -59,7 +62,6 @@ fun DetailProductScreen(
     val state by  productDetailViewModel.productDetailState
 
     var isVisible by remember {mutableStateOf(false)}
-    val notificationDuration = 2000L
 
     LaunchedEffect(isVisible){
         if(isVisible){
@@ -177,7 +179,7 @@ fun DetailProductScreen(
                                     ,
                                     elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
                                     colors = CardDefaults.cardColors(
-                                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                        containerColor = MaterialTheme.colorScheme.surface,
                                         contentColor = MaterialTheme.colorScheme.onSurface,
                                     ),
                                     shape = RoundedCornerShape(
@@ -218,9 +220,7 @@ fun DetailProductScreen(
                                            ),
                                            modifier = Modifier.padding(top = 8.dp)
                                        ){
-                                           Text( text =
-//                                               "Vì vậy, khi bạn gọi property.get(product), bạn đang truyền một giá trị nullable vào, trong khi property.get(...) yêu cầu một đối tượng non-null."
-                                               product!!.description
+                                           Text( text = product!!.description
                                            )
                                        }
                                    }
@@ -236,8 +236,8 @@ fun DetailProductScreen(
                                     ,
                                     elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
                                     colors = CardDefaults.cardColors(
-                                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                        containerColor = MaterialTheme.colorScheme.surface,
+                                        contentColor = MaterialTheme.colorScheme.onSurface,
                                     ),
                                     shape = RoundedCornerShape(
                                         topStart = 0.dp,
@@ -367,7 +367,10 @@ fun DetailProductScreen(
                             }
 
                         if(isVisible){
-                            Notification(modifier = Modifier.align(Alignment.TopCenter))
+                            Notification(
+                                modifier = Modifier.align(Alignment.TopCenter),
+                                text = "Added to cart successfully!"
+                            )
                         }
 
                         // Add to cart and +/- quantity
@@ -428,8 +431,8 @@ fun DetailProductScreen(
                                         onClick = {productDetailViewModel.addToCart()
                                                   isVisible = true },
                                         colors = ButtonDefaults.buttonColors(
-                                            contentColor = MaterialTheme.colorScheme.error,
-                                            backgroundColor = MaterialTheme.colorScheme.surface,
+                                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                                            backgroundColor = MaterialTheme.colorScheme.primary,
                                         ),
                                         modifier = Modifier.padding(end = 8.dp),
                                         contentPadding = PaddingValues(8.dp)
@@ -448,28 +451,8 @@ fun DetailProductScreen(
             }
         }
     }
-    }
 
-@Composable
-fun Notification(modifier: Modifier = Modifier){
-    Box(
-        modifier = Modifier
-            .padding(16.dp) // Khoảng cách giữa thông báo và các thành phần khác
-    ) {
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-            ),
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                modifier = Modifier.padding(16.dp),
-                text = "Added to cart successfully!",
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
+
 }
+
 

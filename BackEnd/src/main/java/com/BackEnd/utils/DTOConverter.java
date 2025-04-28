@@ -3,6 +3,7 @@ package com.BackEnd.utils;
 import com.BackEnd.dto.CartBasicInfoDTO;
 import com.BackEnd.dto.CartDTO;
 import com.BackEnd.dto.CartItemDTO;
+import com.BackEnd.dto.BasicCartItemDTO;
 import com.BackEnd.model.Cart;
 import com.BackEnd.model.CartItem;
 
@@ -34,6 +35,12 @@ public class DTOConverter {
         Long cartId = cart.getCartId();
         String status = cart.getStatus().name();
         return new CartBasicInfoDTO(cartId, status);
+    }
+
+    public static BasicCartItemDTO toBasicCartItemDTO(CartItem cartItem) {
+        Long productId = cartItem.getProduct().getProductId();
+        int quantity = cartItem.getQuantity();
+        return new BasicCartItemDTO(productId, quantity);
     }
 
 
