@@ -125,4 +125,9 @@ dependencies {
     implementation(platform("androidx.compose:compose-bom:1.6.0"))
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
     implementation("androidx.compose.foundation:foundation:1.5.4")
+
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
+    // Material 3 components
+    implementation("androidx.compose.material3:material3:1.3.2")
 }

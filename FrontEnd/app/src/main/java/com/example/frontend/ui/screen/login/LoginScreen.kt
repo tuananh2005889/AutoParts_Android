@@ -27,13 +27,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.frontend.R
 import com.example.frontend.data.model.LoginData
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.frontend.ui.screen.login.LoginViewModel
 
 @Composable
 fun LoginScreen(
@@ -41,9 +40,11 @@ fun LoginScreen(
     onSignupClick: () -> Unit = {},
     loginViewModel: LoginViewModel = hiltViewModel(),
 ) {
-    val loginState by loginViewModel.loginState
-    val textState by loginViewModel.loginTextFieldState
+    /* -------- Observe state từ ViewModel -------- */
+    val uiState   by loginViewModel.ui
+    val textState by loginViewModel.text
 
+    /* -------- Google Sign-In client -------- */
     val context = LocalContext.current
     val serverClientId = stringResource(R.string.google_server_client_id)
     val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -52,22 +53,25 @@ fun LoginScreen(
         .build()
     val googleClient = GoogleSignIn.getClient(context, gso)
 
-    val launcher = rememberLauncherForActivityResult(
+    val googleLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
         try {
             val account = task.getResult(ApiException::class.java)
-            account.idToken?.let { loginViewModel.loginWithGoogle(it) }
-        } catch (_: Exception) {
-            // Google Sign-In error handled silently
-        }
+            account.idToken?.let { token ->
+                val avatarUrl = account.photoUrl?.toString()
+                loginViewModel.loginWithGoogle(token, avatarUrl)
+            }
+        } catch (_: Exception) { /* ignore */ }
     }
 
-    LaunchedEffect(loginState.loginSuccess) {
-        if (loginState.loginSuccess) onLoginSuccess()
+    /* -------- Navigate on success -------- */
+    LaunchedEffect(uiState.loginSuccess) {
+        if (uiState.loginSuccess) onLoginSuccess()
     }
 
+    /* ----------------- UI ----------------- */
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -75,10 +79,12 @@ fun LoginScreen(
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(80.dp))
-        Box(modifier = Modifier.height(200.dp)) {
+        Spacer(Modifier.height(80.dp))
+
+        /* ---- Hero images + title ---- */
+        Box(Modifier.height(200.dp)) {
             Image(
-                painter = painterResource(id = R.drawable.login2),
+                painter = painterResource(R.drawable.login2),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -88,7 +94,7 @@ fun LoginScreen(
                     .graphicsLayer(scaleY = 1.3f)
             )
             Image(
-                painter = painterResource(id = R.drawable.login),
+                painter = painterResource(R.drawable.login),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -98,7 +104,7 @@ fun LoginScreen(
                     .shadow(8.dp, RoundedCornerShape(10.dp))
             )
             Text(
-                text = "LOGIN",
+                "LOGIN",
                 fontSize = 72.sp,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
@@ -109,62 +115,82 @@ fun LoginScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(120.dp))
+        Spacer(Modifier.height(120.dp))
 
+        /* ---- Username ---- */
         LoginField(
-            placeholder = "Enter your user name",
-            value = textState.userName.orEmpty(),
+            placeholder   = "Enter your user name",
+            value         = textState.userName,
             onValueChange = loginViewModel::onUserNameChange
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(Modifier.height(10.dp))
 
+        /* ---- Password ---- */
         LoginField(
-            placeholder = "Enter your password",
-            value = textState.password.orEmpty(),
+            placeholder   = "Enter your password",
+            value         = textState.password,
             onValueChange = loginViewModel::onPasswordChange,
-            isPassword = true
+            isPassword    = true
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(Modifier.height(20.dp))
 
-        loginState.errorMessage?.let {
-            Text(text = it, color = Color.Red, fontSize = 14.sp)
-            Spacer(modifier = Modifier.height(10.dp))
+        /* ---- Error ---- */
+        uiState.errorMessage?.let {
+            Text(it, color = Color.Red, fontSize = 14.sp)
+            Spacer(Modifier.height(10.dp))
         }
 
+        /* ---- LogIn button ---- */
         Button(
             onClick = {
-                val user = LoginData(textState.userName.orEmpty(), textState.password.orEmpty())
+                val user = LoginData(textState.userName, textState.password)
                 loginViewModel.login(user)
             },
+            enabled = !uiState.isLoading,
             modifier = Modifier.width(200.dp),
             shape = RoundedCornerShape(16.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF15D43)),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF15D43))
         ) {
-            Text(text = "LogIn", fontSize = 18.sp, color = Color.White)
+            if (uiState.isLoading) {
+                CircularProgressIndicator(
+                    color = Color.White,
+                    strokeWidth = 2.dp,
+                    modifier = Modifier.size(18.dp)
+                )
+            } else {
+                Text("LogIn", fontSize = 18.sp, color = Color.White)
+            }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(Modifier.height(10.dp))
 
+        /* ---- Sign-up ---- */
         TextButton(onClick = onSignupClick) {
-            Text("You don’t have an account? Register now", fontSize = 12.sp, color = Color.White)
+            Text(
+                "You don’t have an account? Register now",
+                fontSize = 12.sp,
+                color = Color.White
+            )
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(Modifier.height(20.dp))
         Text("Or sign in with Google", color = Color.Gray)
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(Modifier.height(10.dp))
 
+        /* ---- Google button ---- */
         Image(
-            painter = painterResource(id = R.drawable.logogoogle),
+            painter = painterResource(R.drawable.logogoogle),
             contentDescription = "Google Login",
             modifier = Modifier
                 .size(48.dp)
-                .clickable { launcher.launch(googleClient.signInIntent) }
+                .clickable { googleLauncher.launch(googleClient.signInIntent) }
         )
     }
 }
 
+/* ---------- Reusable TextField ---------- */
 @Composable
 fun LoginField(
     placeholder: String,
@@ -175,11 +201,12 @@ fun LoginField(
     TextField(
         value = value,
         onValueChange = onValueChange,
-        placeholder = { Text(text = placeholder, color = Color.Gray, fontSize = 14.sp) },
-        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+        placeholder = { Text(placeholder, color = Color.Gray, fontSize = 14.sp) },
+        visualTransformation = if (isPassword) PasswordVisualTransformation()
+        else VisualTransformation.None,
         keyboardOptions = KeyboardOptions(
             keyboardType = if (isPassword) KeyboardType.Password else KeyboardType.Text,
-            imeAction = ImeAction.Done
+            imeAction    = ImeAction.Done
         ),
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier

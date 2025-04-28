@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class UserDTO{
+public class UserDTO {
     private Long userId;
     private String fullName;
     private String userName;
@@ -15,4 +15,5 @@ public class UserDTO{
     private String role;
     private String phone;
     private List<CartDTO> carts;
+    private String avatarUrl;
 }
