@@ -1,6 +1,5 @@
 package com.BackEnd.service;
 
-
 import com.BackEnd.dto.AddToCartRequest;
 import com.BackEnd.dto.CartBasicInfoDTO;
 import com.BackEnd.dto.CartItemDTO;
@@ -29,40 +28,41 @@ public class CartService {
     private final CartItemRepository cartItemRepo;
     private final ProductRepository productRepo;
     private final UserRepository userRepo;
-//
-//    public CartDTO getActiveCartDTO(String userName) {
-//        User user = userRepo.findByUserName(userName)
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-//        Cart cart = cartRepo.findByUserAndStatus(user, Cart.CartStatus.ACTIVE)
-//                .orElseThrow(() -> new RuntimeException("Cart not found"));
-//
-//        return DTOConverter.toCartDTO(cart);
-//    }
-//
-//    public CartDTO createActiveCartDTO(String userName) {
-//        User user = userRepo.findByUserName(userName)
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-//
-//        Cart newCart = new Cart();
-//        newCart.setUser(user);
-//        newCart.setStatus(Cart.CartStatus.ACTIVE);
-//
-//        cartRepo.save(newCart);
-//
-//        return DTOConverter.toCartDTO(newCart);
-//    }
-// ->
-//      gop 2 method tren thanh 1, giup controller, frontend do rac roi
-    public CartBasicInfoDTO getOrCreateActiveCartDTO(String userName){
+
+    //
+    // public CartDTO getActiveCartDTO(String userName) {
+    // User user = userRepo.findByUserName(userName)
+    // .orElseThrow(() -> new RuntimeException("User not found"));
+    // Cart cart = cartRepo.findByUserAndStatus(user, Cart.CartStatus.ACTIVE)
+    // .orElseThrow(() -> new RuntimeException("Cart not found"));
+    //
+    // return DTOConverter.toCartDTO(cart);
+    // }
+    //
+    // public CartDTO createActiveCartDTO(String userName) {
+    // User user = userRepo.findByUserName(userName)
+    // .orElseThrow(() -> new RuntimeException("User not found"));
+    //
+    // Cart newCart = new Cart();
+    // newCart.setUser(user);
+    // newCart.setStatus(Cart.CartStatus.ACTIVE);
+    //
+    // cartRepo.save(newCart);
+    //
+    // return DTOConverter.toCartDTO(newCart);
+    // }
+    // ->
+    // gop 2 method tren thanh 1, giup controller, frontend do rac roi
+    public CartBasicInfoDTO getOrCreateActiveCartDTO(String userName) {
         User user = userRepo.findByUserName(userName)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-    Cart initalCart = cartRepo.findCartByUserAndStatus(user, Cart.CartStatus.ACTIVE)
+        Cart initalCart = cartRepo.findCartByUserAndStatus(user, Cart.CartStatus.ACTIVE)
                 .orElse(null);
-        if(initalCart == null){
+        if (initalCart == null) {
             initalCart = new Cart();
             initalCart.setUser(user);
             initalCart.setStatus(Cart.CartStatus.ACTIVE);
-           cartRepo.save(initalCart);
+            cartRepo.save(initalCart);
         }
         return DTOConverter.toCartBasicInfoDTO(initalCart);
     }
@@ -85,36 +85,34 @@ public class CartService {
         return cartItemDTOs;
     }
 
-
     // Phương thức thanh toán giỏ hàng, cập nhật trạng thái giỏ hàng thành PAID
     public void checkoutCart(Long cartId) {
         Cart cart = cartRepo.findById(cartId).orElseThrow(() -> new RuntimeException("Cart not found"));
-        cart.setStatus(Cart.CartStatus.PAID);  // Cập nhật trạng thái giỏ hàng thành đã thanh toán
-        cartRepo.save(cart);  // Lưu lại trạng thái mới của giỏ hàng
+        cart.setStatus(Cart.CartStatus.PAID); // Cập nhật trạng thái giỏ hàng thành đã thanh toán
+        cartRepo.save(cart); // Lưu lại trạng thái mới của giỏ hàng
     }
 
-    public CartItemDTO addItemToCart(AddToCartRequest addToCartRequest){
+    public CartItemDTO addItemToCart(AddToCartRequest addToCartRequest) {
         // check quantity request
         if (addToCartRequest.getQuantity() <= 0) {
             throw new IllegalArgumentException("Quantity must be greater than 0");
         }
 
         Cart cart = cartRepo.findById(addToCartRequest.getCartId())
-        .orElseThrow(() -> new RuntimeException("Cart not found"));
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
 
         Product product = productRepo.findByProductId(addToCartRequest.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-
         Optional<CartItem> existingCartItem = cart.getCartItems().stream()
                 .filter(
-                item -> item.getProduct().getProductId().equals(addToCartRequest.getProductId()))
+                        item -> item.getProduct().getProductId().equals(addToCartRequest.getProductId()))
                 .findFirst();
-        if(existingCartItem.isPresent()){
+        if (existingCartItem.isPresent()) {
             existingCartItem.get().setQuantity(existingCartItem.get().getQuantity() + addToCartRequest.getQuantity());
             cartItemRepo.save(existingCartItem.get());
 
-        }else{
+        } else {
             CartItem cartItem = new CartItem(product, addToCartRequest.getQuantity(), cart);
             cartItemRepo.save(cartItem);
             cart.getCartItems().add(cartItem);
@@ -125,12 +123,8 @@ public class CartService {
         return DTOConverter.toCartItemDTO(existingCartItem.get());
     }
 
-
     public Cart getCartStatus(Long cartId) {
         return cartRepo.findById(cartId).orElseThrow(() -> new RuntimeException("Cart not found"));
     }
 
-
-
 }
-

@@ -9,7 +9,7 @@ import retrofit2.http.POST
 //  Request cho Google login
 data class GoogleLoginRequest(val idToken: String)
 //  Response chứa JWT token và info cơ bản
-data class GoogleLoginResponse(val token: String, val userName: String)
+data class GoogleLoginResponse(val userId: Long,val token: String, val userName: String)
 
 interface LoginApiService {
     @POST("/auth/login")

@@ -106,15 +106,19 @@ fun SignupScreen(
 
         Button(
             onClick = {
-                val user = UserData(userName, fullName, gmail, phone, password)
+                val user = UserData(
+                    userId = null,
+                    userName = userName,
+                    fullName = fullName,
+                    gmail = gmail,
+                    phone = phone,
+                    password = password,
+                    isActive = true,
+                    avatarUrl = null
+                )
                 signUpAccount(user) { success, message ->
                     if (success) {
                         onSignupSuccess()
-//                        Handler(Looper.getMainLooper()).post {
-//                            navController.navigate("login") {
-//                                popUpTo("signup") { inclusive = true }
-//                            }
-//                        }
                     } else {
                         errorMessage = message
                     }
