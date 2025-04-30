@@ -23,8 +23,9 @@ public class CartItemService {
 
         cartItem.setQuantity(cartItem.getQuantity() + 1);
         cartItemRepo.save(cartItem);
-        return DTOConverter.toBasicCartItemDTO(cartItem) ;
+        return DTOConverter.toBasicCartItemDTO(cartItem);
     }
+
     public BasicCartItemDTO decreaseQuantity(Long cartItemId) {
         CartItem cartItem = cartItemRepo.findById(cartItemId)
                 .orElseThrow(() -> new RuntimeException("CartItem not found"));
@@ -35,8 +36,5 @@ public class CartItemService {
         cartItemRepo.save(cartItem);
         return DTOConverter.toBasicCartItemDTO(cartItem);
     }
-
-
-
 
 }

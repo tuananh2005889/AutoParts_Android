@@ -142,23 +142,23 @@ fun ProfileContent(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
-                    else -> Text("Chọn avatar", color = Color.White)
+                    else -> Text("Choose avatar", color = Color.White)
                 }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
             // Show info dialog button
             Button(onClick = { showDialog = true }) {
-                Text("Xem thông tin", color = Color.White)
+                Text("View information", color = Color.White)
             }
 
             Spacer(modifier = Modifier.height(24.dp))
             // Policies always visible
-            Text(text = "Chính sách bảo mật", modifier = Modifier.fillMaxWidth(), fontSize = 16.sp)
+            Text(text = "Privacy Policy", modifier = Modifier.fillMaxWidth(), fontSize = 16.sp)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Điều khoản dịch vụ", modifier = Modifier.fillMaxWidth(), fontSize = 16.sp)
+            Text(text = "Terms of Service", modifier = Modifier.fillMaxWidth(), fontSize = 16.sp)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Cài đặt ứng dụng", modifier = Modifier.fillMaxWidth(), fontSize = 16.sp)
+            Text(text = "Install the app", modifier = Modifier.fillMaxWidth(), fontSize = 16.sp)
 
 
 
@@ -169,7 +169,7 @@ fun ProfileContent(
                     .fillMaxWidth()
                     .padding(vertical = 16.dp)
             ) {
-                Text("Đăng xuất", color = Color.White)
+                Text("Log out", color = Color.White)
             }
         }
 
@@ -197,7 +197,7 @@ fun ProfileContent(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(text = "Email: ${user.gmail}")
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text(text = "Phone: ${user.phone ?: "Chưa có"}")
+                        Text(text = "Phone: ${user.phone ?: "Not yet"}")
                         Spacer(modifier = Modifier.height(24.dp))
                     }
                 }

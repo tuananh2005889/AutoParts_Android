@@ -26,7 +26,7 @@ public class WebProductController {
     private final ProductRepository productRepository;
 
     public WebProductController(ProductService productService, CloudinaryyService cloudinaryyService,
-                                ProductRepository productRepository) {
+            ProductRepository productRepository) {
         this.productService = productService;
         this.cloudinaryyService = cloudinaryyService;
         this.productRepository = productRepository;
@@ -53,9 +53,9 @@ public class WebProductController {
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         List<String> base64ImageList = new ArrayList<>();
         if (product != null) {
-            for(String url : product.getImages()){
-               MultipartFile file = ImageDownloader.urlToMultipartFile(url);
-               base64ImageList.add(FIleToBase64.convertToBase64(file));
+            for (String url : product.getImages()) {
+                MultipartFile file = ImageDownloader.urlToMultipartFile(url);
+                base64ImageList.add(FIleToBase64.convertToBase64(file));
             }
 
             model.addAttribute("product", product);
@@ -73,9 +73,8 @@ public class WebProductController {
 
     @PostMapping("/add")
     public String addProduct(@ModelAttribute ProductDTO productDTO,
-                             @RequestParam("images") List<MultipartFile> images,
-                             RedirectAttributes redirectAttributes
-                             ) {
+            @RequestParam("images") List<MultipartFile> images,
+            RedirectAttributes redirectAttributes) {
         try {
             if (images == null || images.isEmpty()) {
                 redirectAttributes.addFlashAttribute("error", "Please upload at least one image.");
@@ -92,13 +91,13 @@ public class WebProductController {
                     productDTO.getYearOfManufacture(), productDTO.getSize(),
                     productDTO.getMaterial(),
                     productDTO.getWeight(),
-                    productDTO.getDiscount(), productDTO.getWarranty() );
+                    productDTO.getDiscount(), productDTO.getWarranty());
 
             product.setImages(imageUrls);
             productService.saveProduct(product);
 
-            //redirectAttribute giup truyen du lieu tam thoi qua tung request
-            //du lieu chi duoc du lai mot lan duy nhat sau khi redirect, sau
+            // redirectAttribute giup truyen du lieu tam thoi qua tung request
+            // du lieu chi duoc du lai mot lan duy nhat sau khi redirect, sau
             // do bi xoa di
             redirectAttributes.addFlashAttribute("successMessage", "Added product successfully");
             return "redirect:/web/product/all";
@@ -109,8 +108,6 @@ public class WebProductController {
             return "redirect:/web/product/add";
         }
     }
-
-
 
     @GetMapping("/edit/{id}")
     public String showEditProductForm(@PathVariable Long id, Model model) {
@@ -144,9 +141,5 @@ public class WebProductController {
             return "error";
         }
     }
-
-
-
-
 
 }

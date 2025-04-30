@@ -1,5 +1,6 @@
 package com.BackEnd.controller;
 
+import com.BackEnd.repository.CartItemRepository;
 import com.BackEnd.repository.ProductRepository;
 import com.BackEnd.service.ProductService;
 import com.BackEnd.dto.ProductRequest;
@@ -24,22 +25,9 @@ public class ProductController {
             ProductRepository productRepo) {
         this.productService = productService;
         this.productRepo = productRepo;
+
     }
 
-    // @PostMapping("/add")
-    // public ResponseEntity<String> addProduct(
-    // @RequestBody Product product,
-    // @RequestParam("imageUrls") List<String> imageUrls
-    // ) {
-    // try {
-    // System.out.println("Received product: " + product.toString());
-    // productService.saveProduct(product);
-    // return ResponseEntity.ok("Product added successfully");
-    // } catch (Exception e) {
-    // e.printStackTrace();
-    // return ResponseEntity.status(500).body("Error: " + e.getMessage());
-    // }
-    // }
     @PostMapping("/add")
     public ResponseEntity<String> addProduct(@RequestBody ProductRequest request) {
         try {
@@ -72,35 +60,6 @@ public class ProductController {
         }
     }
 
-
-//    @GetMapping("/imageUrls")
-//    public ResponseEntity<List<String>> getImageUrls(
-//
-//            @RequestParam("productId") Long productId
-//    ){
-//        try{
-//          List<String> imageUrls =
-//                  productService.getImageUrls(productId);
-//            if (imageUrls != null && !imageUrls.isEmpty()) {
-//                return ResponseEntity.ok(imageUrls);
-//            } else {
-//                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-//            }
-//
-//       }catch(Exception e){
-//
-//            @RequestParam("productId") Long productId) {
-//        try {
-//            Optional<List<String>> imageUrls = productRepo.findImageByProductId(productId);
-//            return imageUrls
-//                    .map(ResponseEntity::ok)
-//                    .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-//        } catch (Exception e) {
-//
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
-
     @GetMapping("/imageUrl")
     public ResponseEntity<String> getImageUrl(@RequestParam("productId") Long productId) {
         try {
@@ -110,7 +69,6 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
-
 
     @GetMapping("/all")
     public ResponseEntity<List<Product>> getAllProducts() {
@@ -132,7 +90,7 @@ public class ProductController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<String> updateProduct(@PathVariable String id, @RequestBody Product productDetails) {
+    public ResponseEntity<String> updateProduct(@PathVariable Long id, @RequestBody Product productDetails) {
         try {
             boolean updated = productService.updateProduct(id, productDetails);
             if (updated) {
@@ -144,14 +102,16 @@ public class ProductController {
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }
-    //
-    // @DeleteMapping("/delete/{id}")
-    // public ResponseEntity<String> deleteProduct(@PathVariable String id) {
-    // boolean deleted = productService.deleteProduct(id);
-    // if (deleted) {
-    // return ResponseEntity.ok("Product deleted successfully");
-    // } else {
-    // return ResponseEntity.notFound().build();
-    // }
-    // }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
+
+        boolean deleted = productService.deleteProduct(id);
+
+        if (deleted) {
+            return ResponseEntity.ok("Product deleted successfully");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
