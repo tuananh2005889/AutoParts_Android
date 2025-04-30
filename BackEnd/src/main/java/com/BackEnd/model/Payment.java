@@ -19,9 +19,7 @@ public class Payment {
     private Long paymentId;
 
     @OneToOne
-    @JoinColumn(name = "order_id",
-            referencedColumnName = "order_id",
-            unique = true, nullable = false)
+    @JoinColumn(name = "order_id", referencedColumnName = "order_id", unique = true, nullable = false)
     private Order order;
 
     @Column(nullable = false, length = 100)

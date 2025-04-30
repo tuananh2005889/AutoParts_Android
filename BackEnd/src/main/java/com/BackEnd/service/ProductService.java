@@ -1,7 +1,11 @@
 
 package com.BackEnd.service;
 
+import com.BackEnd.repository.CartItemRepository;
 import com.BackEnd.repository.ProductRepository;
+
+import jakarta.transaction.Transactional;
+
 import com.BackEnd.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,16 +19,23 @@ public class ProductService {
 
     @Autowired
     private ProductRepository productRepository;
+    private final CartItemRepository cartItemRepo;
 
     public void saveProduct(Product product) {
         productRepository.save(product);
+    }
+
+    @Autowired
+    public ProductService(ProductRepository productRepo, CartItemRepository cartItemRepo) {
+        this.productRepository = productRepo;
+        this.cartItemRepo = cartItemRepo;
     }
 
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
-    public List<String> getImageUrls(Long productId){
+    public List<String> getImageUrls(Long productId) {
         List<String> imageUrls;
         imageUrls = productRepository.findImageByProductId(productId)
                 .orElseThrow(() -> new RuntimeException("No image urls found " +
@@ -32,6 +43,7 @@ public class ProductService {
         return imageUrls;
 
     }
+
     public String getImageUrl(Long productId) {
         List<String> imageUrls = productRepository.findImageByProductId(productId)
                 .orElseThrow(() -> new RuntimeException("No image urls found for product id " + productId));
@@ -42,12 +54,11 @@ public class ProductService {
         return imageUrls.get(0);
     }
 
-
     public Optional<Product> getProductById(Long id) {
         return productRepository.findByProductId(id);
     }
 
-    public boolean updateProduct(String id, Product productDetails) {
+    public boolean updateProduct(Long id, Product productDetails) {
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isPresent()) {
             Product product = optionalProduct.get();
@@ -71,11 +82,14 @@ public class ProductService {
         return false;
     }
 
+    @Transactional
     public boolean deleteProduct(Long id) {
-        if (productRepository.existsById(Long.toString(id))) {
-            productRepository.deleteById(Long.toString(id));
+        cartItemRepo.deleteByProductId(id);
+        if (productRepository.existsById(id)) {
+            productRepository.deleteById(id);
             return true;
         }
         return false;
     }
+
 }

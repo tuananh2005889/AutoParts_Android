@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { BarChart2 } from "lucide-react";
 import Header from "./comon/Header";
 import toast, { Toaster } from "react-hot-toast";
-import ProductGrid from "./Product/TableProduct";
+import TableProduct from "./Product/TableProduct";
 
 const API_ADD = "http://localhost:8080/app/product/add";
 
@@ -123,7 +123,7 @@ const ProductPage = () => {
             </div>
           </motion.div>
         </motion.div>
-        <ProductGrid refresh={refresh} />
+        <TableProduct refresh={refresh} />
       </div>
 
       {productsform && (
