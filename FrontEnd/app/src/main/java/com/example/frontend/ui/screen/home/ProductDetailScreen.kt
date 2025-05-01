@@ -44,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.frontend.R
+import com.example.frontend.ViewModel.ProductDetailViewModel
 import com.example.frontend.ui.common.CloudinaryImage
 import com.example.frontend.ui.common.Notification
 import kotlinx.coroutines.delay
@@ -55,7 +56,7 @@ fun DetailProductScreen(
     productDetailViewModel: ProductDetailViewModel = hiltViewModel(),
     clickBack: () -> Unit,
 
-){
+    ){
     LaunchedEffect(productId) {
         productDetailViewModel.getProductById(productId)
     }

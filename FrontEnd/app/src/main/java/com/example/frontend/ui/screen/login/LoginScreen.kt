@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.frontend.R
+import com.example.frontend.ViewModel.LoginViewModel
 import com.example.frontend.data.model.LoginData
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -55,6 +56,7 @@ import com.google.android.gms.common.api.ApiException
 fun LoginScreen(
     onLoginSuccess: () -> Unit = {},
     onSignupClick: () -> Unit = {},
+    onForgotPasswordClick: () -> Unit = {},
     loginViewModel: LoginViewModel = hiltViewModel(),
 ) {
     /* -------- Observe state từ ViewModel -------- */
@@ -143,16 +145,21 @@ fun LoginScreen(
 
         Spacer(Modifier.height(10.dp))
 
-        /* ---- Password ---- */
         LoginField(
             placeholder   = "Enter your password",
             value         = textState.password,
             onValueChange = loginViewModel::onPasswordChange,
             isPassword    = true
         )
+        Spacer(Modifier.height(10.dp))
 
-        Spacer(Modifier.height(20.dp))
-
+        TextButton(onClick = onForgotPasswordClick) {
+            Text(
+                "Forgot password",
+                fontSize = 12.sp,
+                color = Color.White
+            )
+        }
         /* ---- Error ---- */
         uiState.errorMessage?.let {
             Text(it, color = Color.Red, fontSize = 14.sp)

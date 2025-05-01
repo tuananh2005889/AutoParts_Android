@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
+import com.example.frontend.ViewModel.ProfileViewModel
 import com.example.frontend.data.model.UserData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

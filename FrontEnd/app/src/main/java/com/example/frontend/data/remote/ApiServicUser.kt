@@ -19,4 +19,14 @@ interface ApiServiceUser {
         @Field("userName") userName: String,
         @Field("avatarUrl") avatarUrl: String
     ): Response<String>
+
+    @POST("api/user/forgot-password")
+    suspend fun forgotPassword(@Body body: Map<String,String>): Response<String>
+
+    @POST("api/user/verify-code")
+    suspend fun verifyCode(@Body body: Map<String,String>): Response<String>
+
+    @POST("api/user/reset-password")
+    suspend fun resetPassword(@Body body: Map<String,String>): Response<String>
+
 }
