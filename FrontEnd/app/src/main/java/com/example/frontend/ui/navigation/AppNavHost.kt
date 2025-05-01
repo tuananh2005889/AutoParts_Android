@@ -15,7 +15,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.frontend.ui.screen.home.HomeScreen
 import com.example.frontend.ui.screen.login.LoginScreen
-import com.example.frontend.ui.screen.login.LoginViewModel
+import com.example.frontend.ViewModel.LoginViewModel
+import com.example.frontend.ui.screen.login.ForgotPasswordScreen
 import com.example.frontend.ui.screen.signup.SignupScreen
 
 @Composable
@@ -25,7 +26,7 @@ fun AppNavHost(
 ) {
 
     /* -------- Listen state từ ViewModel -------- */
-    val isLoggedIn          by loginViewModel.isLoggedIn       // State<Boolean>
+    val isLoggedIn          by loginViewModel.isLoggedIn
     val isInitialCheckDone  by loginViewModel.isInitialCheckDone
 
     NavHost(
@@ -33,7 +34,6 @@ fun AppNavHost(
         startDestination = Route.Splash.route
     ) {
 
-        /* ---------- Splash ---------- */
         composable(Route.Splash.route) {
             if (isInitialCheckDone) {
                 LaunchedEffect(isLoggedIn) {
@@ -54,7 +54,6 @@ fun AppNavHost(
             }
         }
 
-        /* ---------- Login ---------- */
         composable(Route.Login.route) {
             LoginScreen(
                 loginViewModel = loginViewModel,
@@ -67,7 +66,6 @@ fun AppNavHost(
             )
         }
 
-        /* ---------- Signup ---------- */
         composable(Route.Signup.route) {
             SignupScreen(
                 onBackToLogin = { navController.navigate(Route.Login.route) },
@@ -79,12 +77,30 @@ fun AppNavHost(
             )
         }
 
-
-        /* ---------- Home ---------- */
         composable(Route.Home.route) {
             HomeScreen(
                 rootNavController = navController,
                 loginViewModel    = loginViewModel
+            )
+        }
+        composable(Route.Login.route) {
+            LoginScreen(
+                loginViewModel = loginViewModel,
+                onLoginSuccess = {
+                    navController.navigate(Route.Home.route) {
+                        popUpTo(Route.Login.route) { inclusive = true }
+                    }
+                },
+                onSignupClick = { navController.navigate(Route.Signup.route) },
+                onForgotPasswordClick = { navController.navigate(Route.ForgotPassword.route) }
+            )
+        }
+
+        composable(Route.ForgotPassword.route) {
+            ForgotPasswordScreen(
+                onBackToLogin = {
+                    navController.popBackStack()
+                }
             )
         }
     }

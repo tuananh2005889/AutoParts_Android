@@ -3,6 +3,7 @@ package com.example.frontend.data.repository
 import com.example.frontend.data.model.UserData
 import com.example.frontend.data.remote.ApiResponse
 import com.example.frontend.data.remote.ApiServiceUser
+import retrofit2.Response
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(
@@ -26,5 +27,12 @@ class UserRepository @Inject constructor(
         } catch (e: Exception) {
             ApiResponse.Error(e.message ?: "Unknown error")
         }
+    suspend fun sendResetCode(email: String): Response<String> =
+        apiService.forgotPassword(mapOf("gmail" to email))
 
+     suspend fun checkCode(email: String, code: String) =
+        apiService.verifyCode(mapOf("gmail" to email, "code" to code))
+
+     suspend fun changePassword(email: String, newPass: String) =
+        apiService.resetPassword(mapOf("gmail" to email, "newPassword" to newPass))
 }

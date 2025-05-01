@@ -167,19 +167,19 @@ const TableProduct = ({ refresh }: ProductGridProps) => {
                     className="border border-gray-300 text-black rounded-md p-3 w-full text-sm"
                     placeholder={
                       {
-                        name: "Tên sản phẩm",
-                        brand: "Thương hiệu",
-                        category: "Danh mục",
-                        description: "Mô tả chi tiết",
-                        compatibleVehicles: "Phù hợp với xe",
-                        yearOfManufacture: "Năm sản xuất",
-                        size: "Kích thước",
-                        material: "Chất liệu",
-                        weight: "Khối lượng",
-                        discount: "Giảm giá (%)",
-                        warranty: "Bảo hành",
-                        price: "Giá bán",
-                        quantity: "Số lượng"
+                        name: "Name",
+                        brand: "Brand",
+                        category: "Category",
+                        description: "Description",
+                        compatibleVehicles: "Compatible Vehicles",
+                        yearOfManufacture: "Year of manufacture",
+                        size: "Size",
+                        material: "Material",
+                        weight: "Weight",
+                        discount: "Discount",
+                        warranty: "warranty",
+                        price: "Price",
+                        quantity: "Quantity"
                       }[key] || key
                     }
                     type={

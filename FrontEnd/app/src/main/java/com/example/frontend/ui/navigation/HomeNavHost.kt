@@ -24,9 +24,9 @@ import com.example.frontend.ui.screen.cart.CartScreen
 import com.example.frontend.ui.screen.cart.CartViewModel
 import com.example.frontend.ui.screen.home.DetailProductScreen
 import com.example.frontend.ui.screen.home.HomeScreenContent
-import com.example.frontend.ui.screen.login.LoginViewModel
+import com.example.frontend.ViewModel.LoginViewModel
 import com.example.frontend.ui.screen.profile.ProfileScreen
-import com.example.frontend.ui.screen.profile.ProfileViewModel
+import com.example.frontend.ViewModel.ProfileViewModel
 
 /**
  * Root navigation host for the bottom‑navigation area that sits inside [HomeScreen].
@@ -46,20 +46,12 @@ fun HomeNavHost(
     onShowSnackBar: (String) -> Unit,
 ) {
 
-    // ──────────────────────────────────────────────────────────────────────────────
-    // 1.  Hold the current userName loaded from DataStore. Nullable until loaded.
-    // ──────────────────────────────────────────────────────────────────────────────
     var userName by remember { mutableStateOf<String?>(null) }
-
-    // 2.  Load it once when this composable is first composed.
     LaunchedEffect(Unit) {
         userName = loginViewModel.getUserName()              // suspend fun – safe here
         Log.d("HomeNavHost", "Loaded userName = $userName")
     }
 
-    // ──────────────────────────────────────────────────────────────────────────────
-    // 3.  Navigation graph for the Home area.
-    // ──────────────────────────────────────────────────────────────────────────────
     NavHost(
         navController = bottomNavController,
         startDestination = Route.Home.route
@@ -113,7 +105,6 @@ fun HomeNavHost(
                 CircularProgressIndicator()
             }
         }
-
         /* ---------------- Cart ---------------- */
         composable(Route.Cart.route) {
             CartScreen()

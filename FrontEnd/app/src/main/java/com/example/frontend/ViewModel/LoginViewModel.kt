@@ -1,4 +1,4 @@
-package com.example.frontend.ui.screen.login
+package com.example.frontend.ViewModel
 
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel

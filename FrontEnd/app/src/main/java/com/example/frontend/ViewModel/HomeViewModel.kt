@@ -1,4 +1,4 @@
-package com.example.frontend.ui.screen.home
+package com.example.frontend.ViewModel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

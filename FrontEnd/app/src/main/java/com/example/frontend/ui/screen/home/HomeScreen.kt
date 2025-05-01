@@ -59,11 +59,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.frontend.R
+import com.example.frontend.ViewModel.HomeViewModel
 import com.example.frontend.data.model.ProductData
 import com.example.frontend.ui.common.CloudinaryImage
 import com.example.frontend.ui.navigation.BottomNavBar
 import com.example.frontend.ui.navigation.HomeNavHost
-import com.example.frontend.ui.screen.login.LoginViewModel
+import com.example.frontend.ViewModel.LoginViewModel
 import com.example.frontend.ui.theme.specialGothicFontFamiLy
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch

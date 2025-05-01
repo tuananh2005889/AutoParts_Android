@@ -50,7 +50,10 @@ dependencies {
     implementation("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
     implementation("com.google.http-client:google-http-client-gson:1.34.1")
 
-
+    //mail
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("org.springframework.security:spring-security-crypto")
+    // implementation("org.springframework.boot:spring-boot-starter-security")
 
 
 }
