@@ -6,6 +6,7 @@ data class UserData(
     val fullName: String,
     val gmail: String,
     val phone: String,
+    val address:String? =null,
     val password: String? = null,
     val isActive: Boolean = true,
     val avatarUrl: String? = null,

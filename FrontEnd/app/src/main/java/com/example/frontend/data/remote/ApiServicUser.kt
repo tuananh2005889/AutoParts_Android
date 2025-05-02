@@ -1,5 +1,7 @@
 package com.example.frontend.data.remote
 
+import com.example.frontend.data.dto.UpdateUserInfoRequest
+import com.example.frontend.data.dto.UserDTO
 import com.example.frontend.data.model.UserData
 import retrofit2.Response
 import retrofit2.http.*
@@ -29,4 +31,6 @@ interface ApiServiceUser {
     @POST("api/user/reset-password")
     suspend fun resetPassword(@Body body: Map<String,String>): Response<String>
 
+    @PUT("api/user/update-info")
+    suspend fun updateUserInfo(@Body dto: UpdateUserInfoRequest): Response<UpdateUserInfoRequest>
 }
