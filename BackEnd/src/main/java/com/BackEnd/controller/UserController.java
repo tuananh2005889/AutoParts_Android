@@ -5,6 +5,7 @@ import com.BackEnd.dto.VerifyCodeRequest;
 import com.BackEnd.dto.CartDTO;
 import com.BackEnd.dto.ForgotPasswordRequest;
 import com.BackEnd.dto.ResetPasswordRequest;
+import com.BackEnd.dto.UpdateUserInfoRequest;
 import com.BackEnd.model.User;
 import com.BackEnd.model.Cart;
 import com.BackEnd.repository.UserRepository;
@@ -81,5 +82,11 @@ public class UserController {
     public ResponseEntity<String> handleNotFound(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ex.getMessage());
+    }
+
+    @PutMapping("/update-info")
+    public ResponseEntity<UserDTO> updateInfo(@RequestBody UpdateUserInfoRequest dto) {
+        UserDTO updated = userService.updateUserInfo(dto);
+        return ResponseEntity.ok(updated);
     }
 }

@@ -1,5 +1,7 @@
 package com.example.frontend.data.repository
 
+import com.example.frontend.data.dto.UpdateUserInfoRequest
+import com.example.frontend.data.dto.UserDTO
 import com.example.frontend.data.model.UserData
 import com.example.frontend.data.remote.ApiResponse
 import com.example.frontend.data.remote.ApiServiceUser
@@ -35,4 +37,9 @@ class UserRepository @Inject constructor(
 
      suspend fun changePassword(email: String, newPass: String) =
         apiService.resetPassword(mapOf("gmail" to email, "newPassword" to newPass))
+
+    suspend fun updateUser(dto: UpdateUserInfoRequest): UpdateUserInfoRequest? {
+        val response = apiService.updateUserInfo(dto)
+        return if (response.isSuccessful) response.body() else null
+    }
 }

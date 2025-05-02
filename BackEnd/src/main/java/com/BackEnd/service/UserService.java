@@ -1,10 +1,14 @@
 package com.BackEnd.service;
 
+import com.BackEnd.dto.UpdateUserInfoRequest;
 import com.BackEnd.dto.UserDTO;
 import com.BackEnd.model.PasswordResetToken;
 import com.BackEnd.model.User;
 import com.BackEnd.repository.PasswordResetTokenRepository;
 import com.BackEnd.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -26,6 +30,19 @@ public class UserService {
         this.userRepo = userRepo;
         this.tokenRepo = tokenRepo;
         this.mailSender = mailSender;
+    }
+
+    private UserDTO toDto(User u) {
+        UserDTO dto = new UserDTO();
+        dto.setUserId(u.getUserId());
+        dto.setUserName(u.getUserName());
+        dto.setFullName(u.getFullName());
+        dto.setGmail(u.getGmail());
+        dto.setPhone(u.getPhone());
+        dto.setAddress(u.getAddress());
+        dto.setRole(u.getRole());
+        dto.setAvatarUrl(u.getAvatarUrl());
+        return dto;
     }
 
     public void initiateForgotPassword(String gmail) {
@@ -87,19 +104,20 @@ public class UserService {
                 .orElse(false);
     }
 
-    /**
-     * Map User entity → UserDTO
-     */
-    private UserDTO toDto(User u) {
-        UserDTO dto = new UserDTO();
-        dto.setUserId(u.getUserId());
-        dto.setUserName(u.getUserName());
-        dto.setFullName(u.getFullName());
-        dto.setGmail(u.getGmail());
-        dto.setPhone(u.getPhone());
-        dto.setAddress(u.getAddress());
-        dto.setRole(u.getRole());
-        dto.setAvatarUrl(u.getAvatarUrl());
-        return dto;
+    @Transactional
+    public UserDTO updateUserInfo(UpdateUserInfoRequest dto) {
+        User u = userRepo.findByUserName(dto.getUserName())
+                .orElseThrow(() -> new RuntimeException("User not found: " + dto.getUserName()));
+
+        u.setFullName(dto.getFullName());
+        u.setGmail(dto.getGmail());
+        // nếu password không rỗng thì cập nhật
+        if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+            u.setPassword(dto.getPassword());
+        }
+        u.setPhone(dto.getPhone());
+        u.setAddress(dto.getAddress());
+        User saved = userRepo.save(u);
+        return toDto(saved);
     }
 }

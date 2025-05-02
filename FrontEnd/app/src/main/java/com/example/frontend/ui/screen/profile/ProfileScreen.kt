@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,13 +20,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.frontend.ViewModel.ProfileViewModel
+import com.example.frontend.data.dto.UpdateUserInfoRequest
 import com.example.frontend.data.model.UserData
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -39,19 +45,28 @@ fun ProfileScreen(
 ) {
     val userState by profileViewModel.userDataState.collectAsState()
     val user = userState
-    val errorState by profileViewModel.updateAvatarError.collectAsState()
-    val error = errorState
+    val avatarError by profileViewModel.updateAvatarError.collectAsState()
+    val updateError by profileViewModel.updateUserError.collectAsState()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    // Load user info
     LaunchedEffect(userName) {
         profileViewModel.loadUser(userName)
     }
 
-    error?.let { msg ->
+    // Show avatar error toast
+    avatarError?.let { msg ->
         LaunchedEffect(msg) {
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
             profileViewModel.clearAvatarError()
+        }
+    }
+    // Show update error toast
+    updateError?.let { msg ->
+        LaunchedEffect(msg) {
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            profileViewModel.clearUpdateUserError()
         }
     }
 
@@ -79,7 +94,8 @@ fun ProfileScreen(
                 }
             }
         },
-        onLogout = onLogout
+        onLogout = onLogout,
+        profileViewModel = profileViewModel
     )
 }
 
@@ -88,19 +104,30 @@ fun ProfileScreen(
 fun ProfileContent(
     user: UserData,
     onUpload: (File) -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    profileViewModel: ProfileViewModel
 ) {
-    var avatarUri by remember { mutableStateOf<Uri?>(null) }
-    var showDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    var userLocal by remember { mutableStateOf(user) }
+    var avatarUri by remember { mutableStateOf<Uri?>(null) }
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         uri?.let {
             avatarUri = it
-            File(getRealPathFromUri(context, it)).let(onUpload)
+            val file = File(getRealPathFromUri(context, it))
+            onUpload(file)
         }
     }
+
+    var showDialog by remember { mutableStateOf(false) }
+    var isEditing by remember { mutableStateOf(false) }
+
+    var editableFullName by remember { mutableStateOf(userLocal.fullName) }
+    var editableEmail by remember { mutableStateOf(userLocal.gmail) }
+    var editablePassword by remember { mutableStateOf(userLocal.password) }
+    var editablePhone by remember { mutableStateOf(userLocal.phone ?: "") }
+    var editableAddress by remember { mutableStateOf(userLocal.address ?: "") }
 
     Scaffold(
         topBar = {
@@ -121,7 +148,6 @@ fun ProfileContent(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Avatar picker
             Box(
                 modifier = Modifier
                     .size(120.dp)
@@ -137,8 +163,8 @@ fun ProfileContent(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
-                    user.avatarUrl != null -> Image(
-                        painter = rememberAsyncImagePainter(user.avatarUrl),
+                    userLocal.avatarUrl != null -> Image(
+                        painter = rememberAsyncImagePainter(userLocal.avatarUrl),
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
@@ -147,59 +173,136 @@ fun ProfileContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-            // Show info dialog button
+            Spacer(Modifier.height(24.dp))
             Button(onClick = { showDialog = true }) {
-                Text("View information", color = Color.White)
+                Text("View / Edit Information", color = Color.White)
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
-            // Policies always visible
-            Text(text = "Privacy Policy", modifier = Modifier.fillMaxWidth(), fontSize = 16.sp)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Terms of Service", modifier = Modifier.fillMaxWidth(), fontSize = 16.sp)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Install the app", modifier = Modifier.fillMaxWidth(), fontSize = 16.sp)
-
-
-
+            Spacer(Modifier.height(24.dp))
+            Text("Privacy Policy", Modifier.fillMaxWidth(), fontSize = 16.sp)
+            Spacer(Modifier.height(8.dp))
+            Text("Terms of Service", Modifier.fillMaxWidth(), fontSize = 16.sp)
+            Spacer(Modifier.height(8.dp))
+            Text("Install the app", Modifier.fillMaxWidth(), fontSize = 16.sp)
+            Spacer(Modifier.height(24.dp))
             Button(
                 onClick = onLogout,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF15D43)),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Log out", color = Color.White)
             }
         }
 
-        // Info dialog
         if (showDialog) {
-            Dialog(onDismissRequest = { showDialog = false }) {
+            Dialog(onDismissRequest = {
+                showDialog = false
+                isEditing = false
+                editableFullName = userLocal.fullName
+                editableEmail = userLocal.gmail
+                editablePassword = userLocal.password
+                editablePhone = userLocal.phone ?: ""
+                editableAddress = userLocal.address ?: ""
+            }) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
+                    shape = RoundedCornerShape(12.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                    shape = RoundedCornerShape(12.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
                 ) {
                     Column(
                         modifier = Modifier
                             .padding(16.dp)
                             .fillMaxWidth()
                     ) {
-                        Text(
-                            text = user.fullName,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(text = "Email: ${user.gmail}")
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(text = "Phone: ${user.phone ?: "Not yet"}")
-                        Spacer(modifier = Modifier.height(24.dp))
+                        if (!isEditing) {
+                            Text(userLocal.fullName, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                            Spacer(Modifier.height(8.dp))
+                            Text("Email: ${userLocal.gmail}")
+                            Spacer(Modifier.height(4.dp))
+                            Text("Phone: ${userLocal.phone ?: "Not yet"}")
+                            Spacer(Modifier.height(4.dp))
+                            Text("Address: ${userLocal.address ?: "Not yet"}")
+                            Spacer(Modifier.height(16.dp))
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                                TextButton(onClick = { isEditing = true }) { Text("Edit") }
+                                Spacer(Modifier.width(8.dp))
+                                TextButton(onClick = { showDialog = false }) { Text("Close") }
+                            }
+                        } else {
+                            OutlinedTextField(
+                                value = editableFullName,
+                                onValueChange = { editableFullName = it },
+                                label = { Text("Full Name") },
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value = editableEmail,
+                                onValueChange = { editableEmail = it },
+                                label = { Text("Email") },
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value = editablePassword.toString(),
+                                onValueChange = { editablePassword = it },
+                                label = { Text("Password") },
+                                singleLine = true,
+                                visualTransformation = PasswordVisualTransformation(),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value = editablePhone,
+                                onValueChange = { editablePhone = it },
+                                label = { Text("Phone") },
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Next),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value = editableAddress,
+                                onValueChange = { editableAddress = it },
+                                label = { Text("Address") },
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(Modifier.height(16.dp))
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                                TextButton(onClick = {
+                                    // Cập nhật local và gọi API
+                                    val request = UpdateUserInfoRequest(
+                                        userName = userLocal.userName,
+                                        fullName = editableFullName,
+                                        password = editablePassword.toString(),
+                                        gmail = editableEmail,
+                                        address = editableAddress,
+                                        phone = editablePhone
+                                    )
+                                    profileViewModel.updateUserInfo(request)
+                                    showDialog = false
+                                    isEditing = false
+                                }) { Text("Save") }
+                                Spacer(Modifier.width(8.dp))
+                                TextButton(onClick = {
+                                    editableFullName = userLocal.fullName
+                                    editableEmail = userLocal.gmail
+                                    editablePassword = userLocal.password
+                                    editablePhone = userLocal.phone ?: ""
+                                    editableAddress = userLocal.address ?: ""
+                                    isEditing = false
+                                }) { Text("Cancel") }
+                            }
+                        }
                     }
                 }
             }
