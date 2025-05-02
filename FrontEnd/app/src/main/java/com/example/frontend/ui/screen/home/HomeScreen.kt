@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -30,6 +31,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -51,6 +53,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -216,6 +219,7 @@ fun ProductGrid(
         }
     }
 }
+
 @Composable
 fun ProductCard(
     product: ProductData,
@@ -223,51 +227,36 @@ fun ProductCard(
     onAddToCartClick: () -> Unit
 ) {
     Card(
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor =
-                Color(0xFF334F62),
-        ),
-        elevation = CardDefaults.cardElevation(12.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(4.dp),
         modifier = Modifier
-            .width(180.dp)
+            .width(200.dp)
             .wrapContentHeight()
             .clickable(onClick = onProductClick)
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            if (product.imageUrlList.isNotEmpty()) {
-                CloudinaryImage(
-                    url = product.imageUrlList.random(),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(140.dp)
-                        .clip(RoundedCornerShape(12.dp)),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(140.dp)
-                        .background(SoftGray),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("No Image", color = Color.White)
-                }
-            }
-
-            Spacer(Modifier.height(10.dp))
-
-            Text(
-                text = product.name,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.ExtraBold
-                ),
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+            // --- IMAGE ---
+            CloudinaryImage(
+                url = product.imageUrlList.randomOrNull().orEmpty(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(140.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop
             )
 
+            Spacer(Modifier.height(8.dp))
+
+            // --- NAME ---
+            Text(
+                text = product.name,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            // --- BRAND ---
             if (product.brand.isNotBlank()) {
                 Text(
                     text = product.brand,
@@ -278,47 +267,48 @@ fun ProductCard(
                 )
             }
 
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(6.dp))
 
-            product.price?.let {
-                Text(
-                    text = "$${"%.2f".format(it)}",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-            }
+            // --- DESCRIPTION (~50 words) ---
+            Text(
+                text = product.description,
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
+            )
 
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(8.dp))
 
+            // --- PRICE, QUANTITY & ADD TO CART ---
             Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                OutlinedButton(
-                    onClick = onAddToCartClick,
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = MaterialTheme.colorScheme.primary
-                    ),
-                    border = BorderStroke(1.dp, Color(0xFFF15D43)),
-                    modifier = Modifier.height(36.dp)
-                ) {
-                    Icon(Icons.Default.ShoppingCart, contentDescription = null)
+                Column {
+                    Text(
+                        text = product.price?.formatAsCurrency() ?: "",
+                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold)
+                    )
+                    Text(
+                        text = "Qty: ${product.quantity}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
                 }
 
-                Button(
-                    onClick = {},
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                    ),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.height(36.dp)
+                IconButton(
+                    onClick = onAddToCartClick,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(Color(0xFFF15D43))
                 ) {
-                    Text(
-                        "Buy",
+                    Icon(
+                        imageVector = Icons.Default.ShoppingCart,
+                        contentDescription = "Add to cart",
+                        modifier = Modifier.size(18.dp),
+                        tint = Color.White
                     )
                 }
             }
@@ -326,6 +316,13 @@ fun ProductCard(
     }
 }
 
+// Ví dụ về hàm extension để format giá
+fun Double.formatAsCurrency(): String {
+    val formatter = java.text.NumberFormat.getCurrencyInstance().apply {
+        maximumFractionDigits = 0
+    }
+    return formatter.format(this)
+}
 
 @Composable
 fun SearchBar(
