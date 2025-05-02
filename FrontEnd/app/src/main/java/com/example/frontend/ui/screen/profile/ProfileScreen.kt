@@ -8,6 +8,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -19,7 +20,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -28,10 +32,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
+import com.example.frontend.R
 import com.example.frontend.ViewModel.ProfileViewModel
 import com.example.frontend.data.dto.UpdateUserInfoRequest
 import com.example.frontend.data.model.UserData
-
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -50,19 +54,16 @@ fun ProfileScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    // Load user info
     LaunchedEffect(userName) {
         profileViewModel.loadUser(userName)
     }
 
-    // Show avatar error toast
     avatarError?.let { msg ->
         LaunchedEffect(msg) {
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
             profileViewModel.clearAvatarError()
         }
     }
-    // Show update error toast
     updateError?.let { msg ->
         LaunchedEffect(msg) {
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
@@ -72,7 +73,7 @@ fun ProfileScreen(
 
     if (user == null) {
         Box(
-            Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator()
@@ -87,11 +88,8 @@ fun ProfileScreen(
                 val url = withContext(Dispatchers.IO) {
                     uploadAvatarToCloudinary(file)
                 }
-                if (url != null) {
-                    profileViewModel.updateAvatarUrl(user.userName, url)
-                } else {
-                    Toast.makeText(context, "Upload thất bại", Toast.LENGTH_SHORT).show()
-                }
+                if (url != null) profileViewModel.updateAvatarUrl(user.userName, url)
+                else Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show()
             }
         },
         onLogout = onLogout,
@@ -111,7 +109,7 @@ fun ProfileContent(
     var userLocal by remember { mutableStateOf(user) }
     var avatarUri by remember { mutableStateOf<Uri?>(null) }
     val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
+        ActivityResultContracts.GetContent()
     ) { uri ->
         uri?.let {
             avatarUri = it
@@ -133,10 +131,21 @@ fun ProfileContent(
         topBar = {
             TopAppBar(
                 title = { Text("Profile", fontSize = 20.sp) },
+                actions = {
+                    IconButton(onClick = onLogout) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_chevron_right),
+                            contentDescription = "Logout",
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
                     containerColor = Color(0xFF30393E),
                     titleContentColor = Color.White
                 )
+
             )
         }
     ) { padding ->
@@ -173,24 +182,27 @@ fun ProfileContent(
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
-            Button(onClick = { showDialog = true }) {
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = userLocal.fullName,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(Modifier.height(12.dp))
+            Button(
+                onClick = { showDialog = true },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFE5D2D))
+            ) {
                 Text("View / Edit Information", color = Color.White)
             }
+
             Spacer(Modifier.height(24.dp))
-            Text("Privacy Policy", Modifier.fillMaxWidth(), fontSize = 16.sp)
-            Spacer(Modifier.height(8.dp))
-            Text("Terms of Service", Modifier.fillMaxWidth(), fontSize = 16.sp)
-            Spacer(Modifier.height(8.dp))
-            Text("Install the app", Modifier.fillMaxWidth(), fontSize = 16.sp)
-            Spacer(Modifier.height(24.dp))
-            Button(
-                onClick = onLogout,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF15D43)),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Log out", color = Color.White)
-            }
+
+            OrderSection(onHistoryClick = { /* TODO: navigate to history screen */ })
+
+
         }
 
         if (showDialog) {
@@ -219,13 +231,16 @@ fun ProfileContent(
                         if (!isEditing) {
                             Text(userLocal.fullName, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                             Spacer(Modifier.height(8.dp))
-                            Text("Email: ${userLocal.gmail}")
+                            Text("Email: ${ userLocal.gmail }")
                             Spacer(Modifier.height(4.dp))
-                            Text("Phone: ${userLocal.phone ?: "Not yet"}")
+                            Text("Phone: ${ userLocal.phone ?: "Not yet" }")
                             Spacer(Modifier.height(4.dp))
-                            Text("Address: ${userLocal.address ?: "Not yet"}")
+                            Text("Address: ${ userLocal.address ?: "Not yet" }")
                             Spacer(Modifier.height(16.dp))
-                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ) {
                                 TextButton(onClick = { isEditing = true }) { Text("Edit") }
                                 Spacer(Modifier.width(8.dp))
                                 TextButton(onClick = { showDialog = false }) { Text("Close") }
@@ -277,18 +292,21 @@ fun ProfileContent(
                                 modifier = Modifier.fillMaxWidth()
                             )
                             Spacer(Modifier.height(16.dp))
-                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ) {
                                 TextButton(onClick = {
-                                    // Cập nhật local và gọi API
-                                    val request = UpdateUserInfoRequest(
-                                        userName = userLocal.userName,
-                                        fullName = editableFullName,
-                                        password = editablePassword.toString(),
-                                        gmail = editableEmail,
-                                        address = editableAddress,
-                                        phone = editablePhone
+                                    profileViewModel.updateUserInfo(
+                                        UpdateUserInfoRequest(
+                                            userName = userLocal.userName,
+                                            fullName = editableFullName,
+                                            password = editablePassword.toString(),
+                                            gmail = editableEmail,
+                                            address = editableAddress,
+                                            phone = editablePhone
+                                        )
                                     )
-                                    profileViewModel.updateUserInfo(request)
                                     showDialog = false
                                     isEditing = false
                                 }) { Text("Save") }
@@ -307,5 +325,54 @@ fun ProfileContent(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun OrderSection(onHistoryClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Column(Modifier.padding(12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Purchase order", fontWeight = FontWeight.Bold)
+                TextButton(onClick = onHistoryClick) {
+                    Text("View purchase history >")
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                item { OrderItem(R.drawable.ic_hourglass, "Waiting for confirmation") }
+                item { OrderItem(R.drawable.ic_inventory, "Waiting for goods") }
+                item { OrderItem(R.drawable.ic_local_shipping, "Waiting for delivery") }
+                item { OrderItem(R.drawable.ic_star, "Evaluate") }
+            }
+        }
+    }
+}
+
+@Composable
+private fun OrderItem(iconRes: Int, label: String) {
+    Column(
+        Modifier
+            .width(64.dp)
+            .clickable { /* TODO */ },
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(painterResource(iconRes), contentDescription = null, modifier = Modifier.size(28.dp))
+        Spacer(Modifier.height(4.dp))
+        Text(label, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
     }
 }
