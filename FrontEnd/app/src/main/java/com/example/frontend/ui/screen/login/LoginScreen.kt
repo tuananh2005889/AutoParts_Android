@@ -1,5 +1,7 @@
 package com.example.frontend.ui.screen.login
 
+import android.app.Activity
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -75,14 +77,25 @@ fun LoginScreen(
     val googleLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        // luôn gọi lấy intent về, không return
+        val data = result.data
+        Log.d("GoogleSignIn", "onActivityResult: resultCode=${result.resultCode}, data=$data")
+
         try {
-            val account = task.getResult(ApiException::class.java)
+            val account = GoogleSignIn
+                .getSignedInAccountFromIntent(data)
+                .getResult(ApiException::class.java)
+
+            // thành công
             account.idToken?.let { token ->
                 val avatarUrl = account.photoUrl?.toString()
                 loginViewModel.loginWithGoogle(token, avatarUrl)
-            }
-        } catch (_: Exception) { /* ignore */ }
+            } ?: Log.e("GoogleSignIn", "idToken is null")
+
+        } catch (e: ApiException) {
+            // đây bạn sẽ đọc được STATUS_CODE chính xác (10, 4, 7…)
+            Log.e("GoogleSignIn", "statusCode=${e.statusCode}, message=${e.statusMessage}")
+        }
     }
 
     /* -------- Navigate on success -------- */
