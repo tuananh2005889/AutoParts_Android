@@ -2,23 +2,14 @@ package com.BackEnd.controller;
 
 import com.BackEnd.dto.UserDTO;
 import com.BackEnd.dto.VerifyCodeRequest;
-import com.BackEnd.dto.CartDTO;
 import com.BackEnd.dto.ForgotPasswordRequest;
 import com.BackEnd.dto.ResetPasswordRequest;
 import com.BackEnd.dto.UpdateUserInfoRequest;
-import com.BackEnd.model.User;
-import com.BackEnd.model.Cart;
-import com.BackEnd.repository.UserRepository;
 import com.BackEnd.service.UserService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-
-import java.util.stream.Collectors;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
