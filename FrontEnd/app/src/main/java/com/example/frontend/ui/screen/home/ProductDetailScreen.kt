@@ -299,7 +299,7 @@ fun DetailProductScreen(
                             Button(
                                 onClick = { showReviewDialog = true },
                                 colors = ButtonDefaults.buttonColors(
-                                    backgroundColor = primaryColor,
+                                    backgroundColor = Color(0xFFF15D43),
                                     contentColor = Color.White
                                 ),
                                 shape = RoundedCornerShape(8.dp),
@@ -452,7 +452,7 @@ fun DetailProductScreen(
                     Icon(
                         Icons.Default.ShoppingCart,
                         contentDescription = null,
-                        tint = primaryColor,
+                        tint = Color(0xFFF15D43),
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -461,7 +461,7 @@ fun DetailProductScreen(
                     onClick = { /* handle buy now */ },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = primaryColor,
+                        backgroundColor = Color(0xFFF15D43),
                         contentColor = Color.White
                     ),
                     shape = RoundedCornerShape(12.dp),

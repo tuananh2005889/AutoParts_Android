@@ -1,6 +1,8 @@
 package com.example.frontend.ui.screen.home
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,11 +17,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -51,10 +58,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -72,12 +81,7 @@ import com.example.frontend.ui.theme.specialGothicFontFamiLy
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 
-private val DarkBackground = Color(0xFF30393E)
-private val SoftWhite = Color(0xFFFAEFEB)
-private val Accent = Color(0xFFF8BD97)
-private val SoftGray = Color(0xFF988F88)
-private val Cream = Color(0xFFF8E5D7)
-private val ElegantBrown = Color(0xFFD5C1B6)
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,13 +90,22 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     loginViewModel: LoginViewModel
 ) {
+    val systemUiController = rememberSystemUiController()
+    SideEffect {
+        systemUiController.setSystemBarsColor(
+            color = Color(0xFF1A2E35)
+        )
+    }
+
     val bottomNavController = rememberNavController()
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
-        modifier = modifier.safeDrawingPadding().background(SoftWhite),
-
+        modifier = modifier
+            .background(Color(0xFFF5F7F6)) // Light background
+            .statusBarsPadding(),
+        containerColor = Color.Transparent,
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         HomeNavHost(
@@ -107,12 +120,6 @@ fun HomeScreen(
             }
         )
     }
-    val systemUiController = rememberSystemUiController()
-    SideEffect {
-        systemUiController.setSystemBarsColor(
-            color = DarkBackground
-        )
-    }
 }
 
 @Composable
@@ -123,66 +130,136 @@ fun HomeScreenContent(
     modifier: Modifier = Modifier,
     onShowSnackBar: (String) -> Unit,
 ) {
+    // Color scheme
+    val primaryColor = Color(0xFFF15D43)
+    val secondaryColor = Color(0xFFF5F7F6) // Light background
+    val accentColor = Color(0xFFFF7D33) // Vibrant orange
+    val textPrimary = Color(0xFF1A2E35) // Dark teal
+    val textSecondary = Color(0xFF6B818C) // Grayish teal
+    val cardBackground = Color.White
+
     val homeUiState by viewModel.homeUiState.collectAsState()
     var searchText by remember { mutableStateOf("") }
 
-    when {
-        homeUiState.isLoading -> {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = Accent)
-            }
-        }
-
-        homeUiState.products.isNotEmpty() -> {
-            val products = homeUiState.products
-            Column(
-                modifier = modifier
-                    .padding(innerPadding)
-                    .background(MaterialTheme.colorScheme.background)
-
-            ) {
+    Column(
+        modifier = modifier
+            .padding(innerPadding)
+            .background(secondaryColor)
+    ) {
+        // Header Section
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(primaryColor)
+                .padding(horizontal = 24.dp, vertical = 16.dp)
+        ) {
+            Column {
                 Text(
-                    text = "Auto Parts Shop",
-                    style = MaterialTheme.typography.headlineSmall.copy(
-                        color = SoftWhite,
-                        fontSize = 24.sp
+                    text = "AutoParts Shop",
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 28.sp
                     ),
-                    fontFamily = specialGothicFontFamiLy,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
 
+                // Search Bar
                 SearchBar(
                     value = searchText,
                     onValueChange = { searchText = it },
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-
-                Spacer(Modifier.height(16.dp))
-
-                SlideCarousel(
-                    images = listOf(R.drawable.hero1, R.drawable.hero2, R.drawable.hero3),
-                    modifier = Modifier.fillMaxWidth().height(200.dp)
-                )
-
-                Spacer(Modifier.height(16.dp))
-
-                ProductGrid(
-                    products,
-                    onProductClick,
-                    viewModel,
-                    onShowSnackBar
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
 
-        homeUiState.errorMessage != null -> {
-            Text(
-                text = "Error: ${homeUiState.errorMessage}",
-                color = Color.Red,
-                modifier = Modifier.padding(16.dp)
-            )
+        when {
+            homeUiState.isLoading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = primaryColor,
+                        strokeWidth = 3.dp
+                    )
+                }
+            }
+
+            homeUiState.errorMessage != null -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Error: ${homeUiState.errorMessage}",
+                        color = Color(0xFFD32F2F),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+
+            homeUiState.products.isNotEmpty() -> {
+                val products = homeUiState.products
+
+                // Hero Carousel
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp)
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                ) {
+                    SlideCarousel(
+                        images = listOf(R.drawable.hero1, R.drawable.hero2, R.drawable.hero3),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(16.dp))
+                    )
+                }
+
+
+                Text(
+                    text = "Featured Products",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        color = textPrimary,
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    modifier = Modifier.padding(start = 24.dp, top = 24.dp, bottom = 8.dp)
+                )
+
+                ProductGrid(
+                    products = products,
+                    onProductClick = onProductClick,
+                    homeViewModel = viewModel,
+                    onShowSnackBar = onShowSnackBar,
+                    cardBackground = cardBackground,
+                    primaryColor = primaryColor,
+                    accentColor = accentColor,
+                    textPrimary = textPrimary,
+                    textSecondary = textSecondary
+                )
+            }
         }
+    }
+}
+
+
+@Composable
+fun CategoryChip(category: String) {
+    Card(
+        modifier = Modifier
+            .padding(4.dp)
+            .clickable { /* Handle category selection */ },
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+        elevation = CardDefaults.cardElevation(2.dp)
+    ) {
+        Text(
+            text = category,
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color(0xFF2A7F62),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        )
     }
 }
 
@@ -191,15 +268,21 @@ fun ProductGrid(
     products: List<ProductData>,
     onProductClick: (Long) -> Unit,
     homeViewModel: HomeViewModel,
-    onShowSnackBar: (String) -> Unit
+    onShowSnackBar: (String) -> Unit,
+    cardBackground: Color,
+    primaryColor: Color,
+    accentColor: Color,
+    textPrimary: Color,
+    textSecondary: Color
 ) {
     val coroutineScope = rememberCoroutineScope()
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier.fillMaxSize()
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.padding(bottom = 80.dp)
     ) {
         items(products) { product ->
             ProductCard(
@@ -209,12 +292,15 @@ fun ProductGrid(
                     coroutineScope.launch {
                         val cartItem = homeViewModel.addOneProductToCart(product.productId)
                         if (cartItem != null) {
-                            onShowSnackBar("Added 1 ${cartItem.productName} to cart")
-                        } else {
-                            onShowSnackBar("Failed to add product to cart.")
+                            onShowSnackBar("Added ${cartItem.productName} to cart")
                         }
                     }
-                }
+                },
+                cardBackground = cardBackground,
+                primaryColor = primaryColor,
+                accentColor = accentColor,
+                textPrimary = textPrimary,
+                textSecondary = textSecondary
             )
         }
     }
@@ -224,103 +310,104 @@ fun ProductGrid(
 fun ProductCard(
     product: ProductData,
     onProductClick: () -> Unit,
-    onAddToCartClick: () -> Unit
+    onAddToCartClick: () -> Unit,
+    cardBackground: Color,
+    primaryColor: Color,
+    accentColor: Color,
+    textPrimary: Color,
+    textSecondary: Color
 ) {
     Card(
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = cardBackground),
         elevation = CardDefaults.cardElevation(4.dp),
         modifier = Modifier
-            .width(200.dp)
-            .wrapContentHeight()
+            .fillMaxWidth()
             .clickable(onClick = onProductClick)
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            // --- IMAGE ---
-            CloudinaryImage(
-                url = product.imageUrlList.randomOrNull().orEmpty(),
+            // Product Image
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(140.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop
-            )
+                    .height(120.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFFEEEEEE))
+            ) {
+                CloudinaryImage(
+                    url = product.imageUrlList.randomOrNull().orEmpty(),
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // --- NAME ---
+            // Product Name
             Text(
                 text = product.name,
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = textPrimary
+                ),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
 
-            // --- BRAND ---
-            if (product.brand.isNotBlank()) {
-                Text(
-                    text = product.brand,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-
-            Spacer(Modifier.height(6.dp))
-
-            // --- DESCRIPTION (~50 words) ---
+            // Brand
             Text(
-                text = product.description,
-                style = MaterialTheme.typography.bodySmall,
-                maxLines = 3,
+                text = product.brand,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    color = textSecondary
+                ),
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
-            // --- PRICE, QUANTITY & ADD TO CART ---
+            // Price Section
             Row(
-                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Column {
-                    Text(
-                        text = product.price?.formatAsCurrency() ?: "",
-                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold)
-                    )
-                    Text(
-                        text = "Quantity: ${product.quantity}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray
-                    )
-                }
 
-                IconButton(
-                    onClick = onAddToCartClick,
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(Color(0xFFF15D43))
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ShoppingCart,
-                        contentDescription = "Add to cart",
-                        modifier = Modifier.size(18.dp),
-                        tint = Color.White
+                    Text(
+                        text = "${product.price?.formatAsCurrency()}",
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = primaryColor
+                        )
                     )
-                }
+
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Add to Cart Button
+            Button(
+                onClick = onAddToCartClick,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFF15D43),
+                    contentColor = Color.White
+                ),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 2.dp,
+                    pressedElevation = 4.dp
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ShoppingCart,
+                    contentDescription = "Add to cart",
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Add to Cart")
             }
         }
     }
-}
-
-fun Double.formatAsCurrency(): String {
-    val formatter = java.text.NumberFormat.getCurrencyInstance().apply {
-        maximumFractionDigits = 0
-    }
-    return formatter.format(this)
 }
 
 @Composable
@@ -333,15 +420,36 @@ fun SearchBar(
         value = value,
         onValueChange = onValueChange,
         leadingIcon = {
-            Icon(Icons.Default.Search, contentDescription = null, tint = SoftGray)
+            Icon(
+                Icons.Default.Search,
+                contentDescription = null,
+                tint = Color(0xFF6B818C)
+            )
         },
-        placeholder = { Text("Search products...", color = SoftGray) },
+        placeholder = {
+            Text(
+                "Search auto parts...",
+                color = Color(0xFF6B818C)
+            )
+        },
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Accent,
-            unfocusedBorderColor = SoftGray,
-            cursorColor = DarkBackground
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color.White,
+            focusedBorderColor = Color.Transparent,
+            unfocusedBorderColor = Color.Transparent,
+            cursorColor = Color(0xFF1A2E35)
         ),
         shape = RoundedCornerShape(16.dp),
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
+            .height(54.dp)
+            .shadow(2.dp, RoundedCornerShape(16.dp))
     )
+}
+
+fun Double.formatAsCurrency(): String {
+    val formatter = java.text.NumberFormat.getCurrencyInstance().apply {
+        maximumFractionDigits = 0
+    }
+    return formatter.format(this)
 }

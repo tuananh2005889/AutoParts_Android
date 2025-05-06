@@ -21,56 +21,65 @@ import androidx.compose.ui.util.lerp
 import kotlinx.coroutines.delay
 import kotlin.math.absoluteValue
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.ui.draw.clip
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SlideCarousel(
-    @DrawableRes images: List<Int>,
+    images: List<Int>,
     modifier: Modifier = Modifier
 ) {
     val pagerState = rememberPagerState(pageCount = { images.size })
 
-    Box(modifier) {
+    Box(modifier = modifier) {
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(180.dp)
+            modifier = Modifier.fillMaxSize()
         ) { page ->
-            Image(
-                painter = painterResource(id = images[page]),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer {
-                        val pageOffset = (pagerState.currentPage - page + pagerState.currentPageOffsetFraction).absoluteValue
-                        val scale = lerp(0.85f, 1f, 1f - pageOffset)
-                        scaleX = scale
-                        scaleY = scale
-                        alpha = lerp(0.5f, 1f, 1f - pageOffset)
-                    }
-            )
+            Card(
+                modifier = Modifier.fillMaxSize(),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = images[page]),
+                    contentDescription = "Promotion ${page + 1}",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
 
-        DotsIndicator(
-            totalDots = images.size,
-            selectedIndex = pagerState.currentPage,
+        // Dots Indicator
+        Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(16.dp)
-        )
-    }
-
-    LaunchedEffect(pagerState) {
-        while (true) {
-            delay(3000)
-            val nextPage = (pagerState.currentPage + 1) % images.size
-            pagerState.animateScrollToPage(nextPage)
+                .padding(bottom = 8.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.Center
+            ) {
+                repeat(images.size) { index ->
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (index == pagerState.currentPage) Color.White else Color.White.copy(alpha = 0.5f)
+                            )
+                            .padding(2.dp)
+                    )
+                    if (index < images.size - 1) {
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
+                }
+            }
         }
     }
 }
+
 
 @Composable
 fun DotsIndicator(
