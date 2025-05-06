@@ -65,7 +65,7 @@ import com.example.frontend.R
 import com.example.frontend.ViewModel.HomeViewModel
 import com.example.frontend.data.model.ProductData
 import com.example.frontend.ui.common.CloudinaryImage
-import com.example.frontend.ui.navigation.BottomNavBar
+
 import com.example.frontend.ui.navigation.HomeNavHost
 import com.example.frontend.ViewModel.LoginViewModel
 import com.example.frontend.ui.theme.specialGothicFontFamiLy
@@ -92,7 +92,7 @@ fun HomeScreen(
 
     Scaffold(
         modifier = modifier.safeDrawingPadding().background(SoftWhite),
-        bottomBar = { BottomNavBar(navController = bottomNavController) },
+
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         HomeNavHost(
@@ -291,7 +291,7 @@ fun ProductCard(
                         style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold)
                     )
                     Text(
-                        text = "Qty: ${product.quantity}",
+                        text = "Quantity: ${product.quantity}",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray
                     )
@@ -316,7 +316,6 @@ fun ProductCard(
     }
 }
 
-// Ví dụ về hàm extension để format giá
 fun Double.formatAsCurrency(): String {
     val formatter = java.text.NumberFormat.getCurrencyInstance().apply {
         maximumFractionDigits = 0

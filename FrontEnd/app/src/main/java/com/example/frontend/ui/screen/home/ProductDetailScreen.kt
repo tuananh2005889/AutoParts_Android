@@ -1,19 +1,11 @@
 package com.example.frontend.ui.screen.home
-
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,437 +15,289 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.frontend.R
 import com.example.frontend.ViewModel.ProductDetailViewModel
 import com.example.frontend.ui.common.CloudinaryImage
 import com.example.frontend.ui.common.Notification
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.delay
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ImageCarousel(
+    images: List<String>,
+    modifier: Modifier = Modifier,
+    height: Dp = 300.dp,
+    autoSlideDuration: Long = 3000L
+) {
+    if (images.isEmpty()) return
+
+    val pageCount = images.size
+    val pagerState = rememberPagerState(pageCount = { pageCount })
+
+    Box(modifier = modifier.height(height)) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize()
+        ) { page ->
+            CloudinaryImage(
+                url = images[page],
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
+
+        DotsIndicator(
+            totalDots = pageCount,
+            selectedIndex = pagerState.currentPage,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp)
+        )
+    }
+
+    // Auto slide mỗi autoSlideDuration ms
+    LaunchedEffect(pagerState) {
+        while (true) {
+            delay(autoSlideDuration)
+            val next = (pagerState.currentPage + 1) % pageCount
+            pagerState.animateScrollToPage(next)
+        }
+    }
+}
+
+@Composable
+fun DotsIndicator(
+    totalDots: Int,
+    selectedIndex: Int,
+    modifier: Modifier = Modifier,
+    dotSize: Dp = 8.dp,
+    selectedDotSize: Dp = 12.dp,
+    dotSpacing: Dp = 6.dp,
+    activeColor: Color = Color.White,
+    inactiveColor: Color = Color.LightGray
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(dotSpacing),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        repeat(totalDots) { index ->
+            Box(
+                modifier = Modifier
+                    .size(if (index == selectedIndex) selectedDotSize else dotSize)
+                    .clip(CircleShape)
+                    .background(if (index == selectedIndex) activeColor else inactiveColor)
+            )
+        }
+    }
+}
 
 @Composable
 fun DetailProductScreen(
     productId: Long,
-    innerPadding: PaddingValues ? = null,
-    productDetailViewModel: ProductDetailViewModel = hiltViewModel(),
+    innerPadding: PaddingValues? = null,
     clickBack: () -> Unit,
+    viewModel: ProductDetailViewModel = hiltViewModel()
+) {
+    LaunchedEffect(productId) { viewModel.getProductById(productId) }
+    val state by viewModel.productDetailState
 
-    ){
-    LaunchedEffect(productId) {
-        productDetailViewModel.getProductById(productId)
-    }
-    val state by  productDetailViewModel.productDetailState
-
-    var isVisible by remember {mutableStateOf(false)}
-
-    LaunchedEffect(isVisible){
-        if(isVisible){
-           delay(2000L)
-            isVisible = false
+    var showNotify by remember { mutableStateOf(false) }
+    LaunchedEffect(showNotify) {
+        if (showNotify) {
+            delay(2_000L)
+            showNotify = false
         }
     }
 
-
-
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ){
-        Button(
-            modifier = Modifier.size(width = 70.dp, height = 50.dp),
-            colors = ButtonDefaults.buttonColors(
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                backgroundColor = MaterialTheme.colorScheme.primary
-            ),
-            onClick = clickBack,
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding ?: PaddingValues())
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = 100.dp)
         ) {
-            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "")
-        }
+            // Back button
+            IconButton(
+                onClick = clickBack,
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+            }
 
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.background,
-                contentColor = MaterialTheme.colorScheme.onBackground,
-            )
-        ){
-
-
-            when{
+            when {
                 state.isLoading -> {
-                    Box(modifier = Modifier.fillMaxSize(),
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
-                    ){
-                        CircularProgressIndicator(modifier = Modifier.size(100.dp))
+                    ) {
+                        CircularProgressIndicator()
                     }
                 }
-
                 state.errorMessage != null -> {
-                    val error = state.errorMessage
                     Text(
-                        modifier = Modifier.fillMaxSize(),
-                        text = "Error: ${error}",
-                        color = MaterialTheme.colorScheme.error
+                        text = "Error: ${state.errorMessage}",
+                        modifier = Modifier.padding(16.dp)
                     )
                 }
-
                 state.product != null -> {
-                    val product = state.product
-                    Box(
+                    val product = state.product!!
+                    val images = product.imageUrlList
+
+                    // ← Thay Grid + Main Image bằng ImageCarousel
+                    ImageCarousel(
+                        images = images,
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(start =  16.dp, end = 16.dp)
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        height = 300.dp
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "${images.size} available classification",
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = product.name,
+                        style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val productImageUrlList: List<String> = product?.imageUrlList ?: emptyList()
+                        Spacer(modifier = Modifier.width(8.dp))
+                        product.price?.let { orig ->
+                            Text(
+                                text = "đ$orig",
 
-                        Column(modifier = Modifier
-                            .fillMaxSize()
-                            .padding(bottom = 100.dp)
-                            .verticalScroll(rememberScrollState()) // help composable can scroll
-                        ){
-                                // Product Images
-                                LazyRow(
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                ) {
-                                    items(items = productImageUrlList) { url ->
-                                        CloudinaryImage(
-                                            url = url,
-                                            modifier = Modifier
-                                                .size(300.dp)
-                                        )
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(16.dp))
-
-                                // Product Name
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                ){
-
-                                    Card(
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                                        ),
-                                        shape = RoundedCornerShape(
-                                            topStart = 0.dp,
-                                            topEnd = 10.dp,
-                                            bottomEnd = 0.dp,
-                                            bottomStart = 10.dp
-                                        ),
-                                        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
-                                    ){
-                                        Text("Honda 94109-14000 Washer, Drain Plug (14MM)",
-                                            color = LocalContentColor.current,
-                                            modifier = Modifier.padding(8.dp),
-                                            fontWeight = FontWeight(800),
-                                            fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-                                        )
-
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(20.dp))
-
-                                // Product Description
-                                Card(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                    ,
-                                    elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = MaterialTheme.colorScheme.surface,
-                                        contentColor = MaterialTheme.colorScheme.onSurface,
-                                    ),
-                                    shape = RoundedCornerShape(
-                                        topStart = 0.dp,
-                                        topEnd = 10.dp,
-                                        bottomEnd = 0.dp,
-                                        bottomStart = 10.dp
-                                    )
-                                ){
-                                   Column(
-                                       modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
-                                   ){
-
-                                       Card(
-                                           modifier = Modifier.fillMaxWidth(),
-                                           colors = CardDefaults.cardColors(
-                                               containerColor = MaterialTheme.colorScheme.secondary,
-                                               contentColor = MaterialTheme.colorScheme.onSecondary,
-                                           ),
-                                           shape = RoundedCornerShape(
-                                               topStart = 10.dp,
-                                               topEnd = 10.dp,
-                                               bottomEnd = 0.dp,
-                                               bottomStart = 0.dp
-                                           )
-                                       ){
-                                           Text(
-                                               modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
-                                               text = "Description",
-                                               fontWeight = FontWeight(800)
-                                           )
-                                       }
-
-                                       Card(
-                                           colors= CardDefaults.cardColors(
-                                               containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                               contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                           ),
-                                           modifier = Modifier.padding(top = 8.dp)
-                                       ){
-                                           Text( text = product!!.description
-                                           )
-                                       }
-                                   }
-                                }
-
-                                Spacer(modifier = Modifier.height(20.dp))
-
-                                // About Product
-                                Card(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(bottom = 80.dp)
-                                    ,
-                                    elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = MaterialTheme.colorScheme.surface,
-                                        contentColor = MaterialTheme.colorScheme.onSurface,
-                                    ),
-                                    shape = RoundedCornerShape(
-                                        topStart = 0.dp,
-                                        topEnd = 10.dp,
-                                        bottomEnd = 0.dp,
-                                        bottomStart = 10.dp
-                                    )
-                                ){
-                                    Column(
-                                        modifier = Modifier
-                                            .padding(8.dp)
-                                    ) {
-                                        Card(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            colors = CardDefaults.cardColors(
-                                                containerColor = MaterialTheme.colorScheme.secondary,
-                                                contentColor = MaterialTheme.colorScheme.onSecondary,
-                                            ),
-                                            shape = RoundedCornerShape(
-                                                topStart = 10.dp,
-                                                topEnd = 10.dp,
-                                                bottomEnd = 0.dp,
-                                                bottomStart = 0.dp
-                                            )
-                                        ){
-                                            Text(
-                                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
-                                                text = "About Product",
-                                                fontWeight = FontWeight(800)
-                                            )
-                                        }
-
-                                        Spacer(modifier = Modifier.height(10.dp))
-
-                                        Column(
-                                            verticalArrangement = Arrangement.spacedBy(10.dp),
-                                            modifier = Modifier.padding(bottom = 10.dp)
-                                        ){
-                                            Card(
-                                                elevation =  CardDefaults.cardElevation(10.dp),
-                                                colors = CardDefaults.cardColors(
-                                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                )
-                                            ){
-                                                Text(
-                                                    modifier = Modifier
-                                                        .padding(horizontal = 10.dp, vertical = 5.dp),
-                                                    text = "Brand: ${product!!.brand}")
-                                            }
-                                            Card(
-                                                elevation =  CardDefaults.cardElevation(10.dp),
-                                                colors = CardDefaults.cardColors(
-                                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                )
-                                            ){
-                                                Text(
-                                                    modifier = Modifier
-                                                        .padding(horizontal = 10.dp, vertical = 5.dp),
-                                                    text = "Category: ${product!!.category}")
-                                            }
-                                            Card(
-                                                elevation =  CardDefaults.cardElevation(10.dp),
-                                                colors = CardDefaults.cardColors(
-                                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                )
-                                            ){
-                                                Text(
-                                                    modifier = Modifier
-                                                        .padding(horizontal = 10.dp, vertical = 5.dp),
-                                                    text = "Compatible Vehicles: ${product!!.compatibleVehicles}")
-                                            }
-                                            Card(
-                                                elevation =  CardDefaults.cardElevation(10.dp),
-                                                colors = CardDefaults.cardColors(
-                                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                )
-                                            ){
-                                                Text(
-                                                    modifier = Modifier
-                                                        .padding(horizontal = 10.dp, vertical = 5.dp),
-                                                    text = "Year Of Manufacture: ${product!!.yearOfManufacture}")
-                                            }
-                                            Card(
-                                                elevation =  CardDefaults.cardElevation(10.dp),
-                                                colors = CardDefaults.cardColors(
-                                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                )
-                                            ){
-                                                Text(
-                                                    modifier = Modifier
-                                                        .padding(horizontal = 10.dp, vertical = 5.dp),
-                                                    text = "Size: ${product!!.size}")
-                                            }
-                                            Card(
-                                                elevation =  CardDefaults.cardElevation(10.dp),
-                                                colors = CardDefaults.cardColors(
-                                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                )
-                                            ){
-                                                Text(
-                                                    modifier = Modifier
-                                                        .padding(horizontal = 10.dp, vertical = 5.dp),
-                                                    text = "Material: ${product!!.material}")
-                                            }
-                                            Card(
-//                                            modifier = Modifier.padding(10.dp),
-                                                elevation =  CardDefaults.cardElevation(10.dp),
-                                                colors = CardDefaults.cardColors(
-                                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                )
-                                            ){
-                                                Text(
-                                                    modifier = Modifier
-                                                        .padding(horizontal = 10.dp, vertical = 5.dp),
-                                                    text = "Weight: ${product!!.weight}")
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                        if(isVisible){
-                            Notification(
-                                modifier = Modifier.align(Alignment.TopCenter),
-                                text = "Added to cart successfully!"
                             )
+                            Spacer(modifier = Modifier.width(8.dp))
                         }
 
-                        // Add to cart and +/- quantity
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.BottomCenter)
-                                .padding(bottom = 65.dp),
-                        ){
-                            val quantity = productDetailViewModel.quantity.value
-                            val totalPrice = productDetailViewModel.totalPrice.value
-                            Card(modifier = Modifier
-                                .padding(horizontal = 5.dp)
-                                .height(50.dp),
-                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.background),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
-                            )
-                            {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                    ,
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = "$ ${totalPrice}",
-                                        modifier = Modifier.padding(start = 40.dp),
-                                    )
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    }
 
-                                    ){
-                                        OutlinedButton (
-                                            onClick={productDetailViewModel.decreaseQuantity()},
-                                            modifier = Modifier.size(width=30.dp, height=30.dp),
-                                            shape = CircleShape,
-                                            contentPadding = PaddingValues(9.dp)
-                                        ){
-                                            Icon(
-                                                painter = painterResource(R.drawable.minus_sign),
-                                                contentDescription = null)
-                                        }
-                                        Text("${quantity}")
-                                        OutlinedButton (
-                                            onClick={ productDetailViewModel.increaseQuantity() },
-                                            modifier = Modifier.size(width=35.dp, height=35.dp),
-                                            shape = CircleShape,
-                                            contentPadding = PaddingValues(10.dp)
-                                        ){
-                                            Icon(
-                                                imageVector = Icons.Default.Add, contentDescription = null)
-                                        }
 
-                                    }
-                                    Button (
-                                        onClick = {productDetailViewModel.addToCart()
-                                                  isVisible = true },
-                                        colors = ButtonDefaults.buttonColors(
-                                            contentColor = MaterialTheme.colorScheme.onPrimary,
-                                            backgroundColor = MaterialTheme.colorScheme.primary,
-                                        ),
-                                        modifier = Modifier.padding(end = 8.dp),
-                                        contentPadding = PaddingValues(8.dp)
-                                    ) {
-                                        Text(text = "Add to cart")
-                                    }
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                                }
-                            }
-                        }
+                    Text(
+                        text = "Bio",
+                        style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                    Text(
+                        text = product.description.orEmpty(),
+                        style = MaterialTheme.typography.body2,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                    )
 
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "Information product",
+                        style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    ) {
+                        Text(text = "Brand: ${product.brand}")
+                        Text(text = "Category: ${product.category}")
+                        Text(text = "CompatibleVehicles: ${product.compatibleVehicles}")
+                        Text(text = "Year Of manufacture: ${product.yearOfManufacture}")
+                        Text(text = "Size: ${product.size}")
+                        Text(text = "Material: ${product.material}")
+                        Text(text = "Weight: ${product.weight}")
 
                     }
                 }
-
             }
         }
+
+        // Bottom bar with safe padding
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .navigationBarsPadding()
+
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            OutlinedButton(
+                onClick = {
+                    viewModel.addToCart()
+                    showNotify = true
+                },
+                modifier = Modifier.size(48.dp),
+                shape = CircleShape,
+
+                contentPadding = PaddingValues(0.dp)
+            ) {
+                Icon(Icons.Default.ShoppingCart, contentDescription = null)
+            }
+            Button(
+                onClick = {  },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Buy now")
+            }
+        }
+
+        if (showNotify) {
+            Notification(
+                modifier = Modifier.align(Alignment.TopCenter),
+                text = "added to cart successfully!"
+            )
+        }
     }
-
-
 }
-
-
