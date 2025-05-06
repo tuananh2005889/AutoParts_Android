@@ -38,5 +38,5 @@ out/
 
 
 .idea/
-local.properties
-/.env
+# local.properties
+# /.env
