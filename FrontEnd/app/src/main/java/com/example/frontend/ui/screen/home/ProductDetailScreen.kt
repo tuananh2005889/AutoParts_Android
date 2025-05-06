@@ -285,12 +285,12 @@ fun DetailProductScreen(
             ) {
                 Icon(Icons.Default.ShoppingCart, contentDescription = null)
             }
-            Button(
-                onClick = {  },
-                modifier = Modifier.weight(1f)
-            ) {
-                Text("Buy now")
-            }
+//            Button(
+//                onClick = {  },
+//                modifier = Modifier.weight(1f)
+//            ) {
+//                Text("Buy now")
+//            }
         }
 
         if (showNotify) {
