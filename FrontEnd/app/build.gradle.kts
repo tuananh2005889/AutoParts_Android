@@ -127,7 +127,8 @@ dependencies {
     implementation("androidx.compose.foundation:foundation:1.5.4")
 
     implementation("io.coil-kt:coil-compose:2.7.0")
-
+    implementation("androidx.compose.material:material:1.4.3")
+    implementation("androidx.compose.material:material-icons-extended:1.4.3")
     // Material 3 components
     implementation("androidx.compose.material3:material3:1.3.2")
 }
