@@ -1,5 +1,6 @@
 package com.example.frontend.ui.screen.home
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -208,6 +209,7 @@ fun ProductGrid(
                 onAddToCartClick = {
                     coroutineScope.launch {
                         val cartItem = homeViewModel.addOneProductToCart(product.productId)
+                        Log.d("cartItem", cartItem.toString())
                         if (cartItem != null) {
                             onShowSnackBar("Added 1 ${cartItem.productName} to cart")
                         } else {
@@ -228,7 +230,7 @@ fun ProductCard(
 ) {
     Card(
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(4.dp),
         modifier = Modifier
             .width(200.dp)

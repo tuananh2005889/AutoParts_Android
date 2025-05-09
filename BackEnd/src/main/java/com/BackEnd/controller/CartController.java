@@ -29,7 +29,7 @@ public class CartController {
     @GetMapping("/items")
     public ResponseEntity<List<CartItemDTO>> getAllCartItems(@RequestParam Long cartId) {
         try {
-            List<CartItemDTO> items = cartService.getCartItemsInActiveCart(cartId);
+            List<CartItemDTO> items = cartService.getCartItemDTOsInActiveCart(cartId);
             return ResponseEntity.ok(items);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -65,6 +65,7 @@ public class CartController {
 
         } catch (Exception e) {
             // Handle other errors
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

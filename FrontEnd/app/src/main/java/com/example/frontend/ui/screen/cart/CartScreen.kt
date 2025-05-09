@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,6 +60,8 @@ fun CartScreen(
 
     val imageUrls by cartViewModel.imageUrlPerCartItem
 
+    val cartId by cartViewModel.cartId.collectAsState()
+
     LaunchedEffect(errorMessage){
         if(errorMessage != null){
             visible = true
@@ -80,7 +83,7 @@ fun CartScreen(
                 ){
 
                     Text(
-                        text = "Don’t let your cart catch dust—check it out!",
+                        text = "Don’t let your cart catch dust—check it out! $cartId",
                         modifier = Modifier.padding(horizontal = 16.dp,
                             vertical = 8.dp),
                         fontSize = MaterialTheme.typography.headlineSmall.fontSize,

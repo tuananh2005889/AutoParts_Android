@@ -44,11 +44,11 @@ class CartRepository @Inject constructor(private val cartApiService: CartApiServ
                 return ApiResponse.Success(response.body() ?: throw Exception("Empty response body"))
             } else {
                 val errorMessage = response.errorBody()?.string() ?: "Unknown error"
-                Log.e("API Error", "Error: $errorMessage")
+                Log.e("CartRepo", "Error: $errorMessage, Message Code: ${response.code()}")
                 return ApiResponse.Error("Error: $errorMessage", response.code())
             }
         } catch (e: Exception) {
-            Log.e("API Exception", "Exception: ${e.message}")
+            Log.e("CartRepo-exception", "Exception: ${e.message}")
             return ApiResponse.Error("Exception: ${e.message ?: "Unknown error"}")
         }
     }

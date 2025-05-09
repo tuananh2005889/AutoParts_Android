@@ -48,6 +48,7 @@ public class Cart {
 
     public enum CartStatus {
         ACTIVE,
+        PENDING,
         PAID,
         CANCELLED
     }

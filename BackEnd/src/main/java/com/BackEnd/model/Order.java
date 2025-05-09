@@ -27,17 +27,28 @@ public class Order {
     private LocalDateTime orderDate;
 
     @Column(nullable = false)
-    private Double totalAmount;
+    private Double totalPrice;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
-    private String status = "Pending";
+    private OrderStatus status = OrderStatus.PENDING;
 
     @Column(columnDefinition = "TEXT")
     private String shippingAddress;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderDetail> orderDetail;
+    private List<OrderDetail> orderDetails;
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
     private Payment payment;
+
+
+
+    public enum OrderStatus{
+        PENDING,
+        PAID,
+        CANCELLED,
+    }
 }
+
+

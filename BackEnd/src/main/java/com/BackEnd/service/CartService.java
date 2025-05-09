@@ -9,11 +9,12 @@ import com.BackEnd.repository.CartRepository;
 import com.BackEnd.repository.ProductRepository;
 import com.BackEnd.repository.UserRepository;
 import com.BackEnd.utils.DTOConverter;
-import java.util.stream.Collectors;
 import com.BackEnd.model.Cart;
 import com.BackEnd.model.CartItem;
 import com.BackEnd.model.User;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -27,6 +28,25 @@ public class CartService {
     private final UserRepository userRepo;
 
 
+    public Cart getCartByCartId(Long cartId){
+        Cart cart =  cartRepo.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("No cart found"));
+        return cart;
+    }
+    public String changeCartStatus(Long cartId, Cart.CartStatus status){
+        try{
+            Cart cart = getCartByCartId(cartId);
+            cart.setStatus(status);
+            cartRepo.save(cart);
+            return "Cart status updated successfully";
+        }catch (EntityNotFoundException e){
+            return "Cart not found";
+        }catch(DataAccessException e){
+            return "Database error while saving cart";
+        }catch(Exception e){
+            return "An unexpected error occurred: " + e.getMessage();
+        }
+    }
     // public CartDTO getActiveCartDTO(String userName) {
     // User user = userRepo.findByUserName(userName)
     // .orElseThrow(() -> new RuntimeException("User not found"));
@@ -65,7 +85,8 @@ public class CartService {
     }
 
     // cartId -> getCart -> getItems in Cart
-    public List<CartItemDTO> getCartItemsInActiveCart(Long cartId) {
+
+    public List<CartItemDTO> getCartItemDTOsInActiveCart(Long cartId) {
         Cart cart = cartRepo.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
@@ -78,6 +99,14 @@ public class CartService {
         return cartItemDTOs;
     }
 
+    public List<CartItem> getAllCartItemsInActiveCart(Long cartId){
+        Cart cart = cartRepo.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
+
+        return  cart.getCartItems();
+
+    }
+
     // Phương thức thanh toán giỏ hàng, cập nhật trạng thái giỏ hàng thành PAID
     public void checkoutCart(Long cartId) {
         Cart cart = cartRepo.findById(cartId).orElseThrow(() -> new RuntimeException("Cart not found"));
@@ -86,41 +115,42 @@ public class CartService {
     }
 
 
-
-
- 
-
-    public CartItemDTO addItemToCart(AddToCartRequest addToCartRequest) {
-
-        // check quantity request
-        if (addToCartRequest.getQuantity() <= 0) {
-            throw new IllegalArgumentException("Quantity must be greater than 0");
-        }
-
-        Cart cart = cartRepo.findById(addToCartRequest.getCartId())
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
-
-        Product product = productRepo.findByProductId(addToCartRequest.getProductId())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-
-        Optional<CartItem> existingCartItem = cart.getCartItems().stream()
-                .filter(
-                        item -> item.getProduct().getProductId().equals(addToCartRequest.getProductId()))
-                .findFirst();
-        if (existingCartItem.isPresent()) {
-            existingCartItem.get().setQuantity(existingCartItem.get().getQuantity() + addToCartRequest.getQuantity());
-            cartItemRepo.save(existingCartItem.get());
-
-        } else {
-            CartItem cartItem = new CartItem(product, addToCartRequest.getQuantity(), cart);
-            cartItemRepo.save(cartItem);
-            cart.getCartItems().add(cartItem);
-
-        }
-
-        cartRepo.save(cart);
-        return DTOConverter.toCartItemDTO(existingCartItem.get());
+    public User getUserByCartId(Long cartId){
+        User user = cartRepo.findUserByCartId(cartId);
+        return user;
     }
+    
+public CartItemDTO addItemToCart(AddToCartRequest addToCartRequest) {
+
+    // Check quantity request
+    if (addToCartRequest.getQuantity() <= 0) {
+        throw new IllegalArgumentException("Quantity must be greater than 0");
+    }
+
+    Cart cart = cartRepo.findById(addToCartRequest.getCartId())
+            .orElseThrow(() -> new RuntimeException("Cart not found"));
+
+    Product product = productRepo.findByProductId(addToCartRequest.getProductId())
+            .orElseThrow(() -> new RuntimeException("Product not found"));
+
+    Optional<CartItem> existingCartItem = cart.getCartItems().stream()
+            .filter(item -> item.getProduct().getProductId().equals(addToCartRequest.getProductId()))
+            .findFirst();
+
+    if (existingCartItem.isPresent()) {
+        CartItem item = existingCartItem.get();
+        item.setQuantity(item.getQuantity() + addToCartRequest.getQuantity());
+        cartItemRepo.save(item);
+        return DTOConverter.toCartItemDTO(item);
+    } else {
+        CartItem newCartItem = new CartItem(product, addToCartRequest.getQuantity(), cart);
+        cartItemRepo.save(newCartItem);
+        cart.getCartItems().add(newCartItem);
+        cartRepo.save(cart);
+        return DTOConverter.toCartItemDTO(newCartItem);
+    }
+}
+
 
     public Cart getCartStatus(Long cartId) {
         return cartRepo.findById(cartId).orElseThrow(() -> new RuntimeException("Cart not found"));
