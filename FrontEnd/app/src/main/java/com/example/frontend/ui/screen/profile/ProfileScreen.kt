@@ -106,7 +106,9 @@ fun ProfileContent(
     profileViewModel: ProfileViewModel
 ) {
     val context = LocalContext.current
-    var userLocal by remember { mutableStateOf(user) }
+    val scope = rememberCoroutineScope()
+
+    // Uri chọn avatar cục bộ
     var avatarUri by remember { mutableStateOf<Uri?>(null) }
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
@@ -118,14 +120,24 @@ fun ProfileContent(
         }
     }
 
+    // Dialog state
     var showDialog by remember { mutableStateOf(false) }
     var isEditing by remember { mutableStateOf(false) }
 
-    var editableFullName by remember { mutableStateOf(userLocal.fullName) }
-    var editableEmail by remember { mutableStateOf(userLocal.gmail) }
-    var editablePassword by remember { mutableStateOf(userLocal.password) }
-    var editablePhone by remember { mutableStateOf(userLocal.phone ?: "") }
-    var editableAddress by remember { mutableStateOf(userLocal.address ?: "") }
+    // Các ô nhập để chỉnh sửa, khởi tạo từ user
+    var editableFullName by remember { mutableStateOf(user.fullName) }
+    var editableEmail    by remember { mutableStateOf(user.gmail) }
+    var editablePhone    by remember { mutableStateOf(user.phone ?: "") }
+    var editableAddress  by remember { mutableStateOf(user.address ?: "") }
+
+    // Mỗi khi user mới được load (sau cập nhật), tự động cập nhật lại các ô nhập
+    LaunchedEffect(user) {
+        editableFullName = user.fullName
+        editableEmail    = user.gmail
+        editablePhone    = user.phone ?: ""
+        editableAddress  = user.address ?: ""
+        avatarUri = null // nếu muốn reset preview avatar cục bộ sau cập nhật
+    }
 
     Scaffold(
         topBar = {
@@ -136,16 +148,10 @@ fun ProfileContent(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_chevron_right),
                             contentDescription = "Logout",
-                            tint = Color.White,
                             modifier = Modifier.size(20.dp)
                         )
                     }
-                },
-                colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = Color(0xFF30393E),
-                    titleContentColor = Color.White
-                )
-
+                }
             )
         }
     ) { padding ->
@@ -157,6 +163,7 @@ fun ProfileContent(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Avatar
             Box(
                 modifier = Modifier
                     .size(120.dp)
@@ -166,25 +173,29 @@ fun ProfileContent(
                 contentAlignment = Alignment.Center
             ) {
                 when {
-                    avatarUri != null -> Image(
-                        painter = rememberAsyncImagePainter(avatarUri),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                    userLocal.avatarUrl != null -> Image(
-                        painter = rememberAsyncImagePainter(userLocal.avatarUrl),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                    else -> Text("Choose avatar", color = Color.White)
+                    avatarUri != null ->
+                        Image(
+                            painter = rememberAsyncImagePainter(avatarUri),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    user.avatarUrl != null ->
+                        Image(
+                            painter = rememberAsyncImagePainter(user.avatarUrl),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    else ->
+                        Text("Choose avatar", color = Color.White)
                 }
             }
 
             Spacer(Modifier.height(16.dp))
+            // Hiển thị tên từ user (sẽ tự cập nhật khi StateFlow thay đổi)
             Text(
-                text = userLocal.fullName,
+                text = user.fullName,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -199,43 +210,32 @@ fun ProfileContent(
             }
 
             Spacer(Modifier.height(24.dp))
-
-            OrderSection(onHistoryClick = { /* TODO: navigate to history screen */ })
-
-
+            OrderSection(onHistoryClick = { /* TODO */ })
         }
 
+        // Dialog chỉnh sửa
         if (showDialog) {
             Dialog(onDismissRequest = {
                 showDialog = false
                 isEditing = false
-                editableFullName = userLocal.fullName
-                editableEmail = userLocal.gmail
-                editablePassword = userLocal.password
-                editablePhone = userLocal.phone ?: ""
-                editableAddress = userLocal.address ?: ""
             }) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                    elevation = CardDefaults.cardElevation(8.dp)
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth()
-                    ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
                         if (!isEditing) {
-                            Text(userLocal.fullName, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                            // Chế độ xem thông tin
+                            Text(user.fullName, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                             Spacer(Modifier.height(8.dp))
-                            Text("Email: ${ userLocal.gmail }")
+                            Text("Email: ${user.gmail}")
                             Spacer(Modifier.height(4.dp))
-                            Text("Phone: ${ userLocal.phone ?: "Not yet" }")
+                            Text("Phone: ${user.phone ?: "Not set"}")
                             Spacer(Modifier.height(4.dp))
-                            Text("Address: ${ userLocal.address ?: "Not yet" }")
+                            Text("Address: ${user.address ?: "Not set"}")
                             Spacer(Modifier.height(16.dp))
                             Row(
                                 Modifier.fillMaxWidth(),
@@ -246,12 +246,12 @@ fun ProfileContent(
                                 TextButton(onClick = { showDialog = false }) { Text("Close") }
                             }
                         } else {
+                            // Chế độ edit: dùng các biến editable*
                             OutlinedTextField(
                                 value = editableFullName,
                                 onValueChange = { editableFullName = it },
                                 label = { Text("Full Name") },
                                 singleLine = true,
-                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                                 modifier = Modifier.fillMaxWidth()
                             )
                             Spacer(Modifier.height(8.dp))
@@ -260,18 +260,8 @@ fun ProfileContent(
                                 onValueChange = { editableEmail = it },
                                 label = { Text("Email") },
                                 singleLine = true,
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            Spacer(Modifier.height(8.dp))
-                            OutlinedTextField(
-                                value = editablePassword.toString(),
-                                onValueChange = { editablePassword = it },
-                                label = { Text("Password") },
-                                singleLine = true,
-                                visualTransformation = PasswordVisualTransformation(),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
                             )
                             Spacer(Modifier.height(8.dp))
                             OutlinedTextField(
@@ -279,8 +269,8 @@ fun ProfileContent(
                                 onValueChange = { editablePhone = it },
                                 label = { Text("Phone") },
                                 singleLine = true,
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Next),
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
                             )
                             Spacer(Modifier.height(8.dp))
                             OutlinedTextField(
@@ -288,7 +278,6 @@ fun ProfileContent(
                                 onValueChange = { editableAddress = it },
                                 label = { Text("Address") },
                                 singleLine = true,
-                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                                 modifier = Modifier.fillMaxWidth()
                             )
                             Spacer(Modifier.height(16.dp))
@@ -297,28 +286,28 @@ fun ProfileContent(
                                 horizontalArrangement = Arrangement.End
                             ) {
                                 TextButton(onClick = {
+                                    // Gọi update lên ViewModel
                                     profileViewModel.updateUserInfo(
                                         UpdateUserInfoRequest(
-                                            userName = userLocal.userName,
+                                            userName = user.userName,
                                             fullName = editableFullName,
-                                            password = editablePassword.toString(),
-                                            gmail = editableEmail,
-                                            address = editableAddress,
-                                            phone = editablePhone
+                                            gmail    = editableEmail,
+                                            address  = editableAddress,
+                                            phone    = editablePhone
                                         )
                                     )
                                     showDialog = false
                                     isEditing = false
-                                }) { Text("Save") }
+                                }) {
+                                    Text("Save")
+                                }
                                 Spacer(Modifier.width(8.dp))
                                 TextButton(onClick = {
-                                    editableFullName = userLocal.fullName
-                                    editableEmail = userLocal.gmail
-                                    editablePassword = userLocal.password
-                                    editablePhone = userLocal.phone ?: ""
-                                    editableAddress = userLocal.address ?: ""
+                                    // Hủy chỉnh sửa, vô hiệu hoá edit mode
                                     isEditing = false
-                                }) { Text("Cancel") }
+                                }) {
+                                    Text("Cancel")
+                                }
                             }
                         }
                     }
@@ -327,6 +316,7 @@ fun ProfileContent(
         }
     }
 }
+
 
 @Composable
 private fun OrderSection(onHistoryClick: () -> Unit) {
