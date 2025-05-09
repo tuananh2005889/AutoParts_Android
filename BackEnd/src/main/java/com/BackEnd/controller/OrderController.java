@@ -1,83 +1,65 @@
 package com.BackEnd.controller;
 
-//@RestController
-//@RequestMapping("/api/order")
-//@RequiredArgsConstructor
-//public class OrderController {
-//    private final OrderService orderService;
-//
-//    @PostMapping("/checkout")
-//    public ResponseEntity<Order> checkout(@RequestParam String username,
-//                                          @RequestParam String paymentMethod) {
-//        Order order = orderService.checkout(username, paymentMethod);
-//        return ResponseEntity.ok(order);
-//    }
-//}
+import com.BackEnd.dto.OrderDetailDTO;
+import com.BackEnd.service.OrderService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
-//@RestController
-//@RequestMapping("/cart")
-//@CrossOrigin(origins = "*")
-//public class OrderController {
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/app/order")
+@RequiredArgsConstructor
+public class OrderController{
+    private final OrderService orderService;
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    @Value("${PAYOS_API_KEY}")
+    private String apiKey;
+    @Value("${PAYOS_CLIENT_ID}")
+    private String clientId;
+
+//    @PostMapping("/create")
+//    public ResponseEntity<?> createOrder(@RequestParam Double ammount) {
+//        String orderCode = UUID.randomUUID().toString();
+//        Double amount = ammount;
 //
-//    private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
+//        Map<String, Object> body = Map.of(
+//                "orderCode", orderCode,
+//                "amount", amount,
+//                "description", "Thanh toán đơn hàng " + orderCode,
+//                "returnUrl", "autoparts://payment-result",
+//                "cancelUrl", "autoparts://payment-cancel"
+//        );
 //
-//    @Autowired
-//    private OrderService orderService;
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.set("x-client-id", "YOUR_CLIENT_ID");
+//        headers.set("x-api-key", "YOUR_API_KEY");
+//        headers.setContentType(MediaType.APPLICATION_JSON);
 //
-//    // Tiêm UserRepository để lấy đối tượng User persistent
-//    @Autowired
-//    private UserRepository userRepository;
+//        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
 //
-//    public OrderController(OrderService orderService, UserRepository userRepository) {
-//        this.orderService = orderService;
-//        this.userRepository = userRepository;
-//    }
+//        ResponseEntity<Map> res = restTemplate.postForEntity("https://api.payos.vn/v1/payment-requests", entity, Map.class);
 //
-//    @PostMapping("/add")
-//    public ResponseEntity<String> addToCart(@RequestBody Map<String, Object> payload) {
-//        try {
-//            String userName = String.valueOf(payload.get("userName"));
-//            String productId = String.valueOf(payload.get("productId"));
-//            int quantity = Integer.parseInt(payload.get("quantity").toString());
-//
-//            // Lấy đối tượng User đã persistent từ DB
-//            Optional<User> userOpt = userRepository.findByUserName(userName);
-//            if (!userOpt.isPresent()) {
-//                logger.error("User with userName '{}' not found in DB", userName);
-//                return ResponseEntity.badRequest().body("User not found");
-//            }
-//            User user = userOpt.get();
-//
-//            boolean added = orderService.addToCart(user, productId, quantity);
-//            if (added) {
-//                return ResponseEntity.ok("Product added to cart successfully");
-//            } else {
-//                logger.error("Failed to add product to cart for user '{}', productId '{}' and quantity '{}'", userName,
-//                        productId, quantity);
-//                return ResponseEntity.badRequest().body("Failed to add product to cart");
-//            }
-//        } catch (Exception e) {
-//            logger.error("Error in addToCart controller: {}", e.getMessage(), e);
-//            return ResponseEntity.status(500).body("Error: " + e.getMessage());
+//        if (res.getStatusCode().is2xxSuccessful()) {
+//            String checkoutUrl = (String) ((Map<String, Object>) res.getBody().get("data")).get("checkoutUrl");
+//            // Lưu trạng thái đơn hàng là "pending" trong DB
+//            return ResponseEntity.ok(Map.of("checkoutUrl", checkoutUrl, "orderCode", orderCode));
 //        }
-//    }
 //
-//    @GetMapping("/get")
-//    public ResponseEntity<List<CartItem>> getCart(@RequestParam String userName) {
-//        try {
-//            Optional<User> userOpt = userRepository.findByUserName(userName);
-//            if (!userOpt.isPresent()) {
-//                return ResponseEntity.noContent().build();
-//            }
-//            User user = userOpt.get();
-//            List<CartItem> cartItems = orderService.getCartByUser(user);
-//            if (cartItems == null || cartItems.isEmpty()) {
-//                return ResponseEntity.noContent().build();
-//            }
-//            return ResponseEntity.ok(cartItems);
-//        } catch (Exception e) {
-//            logger.error("Error in getCart controller for user '{}': {}", userName, e.getMessage(), e);
-//            return ResponseEntity.status(500).build();
-//        }
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tạo đơn hàng thất bại");
 //    }
-//}
+
+    @PostMapping("/create")
+    public ResponseEntity<List<OrderDetailDTO>> createOrder(@RequestParam Long cartId){
+        List<OrderDetailDTO> orderDetailDTOList = orderService.createOrder(cartId);
+        return ResponseEntity.ok(orderDetailDTOList);
+    }
+
+}

@@ -1,11 +1,9 @@
 package com.BackEnd.utils;
 
-import com.BackEnd.dto.CartBasicInfoDTO;
-import com.BackEnd.dto.CartDTO;
-import com.BackEnd.dto.CartItemDTO;
-import com.BackEnd.dto.BasicCartItemDTO;
+import com.BackEnd.dto.*;
 import com.BackEnd.model.Cart;
 import com.BackEnd.model.CartItem;
+import com.BackEnd.model.OrderDetail;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,5 +41,8 @@ public class DTOConverter {
         return new BasicCartItemDTO(productId, quantity);
     }
 
+    public static OrderDetailDTO toOrderDetailDTO(OrderDetail orderDetail){
+        return new OrderDetailDTO(orderDetail.getProduct().getName(), orderDetail.getQuantity(), orderDetail.getTotalPrice());
+    }
 
 }

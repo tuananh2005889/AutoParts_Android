@@ -1,6 +1,7 @@
 package com.example.frontend.ViewModel
 
 import android.util.Log
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.frontend.data.dto.CartItemDTO
@@ -11,7 +12,10 @@ import com.example.frontend.data.repository.ProductRepository
 import com.example.frontend.ui.common.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,6 +35,12 @@ class HomeViewModel @Inject constructor(
     private val _homeUiState =
         MutableStateFlow<HomeUiState>(HomeUiState())
     val homeUiState: StateFlow<HomeUiState> = _homeUiState
+
+    val userName: StateFlow<String?> = authManager.userNameFlow.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        null
+    )
 
     init{
         observeUserName()

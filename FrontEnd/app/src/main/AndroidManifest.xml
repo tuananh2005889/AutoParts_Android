@@ -21,10 +21,18 @@
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.FrontEnd">
+<!--            intent filter de mo app khi nhan vao icon/launcher-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+<!--            intent filter de app mo khi nhan cac url scheme tu payos-->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="autoparts" android:host="payment-result" />
+                <data android:scheme="autoparts" android:host="payment-cancel" />
             </intent-filter>
         </activity>
     </application>

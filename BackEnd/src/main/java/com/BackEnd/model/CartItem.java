@@ -12,11 +12,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CartItem {
-    public CartItem(Product product, int quantity, Cart cart){
-        this.product = product;
-        this.quantity = quantity;
-        this.cart = cart;
-    }
     @Id
     @Column(name = "cart_item_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,4 +28,9 @@ public class CartItem {
     @Column(nullable = false)
     private int quantity;
 
+    public CartItem(Product product, int quantity, Cart cart){
+        this.product = product;
+        this.quantity = quantity;
+        this.cart = cart;
+    }
 }

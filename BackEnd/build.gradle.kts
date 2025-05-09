@@ -54,7 +54,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.security:spring-security-crypto")
     // implementation("org.springframework.boot:spring-boot-starter-security")
-
+    //thanh toan
+    implementation("vn.payos:payos-java:1.0.3")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
 
 }
 

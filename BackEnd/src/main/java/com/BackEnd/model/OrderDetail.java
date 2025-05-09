@@ -17,7 +17,6 @@ public class OrderDetail {
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false,
             referencedColumnName = "order_id"
-    //foreignKey = @ForeignKey(name = "fk_orderDetails_order")
     )
     private Order order;
 
@@ -25,7 +24,6 @@ public class OrderDetail {
     @JoinColumn(name = "product_id",
             referencedColumnName = "product_id",
             nullable = false
-    //foreignKey = @ForeignKey(name = "fk_orderDetails_product")
     )
     private Product product;
 
@@ -33,5 +31,16 @@ public class OrderDetail {
     private int quantity;
 
     @Column(nullable = false)
-    private Double price;
+    private Double totalPrice;
+
+    public OrderDetail(Order order, Product product, int quantity, Double totalPrice) {
+        this.order = order;
+        this.product = product;
+        this.quantity = quantity;
+        this.totalPrice = totalPrice;
+    }
+
+    public OrderDetail() {
+
+    }
 }

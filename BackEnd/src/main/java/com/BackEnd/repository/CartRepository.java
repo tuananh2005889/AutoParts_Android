@@ -32,7 +32,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
             "GROUP BY ci.cart_item_id", nativeQuery = true)
     List<String> findImageUrlPerCartItem(@Param("cartId") Long cartId);
 
-
+    User findUserByCartId(Long cartId);
 
 }
 

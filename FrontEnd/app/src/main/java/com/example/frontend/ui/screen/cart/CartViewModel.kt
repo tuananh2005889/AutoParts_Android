@@ -12,6 +12,9 @@ import com.example.frontend.data.remote.ApiResponse
 import com.example.frontend.data.repository.CartRepository
 import com.example.frontend.ui.common.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,6 +26,13 @@ class CartViewModel @Inject constructor(
 
     private val _cart = mutableStateOf<CartBasicInfoDTO?>(null)
     val cart: State<CartBasicInfoDTO?> = _cart
+
+    val cartId: StateFlow<Long?> = authManager.cartIdFlow
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            null
+        )
 
     private val _cartItemDTOs = mutableStateOf<List<CartItemDTO>>(emptyList())
     val cartItemDTOs: State<List<CartItemDTO>> = _cartItemDTOs
@@ -174,6 +184,7 @@ class CartViewModel @Inject constructor(
             }
         }
     }
+
 
 
 
