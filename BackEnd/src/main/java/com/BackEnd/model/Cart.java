@@ -14,7 +14,7 @@ import java.util.List;
 
 
 @Entity
-@Table(name = "cart")
+@Table(name = "carts")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -29,8 +29,11 @@ public class Cart {
     Neu muon fetch cart ma khong load user(chi getUser luc can thiet), ta dung FetchType.Lazy
     */
 
-    @ManyToOne()
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @Column(nullable = false)
+    private Double totalPrice = 0.0;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE) //automatically delete cart if user is deleted
     private User user;
 

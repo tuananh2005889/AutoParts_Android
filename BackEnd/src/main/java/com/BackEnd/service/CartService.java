@@ -16,6 +16,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -79,6 +80,7 @@ public class CartService {
             initalCart = new Cart();
             initalCart.setUser(user);
             initalCart.setStatus(Cart.CartStatus.ACTIVE);
+            initalCart.setTotalPrice(0.0);
             cartRepo.save(initalCart);
         }
         return DTOConverter.toCartBasicInfoDTO(initalCart);
@@ -119,7 +121,8 @@ public class CartService {
         User user = cartRepo.findUserByCartId(cartId);
         return user;
     }
-    
+
+    @Transactional
 public CartItemDTO addItemToCart(AddToCartRequest addToCartRequest) {
 
     // Check quantity request
@@ -137,20 +140,34 @@ public CartItemDTO addItemToCart(AddToCartRequest addToCartRequest) {
             .filter(item -> item.getProduct().getProductId().equals(addToCartRequest.getProductId()))
             .findFirst();
 
+    CartItem responseItem;
+    //get current cart price
+    Double cartTotalPrice = cart.getTotalPrice();
+
     if (existingCartItem.isPresent()) {
         CartItem item = existingCartItem.get();
         item.setQuantity(item.getQuantity() + addToCartRequest.getQuantity());
-        cartItemRepo.save(item);
-        return DTOConverter.toCartItemDTO(item);
+
+        //increase price
+        Double itemTotalPrice = product.getPrice() * addToCartRequest.getQuantity();
+        cartTotalPrice += itemTotalPrice;
+
+        responseItem = item;
     } else {
         CartItem newCartItem = new CartItem(product, addToCartRequest.getQuantity(), cart);
-        cartItemRepo.save(newCartItem);
         cart.getCartItems().add(newCartItem);
-        cartRepo.save(cart);
-        return DTOConverter.toCartItemDTO(newCartItem);
-    }
-}
+        //increase price
+        Double itemTotalPrice = product.getPrice() * addToCartRequest.getQuantity();
+        cartTotalPrice += itemTotalPrice;
 
+        responseItem = newCartItem;
+    }
+
+    cart.setTotalPrice(cartTotalPrice);
+    cartRepo.save(cart); // co che jpa, lay CartItem tu Cart, sau do thay doi CartItem, sau do chi can save Cart thi
+        //jpa tu dong goi CartItemRepo.save(CartItem) do
+    return DTOConverter.toCartItemDTO(responseItem);
+}
 
     public Cart getCartStatus(Long cartId) {
         return cartRepo.findById(cartId).orElseThrow(() -> new RuntimeException("Cart not found"));

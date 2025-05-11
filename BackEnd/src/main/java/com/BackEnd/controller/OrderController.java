@@ -57,7 +57,7 @@ public class OrderController{
 //    }
 
     @PostMapping("/create")
-    public ResponseEntity<List<OrderDetailDTO>> createOrder(@RequestParam Long cartId){
+    public ResponseEntity<List<OrderDetailDTO>> createOrder(@RequestParam Long cartId ){
         List<OrderDetailDTO> orderDetailDTOList = orderService.createOrder(cartId);
         return ResponseEntity.ok(orderDetailDTOList);
     }
