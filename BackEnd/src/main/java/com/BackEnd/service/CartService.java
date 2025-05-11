@@ -1,7 +1,7 @@
 package com.BackEnd.service;
 
 import com.BackEnd.dto.AddToCartRequest;
-import com.BackEnd.dto.CartBasicInfoDTO;
+import com.BackEnd.dto.BasicCartInfoDto;
 import com.BackEnd.dto.CartItemDTO;
 import com.BackEnd.model.Product;
 import com.BackEnd.repository.CartItemRepository;
@@ -71,7 +71,7 @@ public class CartService {
     // }
     // ->
     // gop 2 method tren thanh 1, giup controller, frontend do rac roi
-    public CartBasicInfoDTO getOrCreateActiveCartDTO(String userName) {
+    public BasicCartInfoDto getOrCreateActiveCartDTO(String userName) {
         User user = userRepo.findByUserName(userName)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Cart initalCart = cartRepo.findCartByUserAndStatus(user, Cart.CartStatus.ACTIVE)
@@ -88,17 +88,17 @@ public class CartService {
 
     // cartId -> getCart -> getItems in Cart
 
-    public List<CartItemDTO> getCartItemDTOsInActiveCart(Long cartId) {
+    public List<CartItemDTO> getAllCartItemDTOsInActiveCart(Long cartId) {
         Cart cart = cartRepo.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
-        List<CartItemDTO> cartItemDTOs = new ArrayList<>();
+        List<CartItemDTO> cartItemDTOList = new ArrayList<>();
 
         cart.getCartItems().stream()
                 .map(cartItem -> DTOConverter.toCartItemDTO(cartItem))
-                .forEach(cartItemDTOs::add);
+                .forEach(item -> cartItemDTOList.add(item));
 
-        return cartItemDTOs;
+        return cartItemDTOList;
     }
 
     public List<CartItem> getAllCartItemsInActiveCart(Long cartId){

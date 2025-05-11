@@ -1,4 +1,4 @@
-package com.example.frontend.ui.screen.cart
+package com.example.frontend.ViewModel
 
 import android.util.Log
 import androidx.compose.runtime.State
@@ -27,52 +27,50 @@ class CartViewModel @Inject constructor(
     private val _cart = mutableStateOf<CartBasicInfoDTO?>(null)
     val cart: State<CartBasicInfoDTO?> = _cart
 
-    val cartId: StateFlow<Long?> = authManager.cartIdFlow
+    val _cartId: StateFlow<Long?> = authManager.cartIdFlow
         .stateIn(
             viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
+            SharingStarted.Companion.WhileSubscribed(5000),
             null
         )
 
-    private val _cartItemDTOs = mutableStateOf<List<CartItemDTO>>(emptyList())
-    val cartItemDTOs: State<List<CartItemDTO>> = _cartItemDTOs
+
+    private val _cartItemDTOList = mutableStateOf<List<CartItemDTO>>(emptyList())
+    val cartItemDTOList: State<List<CartItemDTO>> = _cartItemDTOList
 
 
-    private val _imageUrlPerCartItem = mutableStateOf<List<String>>(emptyList())
-    val imageUrlPerCartItem = _imageUrlPerCartItem
+    private val _imageUrlPerCartItemList = mutableStateOf<List<String>>(emptyList())
+    val imageUrlPerCartItemList = _imageUrlPerCartItemList
 
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
 
     init{
-        getCartItems()
+        getAllCartItems()
         getImageUrlPerCartItem()
     }
 
-    fun getCartItems() {
+    fun getAllCartItems() {
         viewModelScope.launch {
-            val cartId = authManager.getCartIdOnce()
-            Log.d("CartViewModel-getCartItems", "cartId: $cartId")
+            val cartId = _cartId.value
+            Log.d("CartVM-getAllCartItems", "cartId: $cartId")
             if (cartId != null) {
                 val response = cartRepo.getCartItems(cartId)
                 when (response) {
                     is ApiResponse.Success -> {
-                        _cartItemDTOs.value = response.data
+                        _cartItemDTOList.value = response.data
                     }
                     is ApiResponse.Error -> {
-                        Log.d("CartViewModel-getCartItems", "Error: ${response.message}")
+                        Log.d("CartVM-getCartItems", "Error: ${response.message}")
                         _errorMessage.value = "Failed to load cart items: ${response.message}"
                     }
                     is ApiResponse.Loading -> {
-                        Log.d("CartViewModel-getCartItems", "Loading")
+                        Log.d("CartVM-getCartItems", "Loading")
                     }
                 }
             }
         }
     }
-
-
-
 
     fun getImageUrlPerCartItem() {
         viewModelScope.launch {
@@ -82,7 +80,7 @@ class CartViewModel @Inject constructor(
                     val response = cartRepo.getImageUrlPerCartItem(cartId)
                     when(response){
                         is ApiResponse.Success -> {
-                            _imageUrlPerCartItem.value = response.data
+                            _imageUrlPerCartItemList.value = response.data
                         }
                         is ApiResponse.Error ->{
                            _errorMessage.value = "Failed to fetch image urls: ${response.message}"
@@ -97,38 +95,6 @@ class CartViewModel @Inject constructor(
             }
         }
     }
-
-
-//    fun getImageUrl(productId: Long) {
-//        if (_imageUrlMap.containsKey(productId)) return
-//
-//
-//        viewModelScope.launch {
-//            val response = productRepo.getImageUrl(productId)
-//            if (response is ApiResponse.Success) {
-//                val url = response.data
-//                if (url.isNotBlank()) {
-//                    _imageUrlMap[productId] = url
-//                }
-//            } else if (response is ApiResponse.Error) {
-//                Log.e("CartViewModel", "Error fetching image URL: ${response.message}")
-//            }
-//        }
-//    }
-
-
-//    fun getImageUrs(productId: Long) {
-//        if (_imageUrlMap.containsKey(productId)) return
-//
-//        viewModelScope.launch {
-//            val response = productRepo.getImageUrl(productId)
-//            if (response is ApiResponse.Success) {
-//                val url = response.data.firstOrNull()
-//                if (url != null) _imageUrlMap[productId] = url
-//            }
-//        }
-//    }
-
 
         fun getCart() {
             viewModelScope.launch {
@@ -176,9 +142,9 @@ class CartViewModel @Inject constructor(
     }
 
     private fun updateCartItem(updatedItem: BasicCartItemDTO) {
-        _cartItemDTOs.value = _cartItemDTOs.value.map { item ->
+        _cartItemDTOList.value = _cartItemDTOList.value.map { item ->
             if (item.productId == updatedItem.productId) {
-                item.copy(quantity = updatedItem.quantity) // 👈 chỉ update quantity
+                item.copy(quantity = updatedItem.quantity)
             } else {
                 item
             }
@@ -190,4 +156,3 @@ class CartViewModel @Inject constructor(
 
 
 }
-

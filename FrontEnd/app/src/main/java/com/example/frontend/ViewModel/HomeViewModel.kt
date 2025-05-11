@@ -51,7 +51,7 @@ class HomeViewModel @Inject constructor(
     private fun observeUserName(){
         viewModelScope.launch {
             val userName= authManager.getUserNameOnce()
-            Log.d("HomeViewModel-obserUserName", "userName: $userName")
+            Log.d("HomeVM-obserUserName", "userName: $userName")
                 if(userName != null){
                 createCart(userName)
                 }
@@ -63,13 +63,13 @@ class HomeViewModel @Inject constructor(
             when (val response = cartRepo.getOrCreateActiveCart(userName)) {
                 is ApiResponse.Success -> {
                     val cartId = response.data.cartId
-                    Log.d("HomeViewModel-create cart", "Cart created with ID: $cartId")
+                    Log.d("HomeVM-create cart", "Cart created with ID: $cartId")
                     if (cartId != null) {
                         authManager.saveLoginStatus(true, userName, cartId)
                     }
                 }
                 is ApiResponse.Error -> {
-                    Log.d("HomeViewModel-create cart", "Error creating cart: ${response.message}")
+                    Log.d("HomeVM-create cart", "Error creating cart: ${response.message}")
                 }
                 is ApiResponse.Loading -> {
                 }
@@ -82,7 +82,7 @@ class HomeViewModel @Inject constructor(
             val cartId: Long? = authManager.getCartIdOnce()
 
             if (cartId == null) {
-                Log.e("HomeViewModel", "Cannot get cartId to add product to cart")
+                Log.e("HomeVM", "Cannot get cartId to add product to cart")
                 return null
             }
 
@@ -94,11 +94,11 @@ class HomeViewModel @Inject constructor(
 
             return when (result) {
                 is ApiResponse.Success -> {
-                    Log.d("HomeViewModel - addOneProductToCart", "Add to cart successfully: ${result.data}")
+                    Log.d("HomeVM - addOneProductToCart", "Add to cart successfully: ${result.data}")
                      result.data
                 }
                 is ApiResponse.Error -> {
-                    Log.e("HomeViewModel - addOneProductToCart", "Error when add item to cart: ${result.message}")
+                    Log.e("HomeVM - addOneProductToCart", "Error when add item to cart: ${result.message}")
                     null  
                 }
 

@@ -4,15 +4,11 @@ import com.BackEnd.dto.*;
 import com.BackEnd.repository.CartRepository;
 import com.BackEnd.service.CartService;
 import com.BackEnd.model.Cart;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/app/cart")
@@ -29,7 +25,7 @@ public class CartController {
     @GetMapping("/items")
     public ResponseEntity<List<CartItemDTO>> getAllCartItems(@RequestParam Long cartId) {
         try {
-            List<CartItemDTO> items = cartService.getCartItemDTOsInActiveCart(cartId);
+            List<CartItemDTO> items = cartService.getAllCartItemDTOsInActiveCart(cartId);
             return ResponseEntity.ok(items);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -38,9 +34,9 @@ public class CartController {
 
     // done. create/get cart
     @PostMapping("/active")
-    public ResponseEntity<CartBasicInfoDTO> getOrCreateActiveCart(@RequestParam String userName) {
+    public ResponseEntity<BasicCartInfoDto> getOrCreateActiveCart(@RequestParam String userName) {
         try {
-            CartBasicInfoDTO dto = cartService.getOrCreateActiveCartDTO(userName);
+            BasicCartInfoDto dto = cartService.getOrCreateActiveCartDTO(userName);
             return ResponseEntity.ok(dto);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

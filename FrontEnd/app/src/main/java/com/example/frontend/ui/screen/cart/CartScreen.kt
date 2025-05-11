@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.frontend.R
+import com.example.frontend.ViewModel.CartViewModel
 import com.example.frontend.data.dto.CartItemDTO
 import com.example.frontend.ui.common.CloudinaryImage
 import com.example.frontend.ui.common.Notification
@@ -51,14 +52,14 @@ import kotlinx.coroutines.delay
 fun CartScreen(
     cartViewModel: CartViewModel = hiltViewModel()
 ) {
-    val cart by cartViewModel.cart
-    val cartItems by cartViewModel.cartItemDTOs
+    val cartItems by cartViewModel.cartItemDTOList
 
     val errorMessage by cartViewModel.errorMessage
 
     var visible  by remember {  mutableStateOf(false) }
 
-    val imageUrls by cartViewModel.imageUrlPerCartItem
+    val imageUrls by cartViewModel.imageUrlPerCartItemList
+
 
     val cartId by cartViewModel.cartId.collectAsState()
 
@@ -68,13 +69,11 @@ fun CartScreen(
             delay(2000L)
             visible = false
         }
-
     }
 
-    Box(){
-
-        Column(){
-
+    Box{
+        Log.d("cartscreen-imageUrls", imageUrls.toString())
+        Column{
                 Card(
                     modifier = Modifier.padding(horizontal = 8.dp , vertical = 8.dp),
                     colors = CardDefaults.cardColors(
@@ -120,7 +119,7 @@ fun CartItemsList(
         itemsIndexed(items = cartItemDTOs) {index, cartItemDTO ->
 
             val imageUrl = imageUrls.getOrNull(index) ?: "null"
-            Log.d("cart screen", imageUrl)
+            Log.d("CartScreen-imageurl", imageUrl)
             CartItemRow(
                 cartItemDTO =  cartItemDTO,
                 imageUrl = imageUrl,

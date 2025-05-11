@@ -29,11 +29,11 @@ public class DTOConverter {
                 cart.getStatus().name()
         );
     }
-    public static CartBasicInfoDTO toCartBasicInfoDTO(Cart cart) {
+    public static BasicCartInfoDto toCartBasicInfoDTO(Cart cart) {
         Long cartId = cart.getCartId();
         String status = cart.getStatus().name();
         Double totalPrice = cart.getTotalPrice();
-        return new CartBasicInfoDTO(cartId, status, totalPrice);
+        return new BasicCartInfoDto(cartId, status, totalPrice);
     }
 
     public static BasicCartItemDTO toBasicCartItemDTO(CartItem cartItem) {
