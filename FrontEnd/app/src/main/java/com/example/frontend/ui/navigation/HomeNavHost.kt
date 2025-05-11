@@ -21,7 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.frontend.ui.screen.cart.CartScreen
-import com.example.frontend.ui.screen.cart.CartViewModel
+import com.example.frontend.ViewModel.CartViewModel
 import com.example.frontend.ui.screen.home.DetailProductScreen
 import com.example.frontend.ui.screen.home.HomeScreenContent
 import com.example.frontend.ViewModel.LoginViewModel

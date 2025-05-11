@@ -27,7 +27,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
 
     @Query(value = "SELECT MIN(pi.image_url) " +
             "FROM product_images pi " +
-            "JOIN cart_item ci ON ci.product_id = pi.product_id " +
+            "JOIN cart_items ci ON ci.product_id = pi.product_id " +
             "WHERE ci.cart_id = :cartId " +
             "GROUP BY ci.cart_item_id", nativeQuery = true)
     List<String> findImageUrlPerCartItem(@Param("cartId") Long cartId);
