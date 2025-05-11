@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 public class CartBasicInfoDTO {
     private Long cartId;
     private String status;
+    private Double totalPrice;
 }

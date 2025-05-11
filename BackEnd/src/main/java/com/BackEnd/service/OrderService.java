@@ -24,7 +24,7 @@ public class OrderService {
 
 
     public List<OrderDetailDTO> createOrder(Long cartId){
-        //Change Cart Status active -> pending
+        //Change Cart status: active -> pending
         cartService.changeCartStatus(cartId, Cart.CartStatus.PENDING);
 
         //Create Order
@@ -34,10 +34,11 @@ public class OrderService {
         Order order = new Order();
         order.setUser(user);
         order.setOrderDate(now);
-        order.setShippingAddress(user.getAddress());
+        order.setStatus(Order.OrderStatus.PENDING);
+        order.setShippingAddress("test");
         orderRepo.save(order);
 
-        //thieu total amount, orderDetail                ,
+        //cart thieu totalPrice(not null), orderDetail,
         List<CartItem> cartItemList = cartService.getAllCartItemsInActiveCart(cartId);
         List<OrderDetail> orderDetailList = cartItemList.stream()
                 .map(cartItem -> {

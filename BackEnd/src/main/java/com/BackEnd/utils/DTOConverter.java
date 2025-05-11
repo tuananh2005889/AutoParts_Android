@@ -32,7 +32,8 @@ public class DTOConverter {
     public static CartBasicInfoDTO toCartBasicInfoDTO(Cart cart) {
         Long cartId = cart.getCartId();
         String status = cart.getStatus().name();
-        return new CartBasicInfoDTO(cartId, status);
+        Double totalPrice = cart.getTotalPrice();
+        return new CartBasicInfoDTO(cartId, status, totalPrice);
     }
 
     public static BasicCartItemDTO toBasicCartItemDTO(CartItem cartItem) {

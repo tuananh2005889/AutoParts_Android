@@ -104,4 +104,18 @@ public class CartController {
         Cart cart = cartService.getCartStatus(cartId);
         return ResponseEntity.ok(cart); // Trả về trạng thái giỏ hàng
     }
+
+//    @PostMapping("/pendingStatus")
+//    public void changeCartStatusToPending(@RequestParam Long cartId){
+//   Cart cart =     cartService.getCartByCartId(cartId);
+//   cart.setStatus(Cart.CartStatus.PENDING);
+//   cartRepo.save(cart);
+//    }
+//
+//    @PostMapping("/activeStatus")
+//    public void changeCartStatusToActive(@RequestParam Long cartId){
+//        Cart cart =     cartService.getCartByCartId(cartId);
+//        cart.setStatus(Cart.CartStatus.ACTIVE);
+//        cartRepo.save(cart);
+//    }
 }
