@@ -78,6 +78,7 @@ import com.example.frontend.ui.common.CloudinaryImage
 
 import com.example.frontend.ui.navigation.HomeNavHost
 import com.example.frontend.ViewModel.LoginViewModel
+
 import com.example.frontend.ui.theme.specialGothicFontFamiLy
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
@@ -107,7 +108,8 @@ fun HomeScreen(
             .background(Color(0xFFF5F7F6)) // Light background
             .statusBarsPadding(),
         containerColor = Color.Transparent,
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) } ,
+//                bottomBar = { BottomNavBar(navController = bottomNavController) }
     ) { innerPadding ->
         HomeNavHost(
             loginViewModel = loginViewModel,
@@ -283,7 +285,7 @@ fun ProductGrid(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.padding(bottom = 80.dp)
+//        modifier = Modifier.padding(bottom = 80.dp)
     ) {
         items(products) { product ->
             ProductCard(
