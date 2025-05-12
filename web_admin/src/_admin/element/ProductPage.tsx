@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { BarChart2 } from "lucide-react";
+import { BarChart2, Trash2, Upload } from "lucide-react";
 import Header from "./comon/Header";
 import toast, { Toaster } from "react-hot-toast";
 import TableProduct from "./Product/TableProduct";
@@ -130,40 +130,134 @@ const ProductPage = () => {
         <div className="fixed inset-0 bg-gray-950 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white rounded-2xl shadow-2xl p-6 w-[700px] max-h-[90vh] overflow-y-auto text-black">
             <h2 className="text-2xl font-semibold mb-4 text-center">Add New Product</h2>
-            <form onSubmit={handleAddProduct} className="grid grid-cols-2 gap-4">
-              {Object.entries(items).map(([key, value]) => (
-                key !== "images" && (
-                  <input
-                    key={key}
-                    type={key === "description" ? "text" : key === "price" || key === "quantity" || key === "yearOfManufacture" || key === "discount" ? "number" : "text"}
-                    name={key}
-                    placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
-                    value={value}
-                    onChange={handleChange}
-                    className="input-style"
-                  />
-                )
-              ))}
-              <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Upload Images</label>
-                <div className="flex gap-4 flex-wrap">
+            <form onSubmit={handleAddProduct} className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {Object.entries(items).map(([key, value]) => {
+                  if (key === "category") {
+                    return (
+                      <div key={key} className="col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{key.charAt(0).toUpperCase() + key.slice(1)}</label>
+                        <select
+                          name={key}
+                          value={value}
+                          onChange={handleChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                          required
+                        >
+                          <option value="">Select a category</option>
+                          <option value="Interior">Interior</option>
+                          <option value="Exterior">Exterior</option>
+                          <option value="Safety equipment">Safety equipment</option>
+                          <option value="Entertainment system">Entertainment system</option>
+                          <option value="Accessory">Accessory</option>
+                        </select>
+                      </div>
+                    );
+                  }
+
+                  if (key === "warranty") {
+                    return (
+                      <div key={key}>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{key.charAt(0).toUpperCase() + key.slice(1)}</label>
+                        <select
+                          name={key}
+                          value={value}
+                          onChange={handleChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                        >
+                          <option value="">Select warranty</option>
+                          <option value="3 tháng">3 months</option>
+                          <option value="6 tháng">6 months</option>
+                          <option value="1 năm">1 year</option>
+                        </select>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div key={key}>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{key.charAt(0).toUpperCase() + key.slice(1)}</label>
+                      <input
+                        type={
+                          key === "description" ? "text"
+                            : ["price", "quantity", "yearOfManufacture", "discount"].includes(key)
+                              ? "number"
+                              : "text"
+                        }
+                        name={key}
+                        placeholder={`Enter ${key}`}
+                        value={value}
+                        onChange={handleChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                        required={["name", "brand", "price", "quantity"].includes(key)}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Image Upload Section */}
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Product Images (Max 5)</label>
+                <div className="flex flex-wrap gap-4 mb-4">
                   {selectedFiles.map((file, index) => (
-                    <div key={index} className="relative w-24 h-24">
-                      <img src={URL.createObjectURL(file)} alt={`uploaded-${index}`} className="w-full h-full object-cover rounded-md border" />
-                      <button type="button" onClick={() => handleRemoveFile(index)} className="absolute top-[-8px] right-[-8px] bg-red-500 text-white rounded-full w-6 h-6 text-sm flex items-center justify-center">
-                        ×
+                    <div key={index} className="relative group">
+                      <div className="w-24 h-24 rounded-lg overflow-hidden border border-gray-200">
+                        <img 
+                          src={URL.createObjectURL(file)} 
+                          alt={`preview-${index}`} 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <button 
+                        type="button" 
+                        onClick={() => handleRemoveFile(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                      >
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   ))}
+                  
+                  {selectedFiles.length < 5 && (
+                    <label className="w-24 h-24 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
+                      <Upload size={24} className="text-gray-400 mb-1" />
+                      <span className="text-xs text-gray-500 text-center">Upload</span>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        multiple 
+                        onChange={handleFileSelect} 
+                        className="hidden" 
+                      />
+                    </label>
+                  )}
                 </div>
-                <div className="mt-4">
-                  <input type="file" accept="image/*" multiple onChange={handleFileSelect} className="text-sm" />
-                </div>
+                <p className="text-xs text-gray-500">Upload high-quality product images (JPEG, PNG)</p>
               </div>
-              <div className="col-span-2 flex justify-between mt-6">
-                <button type="button" onClick={handleForm} className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-xl">Cancel</button>
-                <button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl flex items-center justify-center">
-                  {loading ? <span className="animate-spin">⏳</span> : "Confirm"}
+
+              {/* Form Actions */}
+              <div className="mt-8 flex justify-end space-x-3">
+                <button 
+                  type="button" 
+                  onClick={handleForm}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 text-white bg-slate-600 hover:bg-red-700 duration-300 transition-all ease-in-out hover:text-white"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className="px-6 py-2 border-gray-300 bg-slate-600 border text-white rounded-lg hover:text-white hover:bg-blue-500 transition-colors disabled:opacity-70 flex items-center justify-center min-w-24"
+                >
+                  {loading ? (
+                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  ) : (
+                    "Add Product"
+                  )}
                 </button>
               </div>
             </form>
