@@ -12,6 +12,7 @@ public class DTOConverter {
 
     public static CartItemDTO toCartItemDTO(CartItem cartItem) {
         return new CartItemDTO(
+                cartItem.getCartItemId(),
                 cartItem.getProduct().getProductId(),
                 cartItem.getProduct().getName(),
                 cartItem.getQuantity()
