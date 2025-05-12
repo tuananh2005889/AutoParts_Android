@@ -52,8 +52,7 @@ public class Cart {
     public enum CartStatus {
         ACTIVE,
         PENDING,
-        PAID,
-        CANCELLED
+        ARCHIVED,
     }
     public Cart() {
         this.status = CartStatus.ACTIVE;

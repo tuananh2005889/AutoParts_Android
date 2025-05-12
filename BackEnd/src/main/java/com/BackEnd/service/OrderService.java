@@ -28,22 +28,20 @@ public class OrderService {
         cartService.changeCartStatus(cartId, Cart.CartStatus.PENDING);
 
         //Create Order
-        User user = cartService.getUserByCartId(cartId);
-        LocalDateTime now = LocalDateTime.now();
-
         Order order = new Order();
-        order.setUser(user);
-        order.setOrderDate(now);
+        order.setUser(cartService.getUserByCartId(cartId));
         order.setStatus(Order.OrderStatus.PENDING);
         order.setShippingAddress("test");
-        orderRepo.save(order);
 
-        //cart thieu totalPrice(not null), orderDetail,
+        // orderDetail,
         List<CartItem> cartItemList = cartService.getAllCartItemsInActiveCart(cartId);
         List<OrderDetail> orderDetailList = cartItemList.stream()
                 .map(cartItem -> {
                     //product
                     Product product = cartItem.getProduct();
+                    if (product == null || product.getPrice() == null) {
+                        throw new IllegalArgumentException("CartItem contains invalid product or price");
+                    }
                     //quantity
                     int quantity = cartItem.getQuantity();
                     //totalPrice
@@ -63,12 +61,8 @@ public class OrderService {
 
         orderRepo.save(order);
 
-        List<OrderDetailDTO> orderDetailDTOList = orderDetailList.stream()
-                .map(orderDetail -> {
-                    return DTOConverter.toOrderDetailDTO(orderDetail);
-        }).collect(Collectors.toList());
-
-
-         return orderDetailDTOList;
+         return orderDetailList.stream()
+                 .map(DTOConverter::toOrderDetailDTO)
+                 .collect(Collectors.toList());
     }
 }

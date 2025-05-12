@@ -108,10 +108,10 @@ public class CartController {
 //   cartRepo.save(cart);
 //    }
 //
-//    @PostMapping("/activeStatus")
-//    public void changeCartStatusToActive(@RequestParam Long cartId){
-//        Cart cart =     cartService.getCartByCartId(cartId);
-//        cart.setStatus(Cart.CartStatus.ACTIVE);
-//        cartRepo.save(cart);
-//    }
+    @PostMapping("/activeStatus")
+    public void changeCartStatusToActive(@RequestParam Long cartId){
+        Cart cart =     cartService.getCartByCartId(cartId);
+        cart.setStatus(Cart.CartStatus.ACTIVE);
+        cartRepo.save(cart);
+    }
 }

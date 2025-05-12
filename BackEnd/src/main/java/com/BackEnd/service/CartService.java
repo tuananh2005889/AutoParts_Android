@@ -111,7 +111,7 @@ public class CartService {
 
     public void checkoutCart(Long cartId) {
         Cart cart = cartRepo.findById(cartId).orElseThrow(() -> new RuntimeException("Cart not found"));
-        cart.setStatus(Cart.CartStatus.PAID);
+        cart.setStatus(Cart.CartStatus.ARCHIVED);
         cartRepo.save(cart);
     }
 
