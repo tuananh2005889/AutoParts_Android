@@ -52,13 +52,17 @@ import kotlinx.coroutines.delay
 fun CartScreen(
     cartViewModel: CartViewModel = hiltViewModel()
 ) {
-    val cartItems by cartViewModel.cartItemDTOList
+    val cartItemList by cartViewModel.cartItemDTOList
+
+    val imageUrls by cartViewModel.imageUrlPerCartItemList
 
     val errorMessage by cartViewModel.errorMessage
 
     var visible  by remember {  mutableStateOf(false) }
 
-    val imageUrls by cartViewModel.imageUrlPerCartItemList
+
+//     val imageUrls by cartViewModel.imageUrlPerCartItemList
+
 
     val cartId by cartViewModel._cartId.collectAsState()
 
@@ -71,7 +75,6 @@ fun CartScreen(
     }
 
     Box{
-        Log.d("cartscreen-imageUrls", imageUrls.toString())
         Column{
                 Card(
                     modifier = Modifier.padding(horizontal = 8.dp , vertical = 8.dp),
@@ -92,9 +95,9 @@ fun CartScreen(
 
 
             CartItemsList(
-                imageUrls = imageUrls,
+                imageUrlList = imageUrls,
                 cartViewModel = cartViewModel,
-                cartItemDTOs = cartItems,)
+                cartItemDTOList = cartItemList,)
         }
 
         if(visible){
@@ -111,19 +114,20 @@ fun CartScreen(
 @Composable
 fun CartItemsList(
     cartViewModel: CartViewModel,
-    cartItemDTOs: List<CartItemDTO>,
-    imageUrls: List<String>,
+    cartItemDTOList: List<CartItemDTO>,
+    imageUrlList: List<String>,
 ) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        itemsIndexed(items = cartItemDTOs) {index, cartItemDTO ->
+        itemsIndexed(items = cartItemDTOList) {index, cartItemDTO ->
 
-            val imageUrl = imageUrls.getOrNull(index) ?: "null"
+            val imageUrl = imageUrlList.getOrNull(index) ?: "null"
             Log.d("CartScreen-imageurl", imageUrl)
+            Log.d("cartScreen-cartItemDTO", "$cartItemDTO")
             CartItemRow(
                 cartItemDTO =  cartItemDTO,
                 imageUrl = imageUrl,
-                onClickDecrease = {cartViewModel.decreaseQuantity(index.toLong() + 1)},
-                onClickIncrease = {cartViewModel.increaseQuantity(index.toLong() + 1)},
+                onClickDecrease = {cartViewModel.decreaseQuantity(cartItemDTO.cartItemId)},
+                onClickIncrease = {cartViewModel.increaseQuantity(cartItemDTO.cartItemId)},
             )
         }
     }
