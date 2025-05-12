@@ -57,9 +57,15 @@ public class OrderController{
 //    }
 
     @PostMapping("/create")
-    public ResponseEntity<List<OrderDetailDTO>> createOrder(@RequestParam Long cartId ){
-        List<OrderDetailDTO> orderDetailDTOList = orderService.createOrder(cartId);
-        return ResponseEntity.ok(orderDetailDTOList);
+    public ResponseEntity<List<OrderDetailDTO>> createOrder(@RequestParam Long cartId) {
+        try {
+            List<OrderDetailDTO> orderDetailDTOList = orderService.createOrder(cartId);
+            return ResponseEntity.ok(orderDetailDTOList);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 }
