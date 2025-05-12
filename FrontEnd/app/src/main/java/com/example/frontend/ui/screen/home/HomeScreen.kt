@@ -143,7 +143,13 @@ fun HomeScreenContent(
 
     val homeUiState by viewModel.homeUiState.collectAsState()
     var searchText by remember { mutableStateOf("") }
-
+    val filteredProducts = if (searchText.isBlank()) {
+        homeUiState.products
+    } else {
+        homeUiState.products.filter {
+            it.name.contains(searchText.trim(), ignoreCase = true)
+        }
+    }
     Column(
         modifier = modifier
             .padding(innerPadding)
@@ -203,7 +209,14 @@ fun HomeScreenContent(
             }
 
             homeUiState.products.isNotEmpty() -> {
-                val products = homeUiState.products
+                val filteredProducts = if (searchText.isBlank()) {
+                    homeUiState.products
+                } else {
+                    homeUiState.products.filter {
+                        it.name.contains(searchText.trim(), ignoreCase = true)
+                    }
+                }
+
 
                 // Hero Carousel
                 Box(
@@ -231,7 +244,7 @@ fun HomeScreenContent(
                 )
 
                 ProductGrid(
-                    products = products,
+                    products = filteredProducts,
                     onProductClick = onProductClick,
                     homeViewModel = viewModel,
                     onShowSnackBar = onShowSnackBar,
