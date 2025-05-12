@@ -60,8 +60,7 @@ fun CartScreen(
 
     val imageUrls by cartViewModel.imageUrlPerCartItemList
 
-
-    val cartId by cartViewModel.cartId.collectAsState()
+    val cartId by cartViewModel._cartId.collectAsState()
 
     LaunchedEffect(errorMessage){
         if(errorMessage != null){
