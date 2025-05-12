@@ -60,6 +60,10 @@ fun CartScreen(
 
     var visible  by remember {  mutableStateOf(false) }
 
+
+//     val imageUrls by cartViewModel.imageUrlPerCartItemList
+
+
     val cartId by cartViewModel._cartId.collectAsState()
 
     LaunchedEffect(errorMessage){
