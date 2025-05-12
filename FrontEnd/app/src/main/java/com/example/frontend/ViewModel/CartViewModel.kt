@@ -2,6 +2,7 @@ package com.example.frontend.ViewModel
 
 import android.util.Log
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,6 +15,8 @@ import com.example.frontend.ui.common.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -46,11 +49,18 @@ class CartViewModel @Inject constructor(
     val errorMessage: State<String?> = _errorMessage
 
     init{
-        getAllCartItems()
-        getImageUrlPerCartItem()
+        viewModelScope.launch {
+            _cartId
+                .filterNotNull() // only get value when _cartId != null
+                .distinctUntilChanged() // chi chay neu gia tri _cartId khac voi lan truoc
+                .collect { cartId ->
+                    getAllCartItems(cartId)
+                    getImageUrlPerCartItem(cartId)
+                }
+        }
     }
 
-    fun getAllCartItems() {
+    fun getAllCartItems(cartId: Long) {
         viewModelScope.launch {
             val cartId = _cartId.value
             Log.d("CartVM-getAllCartItems", "cartId: $cartId")
@@ -72,10 +82,9 @@ class CartViewModel @Inject constructor(
         }
     }
 
-    fun getImageUrlPerCartItem() {
+    fun getImageUrlPerCartItem(cartId: Long) {
         viewModelScope.launch {
             try{
-                val cartId = authManager.getCartIdOnce()
                 if (cartId != null) {
                     val response = cartRepo.getImageUrlPerCartItem(cartId)
                     when(response){

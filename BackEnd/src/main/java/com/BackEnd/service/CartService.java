@@ -109,7 +109,6 @@ public class CartService {
 
     }
 
-    // Phương thức thanh toán giỏ hàng, cập nhật trạng thái giỏ hàng thành PAID
     public void checkoutCart(Long cartId) {
         Cart cart = cartRepo.findById(cartId).orElseThrow(() -> new RuntimeException("Cart not found"));
         cart.setStatus(Cart.CartStatus.PAID);
@@ -123,7 +122,7 @@ public class CartService {
     }
 
     @Transactional
-public CartItemDTO addItemToCart(AddToCartRequest addToCartRequest) {
+    public CartItemDTO addItemToCart(AddToCartRequest addToCartRequest) {
 
     // Check quantity request
     if (addToCartRequest.getQuantity() <= 0) {
