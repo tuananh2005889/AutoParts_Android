@@ -8,8 +8,10 @@ import com.BackEnd.repository.OrderDetailRepository;
 import com.BackEnd.utils.DTOConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,14 +25,15 @@ public class OrderService {
     private final OrderDetailRepository orderDetailRepo;
 
 
+
     public List<OrderDetailDTO> createOrder(Long cartId){
-        //Change Cart status: active -> pending
-        cartService.changeCartStatus(cartId, Cart.CartStatus.PENDING);
+        cartService.changeCartStatus(cartId, Cart.CartStatus.SUBMITTED);
 
         //Create Order
         Order order = new Order();
         order.setUser(cartService.getUserByCartId(cartId));
         order.setStatus(Order.OrderStatus.PENDING);
+        order.setCreatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         order.setShippingAddress("test");
 
         // orderDetail,
@@ -64,5 +67,20 @@ public class OrderService {
          return orderDetailList.stream()
                  .map(DTOConverter::toOrderDetailDTO)
                  .collect(Collectors.toList());
+    }
+
+    public Boolean checkIfUserHasPendingOrder(String userName){
+        User user = userService.getUserByName(userName);
+        return orderRepo.existsByUserAndStatus(user, Order.OrderStatus.PENDING);
+    }
+
+    @Transactional
+    public List<OrderDetailDTO> getOrderDetailListInPendingOrder(String userName){
+        User user = userService.getUserByName(userName);
+        Order order = orderRepo.findByUserAndStatus(user, Order.OrderStatus.PENDING);
+        List<OrderDetail> orderDetailList = order.getOrderDetails();
+        return orderDetailList.stream()
+                .map(DTOConverter::toOrderDetailDTO)
+                .collect(Collectors.toList());
     }
 }

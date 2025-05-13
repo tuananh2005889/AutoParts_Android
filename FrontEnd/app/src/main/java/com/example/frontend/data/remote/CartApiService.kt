@@ -35,5 +35,7 @@ interface CartApiService {
     @PUT("/app/cart-item/decrease")
     suspend fun decreaseCartItemQuantity(@Query("cartItemId") cartItemId: Long): Response<BasicCartItemDTO>
 
+    @GET("/app/cart/total-price")
+    suspend fun getTotalPrice(@Query("cartId") cartId: Long): Response<Double>
 
 }

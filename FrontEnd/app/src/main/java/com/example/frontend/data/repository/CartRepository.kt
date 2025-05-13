@@ -119,6 +119,20 @@ class CartRepository @Inject constructor(private val cartApiService: CartApiServ
         }
     }
 
+    suspend fun getTotalPrice(cartId: Long): ApiResponse<Double>{
+        return try{
+            val response = cartApiService.getTotalPrice(cartId)
+            if(response.isSuccessful){
+                ApiResponse.Success(response.body() ?: 0.0)
+            }else{
+                ApiResponse.Error("Failed to fetch total price", response.code())
+            }
+        }catch(e: Exception){
+            ApiResponse.Error("Unknown error: ${e.message}")
+        }
+
+    }
+
 
 
 }

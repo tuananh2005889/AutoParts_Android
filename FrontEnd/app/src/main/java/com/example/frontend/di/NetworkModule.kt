@@ -3,6 +3,7 @@ package com.example.frontend.di
 import com.example.frontend.data.dto.GoogleAuthApi
 import com.example.frontend.data.remote.CartApiService
 import com.example.frontend.data.remote.LoginApiService
+import com.example.frontend.data.remote.OrderApiService
 import com.example.frontend.data.remote.ProductApiService
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -47,7 +48,13 @@ val gson = GsonBuilder().setLenient().create()
     fun provideCartApiService(retrofit: Retrofit): CartApiService{
         return retrofit.create(CartApiService::class.java)
     }
+
     @Provides
     fun provideGoogleAuthApi(retrofit: Retrofit): GoogleAuthApi =
         retrofit.create(GoogleAuthApi::class.java)
+
+    @Provides
+    fun provideOrderApiService(retrofit: Retrofit): OrderApiService{
+        return retrofit.create(OrderApiService::class.java)
+    }
 }

@@ -82,12 +82,11 @@ public class CartController {
         }
     }
 
-    // API thanh toán giỏ hàng (cập nhật trạng thái thành PAID)
-    @PostMapping("/checkout")
-    public ResponseEntity<?> checkout(@RequestParam Long cartId) {
-        cartService.checkoutCart(cartId);
-        return ResponseEntity.ok("Cart successfully checked out and paid.");
-    }
+//    @PostMapping("/checkout")
+//    public ResponseEntity<?> checkout(@RequestParam Long cartId) {
+//        cartService.checkoutCart(cartId);
+//        return ResponseEntity.ok("Cart successfully checked out and paid.");
+//    }
 
     // @GetMapping("/activate")
     // public ResponseEntity<Cart> getActiveCart(@RequestParam String userName) {
@@ -113,5 +112,14 @@ public class CartController {
         Cart cart =     cartService.getCartByCartId(cartId);
         cart.setStatus(Cart.CartStatus.ACTIVE);
         cartRepo.save(cart);
+    }
+
+    @GetMapping("/total-price")
+    public ResponseEntity<Double> getCartTotalPrice(@RequestParam Long cartId){
+        Double price = cartService.getTotalPrice(cartId);
+        if(price == null ){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(price);
     }
 }

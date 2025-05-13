@@ -26,7 +26,7 @@ public class Order {
             nullable = false)
     private User user;
 
-    @CreatedDate
+    @Column( columnDefinition = "DATETIME(0)")
     private LocalDateTime createdAt;
 
     @Column(nullable = false)

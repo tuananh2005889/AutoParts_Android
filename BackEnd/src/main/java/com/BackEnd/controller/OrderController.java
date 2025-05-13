@@ -57,13 +57,32 @@ public class OrderController{
 //    }
 
     @PostMapping("/create")
-    public ResponseEntity<List<OrderDetailDTO>> createOrder(@RequestParam Long cartId) {
+    public ResponseEntity<Void> createOrder(@RequestParam Long cartId) {
         try {
             List<OrderDetailDTO> orderDetailDTOList = orderService.createOrder(cartId);
-            return ResponseEntity.ok(orderDetailDTOList);
+            return ResponseEntity.ok().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/check-pending-status")
+    public ResponseEntity<Boolean> checkIfUserHasPendingOrder(@RequestParam String userName){
+        boolean result =  orderService.checkIfUserHasPendingOrder(userName);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/pending-order-detail-list")
+    public ResponseEntity<List<OrderDetailDTO>> getOrderDetailListInPendingOrder(@RequestParam String userName){
+        try {
+            List<OrderDetailDTO> result = orderService.getOrderDetailListInPendingOrder(userName);
+            return ResponseEntity.ok(result);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

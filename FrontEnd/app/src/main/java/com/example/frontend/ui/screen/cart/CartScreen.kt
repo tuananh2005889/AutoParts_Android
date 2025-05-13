@@ -1,6 +1,7 @@
 package com.example.frontend.ui.screen.cart
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -41,16 +42,19 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.example.frontend.R
 import com.example.frontend.ViewModel.CartViewModel
 import com.example.frontend.data.dto.CartItemDTO
 import com.example.frontend.ui.common.CloudinaryImage
 import com.example.frontend.ui.common.Notification
+import com.example.frontend.ui.navigation.Route
 import kotlinx.coroutines.delay
 
 @Composable
 fun CartScreen(
-    cartViewModel: CartViewModel = hiltViewModel()
+    cartViewModel: CartViewModel = hiltViewModel(),
+    navController: NavHostController
 ) {
     val cartItemList by cartViewModel.cartItemDTOList
 
@@ -60,6 +64,7 @@ fun CartScreen(
 
     var visible  by remember {  mutableStateOf(false) }
 
+    val cartTotalPrice by cartViewModel.cartTotalPrice
 
 //     val imageUrls by cartViewModel.imageUrlPerCartItemList
 
@@ -97,8 +102,17 @@ fun CartScreen(
             CartItemsList(
                 imageUrlList = imageUrls,
                 cartViewModel = cartViewModel,
-                cartItemDTOList = cartItemList,)
+                cartItemDTOList = cartItemList,
+                )
         }
+
+        TotalPrice(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            totalPrice = cartTotalPrice,
+            clickOrderNow = {
+                cartViewModel.clickOrderNow(navController)
+            }
+        )
 
         if(visible){
             Notification(
@@ -111,6 +125,35 @@ fun CartScreen(
     }
 
 }
+
+@Composable
+fun TotalPrice(
+    modifier: Modifier = Modifier,
+    totalPrice: Double,
+    clickOrderNow: ()->Unit,
+){
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp)
+            .background(MaterialTheme.colorScheme.background, shape = RoundedCornerShape(8.dp))
+    ) {
+        Text(
+            text = "Total Price: ${totalPrice}$",
+            fontWeight = FontWeight.Bold,
+            fontSize = _root_ide_package_.androidx.compose.ui.unit.TextUnit(25f, androidx.compose.ui.unit.TextUnitType.Sp),
+            )
+        Button(
+            onClick={
+                clickOrderNow()
+            }
+        ){
+            Text(
+                text = "Order Now"
+            )
+        }
+    }
+}
 @Composable
 fun CartItemsList(
     cartViewModel: CartViewModel,
@@ -121,8 +164,8 @@ fun CartItemsList(
         itemsIndexed(items = cartItemDTOList) {index, cartItemDTO ->
 
             val imageUrl = imageUrlList.getOrNull(index) ?: "null"
-            Log.d("CartScreen-imageurl", imageUrl)
-            Log.d("cartScreen-cartItemDTO", "$cartItemDTO")
+//            Log.d("CartScreen-imageurl", imageUrl)
+//            Log.d("cartScreen-cartItemDTO", "$cartItemDTO")
             CartItemRow(
                 cartItemDTO =  cartItemDTO,
                 imageUrl = imageUrl,

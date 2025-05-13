@@ -8,12 +8,11 @@ import javax.inject.Inject
 
 class OrderRepository @Inject constructor(private val orderApiService: OrderApiService) {
 
-    suspend fun createOrder(cartId: Long): ApiResponse<List<OrderDetailDTO>>{
+    suspend fun createOrder(cartId: Long): ApiResponse<Unit>{
         return try{
            val response = orderApiService.createOrder(cartId)
             if(response.isSuccessful){
-                val orderDetailDTOList:  List<OrderDetailDTO> = response.body() ?: emptyList()
-                ApiResponse.Success(orderDetailDTOList)
+                ApiResponse.Success(Unit)
             }else{
                 val errorMessage: String = response.errorBody().toString()
                 val code = response.code()
@@ -24,4 +23,32 @@ class OrderRepository @Inject constructor(private val orderApiService: OrderApiS
             ApiResponse.Error("Exception occurred: ${e.message ?: "Unknown error"}", null)
         }
     }
+
+    suspend fun checkIfUserHasPendingOrder(userName: String): ApiResponse<Boolean> {
+        return try {
+            val result = orderApiService.checkIfUserHasPendingOrder(userName)
+            if (result.isSuccessful) {
+                ApiResponse.Success(result.body() ?: false)
+            } else {
+                ApiResponse.Error("Failed to get pending order status", result.code())
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error("Exception occurred: ${e.message ?: "Unknown error"}")
+        }
+    }
+
+    suspend fun getOrderDetailListInPendingOrder(userName: String): ApiResponse<List<OrderDetailDTO>>{
+        return try{
+            val response = orderApiService.getAllOrderDetailsInPendingOrder(userName)
+            if(response.isSuccessful){
+                ApiResponse.Success(response.body() ?: emptyList())
+            }else{
+                ApiResponse.Error("Failed to get order detail list", response.code())
+            }
+        }catch(e: Exception){
+            ApiResponse.Error("Exception occurred: ${e.message ?: "Unknown error"}")
+
+        }
+    }
+
 }
