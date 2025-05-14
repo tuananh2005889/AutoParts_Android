@@ -1,6 +1,5 @@
 package com.example.frontend.ui.screen.cart
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,8 +47,15 @@ import com.example.frontend.ViewModel.CartViewModel
 import com.example.frontend.data.dto.CartItemDTO
 import com.example.frontend.ui.common.CloudinaryImage
 import com.example.frontend.ui.common.Notification
-import com.example.frontend.ui.navigation.Route
 import kotlinx.coroutines.delay
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.runtime.rememberCoroutineScope
+import com.example.frontend.ui.common.SimpleDialog
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlin.coroutines.coroutineContext
 
 @Composable
 fun CartScreen(
@@ -66,9 +72,6 @@ fun CartScreen(
 
     val cartTotalPrice by cartViewModel.cartTotalPrice
 
-//     val imageUrls by cartViewModel.imageUrlPerCartItemList
-
-
     val cartId by cartViewModel._cartId.collectAsState()
 
     LaunchedEffect(errorMessage){
@@ -79,7 +82,18 @@ fun CartScreen(
         }
     }
 
-    Box{
+    val hasPendingOrder by cartViewModel.hasPendingOrder
+    var showDialog by remember {mutableStateOf(false)}
+    SimpleDialog(
+        showDialog,
+        onDismiss = {showDialog = false},
+        title = "Order Alert",
+        text = "Please pay for the previous order"
+    )
+
+    Box(
+        modifier = Modifier.padding(WindowInsets.statusBars.asPaddingValues())
+    ){
         Column{
                 Card(
                     modifier = Modifier.padding(horizontal = 8.dp , vertical = 8.dp),
@@ -105,12 +119,16 @@ fun CartScreen(
                 cartItemDTOList = cartItemList,
                 )
         }
-
         TotalPrice(
             modifier = Modifier.align(Alignment.BottomCenter),
             totalPrice = cartTotalPrice,
             clickOrderNow = {
-                cartViewModel.clickOrderNow(navController)
+                    if(hasPendingOrder){
+                        showDialog = true
+                    }else{
+                        cartViewModel.clickOrderNow(navController)
+
+                }
             }
         )
 

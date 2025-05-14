@@ -14,7 +14,7 @@ import retrofit2.http.Query
 
 interface CartApiService {
     @GET("/app/cart/items")
-    suspend fun getCartItems(
+    suspend fun getAllCartItems(
         @Query("cartId") cartId: Long
     ): Response<List<CartItemDTO>>
 

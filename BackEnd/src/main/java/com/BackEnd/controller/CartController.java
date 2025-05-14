@@ -82,18 +82,6 @@ public class CartController {
         }
     }
 
-//    @PostMapping("/checkout")
-//    public ResponseEntity<?> checkout(@RequestParam Long cartId) {
-//        cartService.checkoutCart(cartId);
-//        return ResponseEntity.ok("Cart successfully checked out and paid.");
-//    }
-
-    // @GetMapping("/activate")
-    // public ResponseEntity<Cart> getActiveCart(@RequestParam String userName) {
-    // Cart cart = cartService.createCart(userName); // tạo mới nếu chưa có
-    // return ResponseEntity.ok(cart);
-    // }
-    // API kiểm tra trạng thái giỏ hàng
     @GetMapping("/status")
     public ResponseEntity<Cart> getCartStatus(@RequestParam Long cartId) {
         Cart cart = cartService.getCartStatus(cartId);

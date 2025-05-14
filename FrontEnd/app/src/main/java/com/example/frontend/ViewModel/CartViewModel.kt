@@ -55,10 +55,12 @@ class CartViewModel @Inject constructor(
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
 
-
+    private val _hasPendingOrder = mutableStateOf<Boolean>(false)
+    val hasPendingOrder: State<Boolean> = _hasPendingOrder
 
     init{
         viewModelScope.launch {
+            checkIfUserHasPendingOrder()
             _cartId
                 .filterNotNull() // only get value when _cartId != null
 //                .distinctUntilChanged() // chi chay neu gia tri _cartId khac voi lan truoc
@@ -75,7 +77,7 @@ class CartViewModel @Inject constructor(
             val cartId = _cartId.value
             Log.d("CartVM-getAllCartItems", "cartId: $cartId")
             if (cartId != null) {
-                val response = cartRepo.getCartItems(cartId)
+                val response = cartRepo.getAllCartItems(cartId)
                 when (response) {
                     is ApiResponse.Success -> {
                         _cartItemDTOList.value = response.data
@@ -197,7 +199,9 @@ class CartViewModel @Inject constructor(
         }
     }
 
-    fun clickOrderNow(navController: NavHostController){
+     fun clickOrderNow(navController: NavHostController){
+//        checkIfUserHasPendingOrder()
+
         val cartId = _cartId.value
         if(cartId != null){
             viewModelScope.launch{
@@ -206,6 +210,22 @@ class CartViewModel @Inject constructor(
             }
         }
 
+    }
+
+    suspend fun checkIfUserHasPendingOrder(){
+        val userName:String = authManager.getUserNameOnce().toString()
+        val result = orderRepo.checkIfUserHasPendingOrder(userName)
+        when(result){
+            is ApiResponse.Success -> {
+                _hasPendingOrder.value = result.data
+            }
+            is ApiResponse.Error -> {
+                _errorMessage.value = "Failed to check pending order: ${result.message}"
+            }
+            is ApiResponse.Loading -> {
+
+            }
+        }
     }
 
 

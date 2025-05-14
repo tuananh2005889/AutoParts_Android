@@ -53,9 +53,9 @@ class CartRepository @Inject constructor(private val cartApiService: CartApiServ
         }
     }
 
-    suspend fun getCartItems(cartId: Long): ApiResponse<List<CartItemDTO>>{
+    suspend fun getAllCartItems(cartId: Long): ApiResponse<List<CartItemDTO>>{
        return try{
-           val response = cartApiService.getCartItems(cartId)
+           val response = cartApiService.getAllCartItems(cartId)
            if(response.isSuccessful){
                ApiResponse.Success(response.body() ?: emptyList())
            }else{
