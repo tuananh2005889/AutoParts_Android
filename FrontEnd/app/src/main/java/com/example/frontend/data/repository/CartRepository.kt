@@ -53,9 +53,9 @@ class CartRepository @Inject constructor(private val cartApiService: CartApiServ
         }
     }
 
-    suspend fun getCartItems(cartId: Long): ApiResponse<List<CartItemDTO>>{
+    suspend fun getAllCartItems(cartId: Long): ApiResponse<List<CartItemDTO>>{
        return try{
-           val response = cartApiService.getCartItems(cartId)
+           val response = cartApiService.getAllCartItems(cartId)
            if(response.isSuccessful){
                ApiResponse.Success(response.body() ?: emptyList())
            }else{
@@ -117,6 +117,20 @@ class CartRepository @Inject constructor(private val cartApiService: CartApiServ
         } catch (e: Exception) {
             ApiResponse.Error("Exception: ${e.localizedMessage ?: "Unknown error"}")
         }
+    }
+
+    suspend fun getTotalPrice(cartId: Long): ApiResponse<Double>{
+        return try{
+            val response = cartApiService.getTotalPrice(cartId)
+            if(response.isSuccessful){
+                ApiResponse.Success(response.body() ?: 0.0)
+            }else{
+                ApiResponse.Error("Failed to fetch total price", response.code())
+            }
+        }catch(e: Exception){
+            ApiResponse.Error("Unknown error: ${e.message}")
+        }
+
     }
 
 

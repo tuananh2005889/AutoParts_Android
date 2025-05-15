@@ -11,6 +11,4 @@ public class PaymentRequest {
     Long orderCode;
     Integer amount;
     String description;
-//    String cancelUrl;
-//    String returnUrl;
 }

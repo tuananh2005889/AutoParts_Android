@@ -196,12 +196,13 @@ fun DetailProductScreen(
                                     Spacer(modifier = Modifier.height(8.dp))
 
                                     Text(
-                                        text = "${product.price}$",
+                                        text = "${product.price}",
                                         style = MaterialTheme.typography.h6.copy(
                                             color = accentColor,
                                             fontWeight = FontWeight.Bold
                                         )
                                     )
+
 
                                     Spacer(modifier = Modifier.height(12.dp))
 
@@ -512,6 +513,7 @@ fun DetailProductScreen(
             )
         }
     }
+
 }
 
 @Composable
@@ -848,7 +850,7 @@ fun AddReviewDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Viết đánh giá") },
+        title = { Text("Write a review") },
         text = {
             Column {
                 Row {
@@ -864,7 +866,7 @@ fun AddReviewDialog(
                 OutlinedTextField(
                     value = comment,
                     onValueChange = { comment = it },
-                    label = { Text("Bình luận") },
+                    label = { Text("Review") },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -874,8 +876,9 @@ fun AddReviewDialog(
                 if (rating > 0 && comment.isNotBlank()) {
                     onSubmit(rating, comment.trim())
                 }
-            }) { Text("Gửi") }
+            }) { Text("Send") }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Hủy") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
     )
 }
+

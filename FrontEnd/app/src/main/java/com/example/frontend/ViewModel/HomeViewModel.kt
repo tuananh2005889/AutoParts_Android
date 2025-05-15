@@ -2,21 +2,27 @@ package com.example.frontend.ViewModel
 
 import android.util.Log
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.frontend.data.dto.CartItemDTO
 import com.example.frontend.data.model.ProductData
 import com.example.frontend.data.remote.ApiResponse
 import com.example.frontend.data.repository.CartRepository
+import com.example.frontend.data.repository.OrderRepository
 import com.example.frontend.data.repository.ProductRepository
 import com.example.frontend.ui.common.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import javax.inject.Inject
 
 data class HomeUiState(
@@ -29,6 +35,7 @@ data class HomeUiState(
 class HomeViewModel @Inject constructor(
     private val productRepo: ProductRepository,
     private val cartRepo: CartRepository,
+    private val orderRepo: OrderRepository,
     private val authManager: AuthManager,
     ) : ViewModel() {
 
@@ -36,26 +43,43 @@ class HomeViewModel @Inject constructor(
         MutableStateFlow<HomeUiState>(HomeUiState())
     val homeUiState: StateFlow<HomeUiState> = _homeUiState
 
-    val userName: StateFlow<String?> = authManager.userNameFlow.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        null
-    )
+//    val userName: StateFlow<String?> = authManager.userNameFlow.stateIn(
+//        viewModelScope,
+//        SharingStarted.WhileSubscribed(5000),
+//        null
+//    )
+
+    private val _hasPendingOrder = MutableStateFlow(false)
+    val hasPendingOrder: StateFlow<Boolean> = _hasPendingOrder
 
     init{
-        observeUserName()
+        viewModelScope.launch {
+            authManager.userNameFlow.filterNotNull().collect { userName ->
+//                val hasPending = checkIfUserHasPendingOrder(userName)
+//                if (!hasPending) {
+                    createCart(userName)
+//                }
+            }
+        }
         getAllProducts()
     }
 
-
-    private fun observeUserName(){
-        viewModelScope.launch {
-            val userName= authManager.getUserNameOnce()
-            Log.d("HomeVM-obserUserName", "userName: $userName")
-                if(userName != null){
-                createCart(userName)
-                }
+    suspend fun checkIfUserHasPendingOrder(userName: String): Boolean {
+        val result = orderRepo.checkIfUserHasPendingOrder(userName)
+        return when (result) {
+            is ApiResponse.Success -> {
+                _hasPendingOrder.value = result.data
+                Log.d("HomeVM-checkPending", "Has pending order: ${result.data}")
+                result.data
             }
+            is ApiResponse.Error -> {
+                Log.d("HomeVM-checkIfUserHasPendingOrder", "Error: ${result.message}")
+                false
+            }
+            is ApiResponse.Loading -> {
+                false
+            }
+        }
     }
 
     fun createCart(userName: String) {
@@ -64,7 +88,7 @@ class HomeViewModel @Inject constructor(
                 is ApiResponse.Success -> {
                     val cartId = response.data.cartId
                     Log.d("HomeVM-create cart", "Cart created with ID: $cartId")
-                    if (cartId != null) {
+                    cartId?.let{
                         authManager.saveLoginStatus(true, userName, cartId)
                     }
                 }
@@ -101,12 +125,10 @@ class HomeViewModel @Inject constructor(
                     Log.e("HomeVM - addOneProductToCart", "Error when add item to cart: ${result.message}")
                     null  
                 }
-
-                ApiResponse.Loading -> null
+                is ApiResponse.Loading -> null
             }
 
     }
-
 
     fun getAllProducts(){
         viewModelScope.launch {
@@ -125,5 +147,7 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
+
 
 }
