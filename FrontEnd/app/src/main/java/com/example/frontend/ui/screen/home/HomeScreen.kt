@@ -482,8 +482,16 @@ fun SearchBar(
     )
 }
 
+//fun Double.formatAsCurrency(): String {
+//    val formatter = java.text.NumberFormat.getCurrencyInstance().apply {
+//        maximumFractionDigits = 0
+//    }
+//    return formatter.format(this)
+//}
+
 fun Double.formatAsCurrency(): String {
-    val formatter = java.text.NumberFormat.getCurrencyInstance().apply {
+    val localeVN = java.util.Locale("vi", "VN")
+    val formatter = java.text.NumberFormat.getCurrencyInstance(localeVN).apply {
         maximumFractionDigits = 0
     }
     return formatter.format(this)

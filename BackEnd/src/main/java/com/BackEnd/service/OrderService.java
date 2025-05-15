@@ -24,8 +24,6 @@ public class OrderService {
     private final OrderRepository orderRepo;
     private final OrderDetailRepository orderDetailRepo;
 
-
-
     public List<OrderDetailDTO> createOrder(Long cartId){
         cartService.changeCartStatus(cartId, Cart.CartStatus.SUBMITTED);
 
@@ -72,6 +70,12 @@ public class OrderService {
     public Boolean checkIfUserHasPendingOrder(String userName){
         User user = userService.getUserByName(userName);
         return orderRepo.existsByUserAndStatus(user, Order.OrderStatus.PENDING);
+    }
+
+    public Long getPendingOrderId(String userName){
+        User user = userService.getUserByName(userName);
+        Order order = orderRepo.findTopByUserAndStatusOrderByCreatedAtDesc(user, Order.OrderStatus.PENDING);
+        return order.getOrderId();
     }
 
     @Transactional

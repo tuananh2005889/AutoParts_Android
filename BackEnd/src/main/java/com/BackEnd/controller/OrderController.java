@@ -1,23 +1,28 @@
 package com.BackEnd.controller;
 
 import com.BackEnd.dto.OrderDetailDTO;
+import com.BackEnd.dto.PaymentRequest;
+import com.BackEnd.model.Cart;
+import com.BackEnd.model.Payment;
+import com.BackEnd.model.User;
+import com.BackEnd.service.CartService;
 import com.BackEnd.service.OrderService;
+import com.BackEnd.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/app/order")
-@RequiredArgsConstructor
+@RequiredArgsConstructor // giup DI, khong can tao constructor
 public class OrderController{
     private final OrderService orderService;
+    private final PaymentService paymentService;
+    private final CartService cartService;
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${PAYOS_API_KEY}")
@@ -57,13 +62,26 @@ public class OrderController{
 //    }
 
     @PostMapping("/create")
-    public ResponseEntity<Void> createOrder(@RequestParam Long cartId) {
+    public ResponseEntity<String> createOrder(@RequestParam Long cartId) {
         try {
             List<OrderDetailDTO> orderDetailDTOList = orderService.createOrder(cartId);
-            return ResponseEntity.ok().build();
+            Integer totalPrice = 0;
+            for(OrderDetailDTO orderDetailDTO : orderDetailDTOList){
+                totalPrice +=  orderDetailDTO.getTotalPrice().intValue();
+            }
+
+
+            User user =  cartService.getUserByCartId(cartId);
+            Long orderId =  orderService.getPendingOrderId(user.getUserName());
+            PaymentRequest paymentRequest = new PaymentRequest(orderId, totalPrice,"Checkout AutoParts Order");
+            String qrCode =  paymentService.createOrderInPayOS(paymentRequest);
+
+            return ResponseEntity.ok(qrCode);
         } catch (IllegalArgumentException e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().build();
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

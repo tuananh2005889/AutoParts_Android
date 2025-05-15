@@ -1,21 +1,18 @@
-package com.BackEnd.controller;
+package com.BackEnd.service;
+
 import com.BackEnd.dto.PaymentRequest;
 import com.BackEnd.utils.SignatureUtil;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Service;
 import vn.payos.PayOS;
 import vn.payos.type.CheckoutResponseData;
-import vn.payos.type.ItemData;
 import vn.payos.type.PaymentData;
-
 import java.util.HashMap;
 import java.util.Map;
 
-@RestController
-@RequestMapping("/checkout")
-public class CheckoutController {
+@Service
+public class PaymentService {
     @Value("${PAYOS_API_KEY}")
     private String apiKey;
     @Value("${PAYOS_CLIENT_ID}")
@@ -30,8 +27,7 @@ public class CheckoutController {
         payOS = new PayOS(clientId, apiKey, checksumKey);
     }
 
-    @PostMapping("/create-payment-link")
-    public String createPaymentLink(@RequestBody PaymentRequest request) throws Exception {
+    public String createOrderInPayOS(PaymentRequest request) throws Exception {
         Map<String, String> params = new HashMap<>();
         params.put("amount", String.valueOf(request.getAmount()));
         params.put("cancelUrl", "autoparts://payment-cancel");
@@ -50,7 +46,7 @@ public class CheckoutController {
                 .signature(signature)
                 .build();
 
-        CheckoutResponseData  checkoutResponse= payOS.createPaymentLink(paymentData);
+        CheckoutResponseData checkoutResponse= payOS.createPaymentLink(paymentData);
         String qrCode = checkoutResponse.getQrCode();
         return qrCode;
     }

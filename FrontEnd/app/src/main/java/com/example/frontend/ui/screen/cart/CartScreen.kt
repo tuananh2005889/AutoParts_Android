@@ -1,6 +1,7 @@
 package com.example.frontend.ui.screen.cart
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -31,7 +32,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -52,6 +52,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import com.example.frontend.ui.common.SimpleDialog
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -111,8 +112,6 @@ fun CartScreen(
                     )
 
                 }
-
-
             CartItemsList(
                 imageUrlList = imageUrls,
                 cartViewModel = cartViewModel,
@@ -127,7 +126,6 @@ fun CartScreen(
                         showDialog = true
                     }else{
                         cartViewModel.clickOrderNow(navController)
-
                 }
             }
         )
@@ -141,7 +139,6 @@ fun CartScreen(
             )
         }
     }
-
 }
 
 @Composable
@@ -153,15 +150,21 @@ fun TotalPrice(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(bottom = 16.dp)
-            .background(MaterialTheme.colorScheme.background, shape = RoundedCornerShape(8.dp))
+            .padding(vertical = 16.dp, horizontal = 16.dp)
+            .background(MaterialTheme.colorScheme.background, shape = RoundedCornerShape(14.dp)),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceAround
     ) {
         Text(
-            text = "Total Price: ${totalPrice}$",
+            text = "Total Price: ${totalPrice.formatAsCurrency()}",
             fontWeight = FontWeight.Bold,
-            fontSize = _root_ide_package_.androidx.compose.ui.unit.TextUnit(25f, androidx.compose.ui.unit.TextUnitType.Sp),
+            fontSize = _root_ide_package_.androidx.compose.ui.unit.TextUnit(22f, androidx.compose.ui.unit.TextUnitType.Sp),
             )
+        Spacer(
+            modifier = Modifier.size(20.dp)
+        )
         Button(
+            modifier = Modifier.padding(vertical = 10.dp),
             onClick={
                 clickOrderNow()
             }
@@ -180,10 +183,7 @@ fun CartItemsList(
 ) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         itemsIndexed(items = cartItemDTOList) {index, cartItemDTO ->
-
             val imageUrl = imageUrlList.getOrNull(index) ?: "null"
-//            Log.d("CartScreen-imageurl", imageUrl)
-//            Log.d("cartScreen-cartItemDTO", "$cartItemDTO")
             CartItemRow(
                 cartItemDTO =  cartItemDTO,
                 imageUrl = imageUrl,
@@ -239,7 +239,7 @@ fun CartItemRow(
                     overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = cartItemDTO.quantity.toString(), color = Color.Gray)
+                Text(text = "Quantity: ${cartItemDTO.quantity.toString()}", color = Color.Gray)
             }
 
             Spacer(modifier = Modifier.width(8.dp))
@@ -276,9 +276,13 @@ fun CartItemRow(
     }
 }
 
-
-
-
+fun Double.formatAsCurrency(): String {
+    val localeVN = java.util.Locale("vi", "VN")
+    val formatter = java.text.NumberFormat.getCurrencyInstance(localeVN).apply {
+        maximumFractionDigits = 0
+    }
+    return formatter.format(this)
+}
 
 
 

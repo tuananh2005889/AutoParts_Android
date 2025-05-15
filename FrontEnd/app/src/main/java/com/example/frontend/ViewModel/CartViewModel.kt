@@ -48,7 +48,6 @@ class CartViewModel @Inject constructor(
     private val _cartItemDTOList = mutableStateOf<List<CartItemDTO>>(emptyList())
     val cartItemDTOList: State<List<CartItemDTO>> = _cartItemDTOList
 
-
     private val _imageUrlPerCartItemList = mutableStateOf<List<String>>(emptyList())
     val imageUrlPerCartItemList = _imageUrlPerCartItemList
 

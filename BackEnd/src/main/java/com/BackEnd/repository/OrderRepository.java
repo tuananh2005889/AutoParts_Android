@@ -17,5 +17,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     boolean existsByUserAndStatus(User user, Order.OrderStatus status);
 
     Order findByUserAndStatus(User user, Order.OrderStatus status);
+
+    Order findTopByUserAndStatusOrderByCreatedAtDesc(User user, Order.OrderStatus status);
+
 }
 

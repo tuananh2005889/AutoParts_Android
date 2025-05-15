@@ -44,7 +44,11 @@ public class DTOConverter {
     }
 
     public static OrderDetailDTO toOrderDetailDTO(OrderDetail orderDetail){
-        return new OrderDetailDTO(orderDetail.getProduct().getName(), orderDetail.getQuantity(), orderDetail.getTotalPrice());
+        return new OrderDetailDTO(
+                orderDetail.getProduct().getProductId(),
+                orderDetail.getProduct().getName(),
+                orderDetail.getQuantity(),
+                orderDetail.getTotalPrice());
     }
 
 }

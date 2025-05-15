@@ -53,7 +53,6 @@ class HomeViewModel @Inject constructor(
     val hasPendingOrder: StateFlow<Boolean> = _hasPendingOrder
 
     init{
-        Log.d("HomeVM", "Init run")
         viewModelScope.launch {
             authManager.userNameFlow.filterNotNull().collect { userName ->
 //                val hasPending = checkIfUserHasPendingOrder(userName)
