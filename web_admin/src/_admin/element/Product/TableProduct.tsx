@@ -260,7 +260,7 @@ return (
                   {/* Price Cell */}
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-semibold text-indigo-600">
-                      ${product.price.toFixed(2)}
+                      {product.price} VNĐ
                       {product.discount > 0 && (
                         <span className="ml-2 text-xs text-green-600 bg-green-100 px-1.5 py-0.5 rounded-full">
                           {product.discount}% off
@@ -460,7 +460,7 @@ return (
 
     {/* Edit Product Modal - Updated colors */}
     {editingProduct && (
-      <div className="fixed inset-0  bg-opacity-30 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+      <div className="fixed inset-0 text-black bg-opacity-30 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
         <motion.div 
           className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-200"
           initial={{ opacity: 0, scale: 0.95 }}

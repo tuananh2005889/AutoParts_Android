@@ -45,6 +45,8 @@ import com.example.frontend.ui.common.SimpleDialog
 import com.example.frontend.ui.screen.home.formatAsCurrency
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 fun CartScreen(
@@ -422,4 +424,12 @@ private fun EmptyCartPlaceholder(
             )
         )
     }
+}
+fun Double.formatAsCurrency(): String {
+    val formatter = NumberFormat.getNumberInstance(Locale("vi", "VN")).apply {
+        maximumFractionDigits = 0
+        isGroupingUsed = true
+    }
+    val formattedNumber = formatter.format(this)
+    return "$formattedNumber VNĐ"
 }
