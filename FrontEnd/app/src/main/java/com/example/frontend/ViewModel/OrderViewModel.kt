@@ -141,6 +141,8 @@ fun dismissPaymentMessage() {
                 _orderDetailList.value = emptyList()
                 showPaymentMessage = false
                 isOrderPaid = false
+                _currentQRCode.value = ""
+                authManager.clearCurrentQRCode()
             } else if (result is ApiResponse.Error) {
                 Log.d("OrdVM", "Error changing order status: ${result.message}")
             }

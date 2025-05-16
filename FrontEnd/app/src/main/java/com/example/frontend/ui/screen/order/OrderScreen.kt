@@ -92,15 +92,13 @@ fun OrderScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(
-            text = "Scan QR To Checkout",
-            fontSize = 20.sp
-        )
-
         if(currentQrCode.isNotEmpty()){
+            Text(
+                text = "Scan QR To Checkout",
+                fontSize = 20.sp
+            )
             QRCodeImage(currentQrCode)
         }else{
-            CircularProgressIndicator()
         }
     }
 }
