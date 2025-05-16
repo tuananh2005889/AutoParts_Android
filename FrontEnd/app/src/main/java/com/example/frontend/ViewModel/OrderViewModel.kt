@@ -18,6 +18,7 @@ import com.example.frontend.data.repository.ProductRepository
 import com.example.frontend.ui.common.AuthManager
 import com.google.android.gms.common.api.Api
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -45,40 +46,48 @@ class OrderViewModel @Inject constructor(
     var showPaymentMessage by mutableStateOf(false)
         private set
 
-//     fun checkOrderStatus() {
-//        viewModelScope.launch {
-//            while(true){
-//                try {
-//                    val orderCode = authManager.getCurrentPendingOrderCodeOnce()
-//                    orderCode?.let{
-//                        val status  = paymentRepo.getPaymentStatus(orderCode)
-//                        when(status){
-//                            is ApiResponse.Success ->{
-//                                if (status.data == PaymentStatus.PAID) {
-//                                    isOrderPaid = true
-//                                    showPaymentMessage = true
-//                                }
-//                            }
-//                            is ApiResponse.Loading -> {
-//
-//                            }
-//                            is ApiResponse.Error -> {
-//                                Log.d("OrdVM-checkOrdStt", "Error: ${status.message}")
-//                            }
-//
-//                        }
-//
-//                    }
-//
-//                } catch (e: Exception) {
-//                    e.printStackTrace()
-//                    Log.d("OrdVM-checkOrdStatus", "Error ${e.message}")
-//                }
-//            }
-//        }
-//    }
-fun checkOrderStatus() {
-    viewModelScope.launch {
+    private val _hasPendingOrder = mutableStateOf(false)
+    val hasPendingOrder = _hasPendingOrder
+
+    init {
+        viewModelScope.launch {
+            val hasPendingOrder = async { checkHasPendingOrder() }
+            if(hasPendingOrder.await()){
+                checkOrderStatus()
+                getCurrentQRCode()
+                getAllOrderDetailsInPendingOrder()
+            }
+
+        }
+
+    }
+
+    suspend fun checkHasPendingOrder(): Boolean{
+        val userName = authManager.getUserNameOnce().toString()
+        val result = orderRepo.checkIfUserHasPendingOrder(userName)
+        when(result){
+            is ApiResponse.Success -> {
+                if(result.data){
+                    _hasPendingOrder.value = true
+                    return true
+                }else{
+                    _hasPendingOrder.value = false
+                    return false
+                }
+            }
+            is ApiResponse.Error -> {
+                Log.d("OrderVM-checkHasPendingOrder", "Error: ${result.message}")
+                return false
+            }
+            is ApiResponse.Loading ->{
+                return false
+            }
+        }
+
+    }
+
+    fun checkOrderStatus() {
+     viewModelScope.launch {
         while (true) {
             try {
                 val orderCode = authManager.getCurrentPendingOrderCodeOnce()
@@ -109,29 +118,6 @@ fun checkOrderStatus() {
     }
 }
 
-
-//    fun pollOrderStatusUntilPaid(orderId: Long) {
-//        viewModelScope.launch {
-//            while (true) {
-//                try {
-//                    val status = paymentRepo.getPaymentStatus(orderId)
-//
-//                    if (status == PaymentStatus.PAID) {
-//                        isOrderPaid = true
-//                        showPaymentMessage = true
-//                        break // thoát vòng lặp nếu đã thanh toán
-//                    }
-//                    delay(5000) // chờ 5 giây trước khi kiểm tra lại
-//                } catch (e: Exception) {
-//                    // xử lý lỗi nếu cần
-//                    delay(5000) // thử lại sau 5 giây nếu lỗi
-//                }
-//            }
-//        }
-//    }
-
-
-
 fun dismissPaymentMessage() {
     viewModelScope.launch {
         val orderCode = authManager.getCurrentPendingOrderCodeOnce()
@@ -151,16 +137,6 @@ fun dismissPaymentMessage() {
         }
     }
 }
-
-
-    init {
-        viewModelScope.launch {
-            checkOrderStatus()
-            getCurrentQRCode()
-            getAllOrderDetailsInPendingOrder()
-        }
-
-    }
 
     suspend fun getCurrentQRCode(){
         val qrCode = authManager.getCurrentQRCodeOnce().toString()
