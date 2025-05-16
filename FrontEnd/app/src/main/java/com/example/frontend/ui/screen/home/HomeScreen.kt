@@ -82,29 +82,25 @@ fun HomeScreen(
 ) {
     val systemUiController = rememberSystemUiController()
     SideEffect {
-        systemUiController.setSystemBarsColor(
-            color = Color(0xFF1A2E35)
-        )
+        // đồng bộ status-bar với theme
+        systemUiController.setSystemBarsColor(color = Color(0xFF1A2E35), darkIcons = false)
     }
 
     val bottomNavController = rememberNavController()
     val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
+    val coroutineScope    = rememberCoroutineScope()
 
     Scaffold(
-        modifier = modifier
-            .background(Color(0xFFF5F7F6))
-            .statusBarsPadding(),
+        modifier      = modifier.statusBarsPadding(),
         containerColor = Color.Transparent,
-        snackbarHost = { SnackbarHost(snackbarHostState) } ,
-//                bottomBar = { BottomNavBar(navController = bottomNavController) }
+        snackbarHost  = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         HomeNavHost(
-            loginViewModel = loginViewModel,
+            loginViewModel    = loginViewModel,
             bottomNavController = bottomNavController,
             rootNavController = rootNavController,
-            innerPadding = innerPadding,
-            onShowSnackBar = { message ->
+            innerPadding      = innerPadding,
+            onShowSnackBar    = { message ->
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(message)
                 }
@@ -155,6 +151,7 @@ fun HomeScreenContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .statusBarsPadding()
                 .background(primaryColor)
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
@@ -469,20 +466,6 @@ fun SearchBar(
     )
 }
 
-//fun Double.formatAsCurrency(): String {
-//    val formatter = java.text.NumberFormat.getCurrencyInstance().apply {
-//        maximumFractionDigits = 0
-//    }
-//    return formatter.format(this)
-//}
-
-//fun Double.formatAsCurrency(): String {
-//    val localeVN = java.util.Locale("vi", "VN")
-//    val formatter = java.text.NumberFormat.getCurrencyInstance(localeVN).apply {
-//        maximumFractionDigits = 0
-//    }
-//    return formatter.format(this)
-//}
 fun Double.formatAsCurrency(): String {
     val formatter = NumberFormat.getNumberInstance(Locale("vi", "VN")).apply {
         maximumFractionDigits = 0

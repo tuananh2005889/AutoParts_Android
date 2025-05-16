@@ -51,10 +51,6 @@ fun BottomNavBar(navController: NavController) {
         ) {
             items.forEach { screen ->
                 val selected = currentRoute == screen.route
-                val iconSize by animateDpAsState(
-                    targetValue = if (selected) 28.dp else 24.dp,
-                    label = "iconSize"
-                )
 
                 NavigationBarItem(
                     icon = {
@@ -62,8 +58,10 @@ fun BottomNavBar(navController: NavController) {
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
                                 .background(
-                                    color = (if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
-                                    else Color.White),
+                                    color = if (selected)
+                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                                    else
+                                        Color(0xFFF5F7F6),  // nền icon chưa chọn
                                     shape = CircleShape
                                 )
                                 .padding(8.dp)
@@ -71,10 +69,12 @@ fun BottomNavBar(navController: NavController) {
                             Icon(
                                 imageVector = screen.icon ?: Icons.Default.Warning,
                                 contentDescription = screen.route,
-//                                modifier = Modifier.size(iconSize),
-                                tint = if (selected) MaterialTheme.colorScheme.primary
-                                else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                tint = if (selected)
+                                    Color(0xFFF15D43)
+                                else
+                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                             )
+
                         }
                     },
                     label = {
@@ -100,11 +100,10 @@ fun BottomNavBar(navController: NavController) {
                     },
                     alwaysShowLabel = true,
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = MaterialTheme.colorScheme.primary,
-                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        selectedIconColor   = MaterialTheme.colorScheme.primary,
+                        selectedTextColor   = MaterialTheme.colorScheme.primary,
                         unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-
+                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     )
                 )
             }
