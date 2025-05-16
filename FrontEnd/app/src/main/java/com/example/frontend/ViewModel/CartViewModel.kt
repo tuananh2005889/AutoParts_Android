@@ -11,6 +11,7 @@ import androidx.navigation.NavHostController
 import com.example.frontend.data.dto.BasicCartItemDTO
 import com.example.frontend.data.dto.CartBasicInfoDTO
 import com.example.frontend.data.dto.CartItemDTO
+import com.example.frontend.data.dto.CreateOrderResponse
 import com.example.frontend.data.dto.OrderDetailDTO
 import com.example.frontend.data.remote.ApiResponse
 import com.example.frontend.data.repository.CartRepository
@@ -199,13 +200,26 @@ class CartViewModel @Inject constructor(
     }
 
      fun clickOrderNow(navController: NavHostController){
-//        checkIfUserHasPendingOrder()
-
         val cartId = _cartId.value
+
         if(cartId != null){
             viewModelScope.launch{
-                orderRepo.createOrder(cartId)
-                navController.navigate(Route.Order.route)
+               val result  = orderRepo.createOrder(cartId)
+                when(result){
+                    is ApiResponse.Success ->{
+                        val data: CreateOrderResponse = result.data
+                        authManager.saveCurrentQRCode(data.qrCode)
+                        authManager.saveCurrentPendingOrderCode(data.orderCode)
+
+                        navController.navigate(Route.Order.route)
+                    }
+                    is ApiResponse.Error ->{
+
+                    }
+                    is ApiResponse.Loading ->{
+
+                    }
+                }
             }
         }
 

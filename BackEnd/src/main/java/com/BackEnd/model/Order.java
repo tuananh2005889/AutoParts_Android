@@ -26,6 +26,9 @@ public class Order {
             nullable = false)
     private User user;
 
+    @Column(unique = true)
+    private Long orderCode;
+
     @Column( columnDefinition = "DATETIME(0)")
     private LocalDateTime createdAt;
 

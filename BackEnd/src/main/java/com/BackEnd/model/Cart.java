@@ -47,18 +47,14 @@ public class Cart {
     private List<CartItem> cartItems = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private CartStatus status;
 
     public enum CartStatus {
         ACTIVE,
-
         SUBMITTED,
     }
     public Cart() {
         this.status = CartStatus.ACTIVE;
     }
-
-
-
-
 }

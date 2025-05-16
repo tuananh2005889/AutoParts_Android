@@ -54,12 +54,14 @@ class HomeViewModel @Inject constructor(
 
     init{
         viewModelScope.launch {
-            authManager.userNameFlow.filterNotNull().collect { userName ->
-//                val hasPending = checkIfUserHasPendingOrder(userName)
-//                if (!hasPending) {
-                    createCart(userName)
-//                }
-            }
+//            authManager.userNameFlow.filterNotNull().collect { userName ->
+////                val hasPending = checkIfUserHasPendingOrder(userName)
+////                if (!hasPending) {
+//                    createCart(userName)
+////                }
+//            }
+            val userName: String = authManager.getUserNameOnce().toString();
+            createCart(userName);
         }
         getAllProducts()
     }

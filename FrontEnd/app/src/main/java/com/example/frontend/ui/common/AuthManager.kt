@@ -29,6 +29,8 @@ object AuthPreferencesKeys {
     val avatarUrl = stringPreferencesKey("avatar_url") // <-- thêm dòng này
     val cartId = longPreferencesKey("cart_id")
     val authToken = stringPreferencesKey("auth_token")
+    val currentQRCode = stringPreferencesKey("current_qr_code")
+    val currentPendingOrderCode = longPreferencesKey("current_pending_order_code")
 }
 
 @Singleton
@@ -46,6 +48,9 @@ class AuthManager @Inject constructor(
 
     val authTokenFlow: Flow<String?> = context.dataStore.data
         .map { it[AuthPreferencesKeys.authToken] }
+
+    val currentQRCodeFlow: Flow<String?> = context.dataStore.data
+        .map { it[AuthPreferencesKeys.currentQRCode] }
 
     // Khi login thành công sẽ lưu luôn trạng thái đăng nhập
     suspend fun saveLoginStatus(
@@ -152,6 +157,35 @@ class AuthManager @Inject constructor(
             )
         } else {
             null
+        }
+    }
+
+    suspend fun getCurrentQRCodeOnce(): String? =
+        context.dataStore.data.first()[AuthPreferencesKeys.currentQRCode]
+
+    suspend fun saveCurrentQRCode(qrCode: String) {
+        context.dataStore.edit { prefs ->
+            prefs[AuthPreferencesKeys.currentQRCode] = qrCode
+        }
+    }
+
+    suspend fun clearCurrentQRCode() {
+        context.dataStore.edit { prefs ->
+            prefs.remove(AuthPreferencesKeys.currentQRCode)
+        }
+    }
+
+    suspend fun getCurrentPendingOrderCodeOnce(): Long? =
+        context.dataStore.data.first()[AuthPreferencesKeys.currentPendingOrderCode]
+
+    suspend fun saveCurrentPendingOrderCode(pendingOrderCode: Long) {
+        context.dataStore.edit { prefs ->
+            prefs[AuthPreferencesKeys.currentPendingOrderCode] = pendingOrderCode
+        }
+    }
+    suspend fun clearCurrentPendingOrderCode() {
+        context.dataStore.edit { prefs ->
+            prefs.remove(AuthPreferencesKeys.currentPendingOrderCode)
         }
     }
 }
