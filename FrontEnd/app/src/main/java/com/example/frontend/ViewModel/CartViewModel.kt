@@ -14,6 +14,7 @@ import com.example.frontend.data.dto.CartItemDTO
 import com.example.frontend.data.dto.CreateOrderResponse
 import com.example.frontend.data.dto.OrderDetailDTO
 import com.example.frontend.data.remote.ApiResponse
+import com.example.frontend.data.remote.CartApiService
 import com.example.frontend.data.repository.CartRepository
 import com.example.frontend.data.repository.OrderRepository
 import com.example.frontend.ui.common.AuthManager
@@ -62,8 +63,7 @@ class CartViewModel @Inject constructor(
         viewModelScope.launch {
             checkIfUserHasPendingOrder()
             _cartId
-                .filterNotNull() // only get value when _cartId != null
-//                .distinctUntilChanged() // chi chay neu gia tri _cartId khac voi lan truoc
+                .filterNotNull()
                 .collect { cartId ->
                     getAllCartItems(cartId)
                     getImageUrlPerCartItem(cartId)
@@ -198,6 +198,24 @@ class CartViewModel @Inject constructor(
             }
         }
     }
+    fun removeItemFromCart(cartItemId: Long) {
+        viewModelScope.launch {
+            when (val response = cartRepo.removeItemFromCart(cartItemId)) {
+                is ApiResponse.Success -> {
+                    // Sau khi backend xóa thành công hãy reload
+                    _cartId.value?.let { id ->
+                        getAllCartItems(id)
+                        getTotalPrice(id)
+                    }
+                }
+                is ApiResponse.Error -> {
+                    _errorMessage.value = "Failed to remove item: ${response.message}"
+                }
+                else -> {}
+            }
+        }
+    }
+
 
      fun clickOrderNow(navController: NavHostController){
         val cartId = _cartId.value

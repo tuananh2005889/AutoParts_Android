@@ -6,9 +6,11 @@ import com.example.frontend.data.dto.CartBasicInfoDTO
 import com.example.frontend.data.dto.CartItemDTO
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 
@@ -37,5 +39,11 @@ interface CartApiService {
 
     @GET("/app/cart/total-price")
     suspend fun getTotalPrice(@Query("cartId") cartId: Long): Response<Double>
+
+
+    @DELETE("app/cart/remove-item/{cartItemId}")
+    suspend fun removeItemFromCart(
+        @Path("cartItemId") cartItemId: Long
+    ): Response<Unit>
 
 }

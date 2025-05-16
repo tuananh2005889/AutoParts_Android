@@ -1,9 +1,6 @@
 package com.example.frontend.ui.screen.home
 
 import android.util.Log
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,18 +13,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -39,9 +30,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -62,9 +51,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -80,7 +67,6 @@ import com.example.frontend.ui.navigation.HomeNavHost
 import com.example.frontend.ViewModel.LoginViewModel
 import com.example.frontend.ui.common.SimpleDialog
 
-import com.example.frontend.ui.theme.specialGothicFontFamiLy
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 
@@ -136,10 +122,10 @@ fun HomeScreenContent(
 ) {
     // Color scheme
     val primaryColor = Color(0xFFF15D43)
-    val secondaryColor = Color(0xFFF5F7F6) // Light background
-    val accentColor = Color(0xFFFF7D33) // Vibrant orange
-    val textPrimary = Color(0xFF1A2E35) // Dark teal
-    val textSecondary = Color(0xFF6B818C) // Grayish teal
+    val secondaryColor = Color(0xFFF5F7F6)
+    val accentColor = Color(0xFFFF7D33)
+    val textPrimary = Color(0xFF1A2E35)
+    val textSecondary = Color(0xFF6B818C)
     val cardBackground = Color.White
 
     val homeUiState by viewModel.homeUiState.collectAsState()
@@ -153,57 +139,69 @@ fun HomeScreenContent(
     }
 
     var showDialog by remember {mutableStateOf(false)}
-        SimpleDialog(
-            showDialog,
-            onDismiss = {showDialog = false},
-            title = "Order Alert",
-            text = "Please pay for the previous order"
-            )
-        Column(
-            modifier = modifier
-                .padding(innerPadding)
-                .background(secondaryColor)
+    SimpleDialog(
+        showDialog,
+        onDismiss = {showDialog = false},
+        title = "Order Alert",
+        text = "Please pay for the previous order"
+    )
+    Column(
+        modifier = modifier
+            .padding(innerPadding)
+            .background(secondaryColor)
+    ) {
+        // Header Section
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(primaryColor)
+                .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
-            // Header Section
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(primaryColor)
-                    .padding(horizontal = 24.dp, vertical = 16.dp)
-            ) {
-                Column {
-                    Text(
-                        text = "AutoParts Shop",
-                        style = MaterialTheme.typography.headlineLarge.copy(
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 28.sp
-                        ),
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
+            Column {
+                Text(
+                    text = "AutoParts Shop",
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 28.sp
+                    ),
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
 
-                    // Search Bar
-                    SearchBar(
-                        value = searchText,
-                        onValueChange = { searchText = it },
-                        modifier = Modifier.fillMaxWidth()
+                // Search Bar
+                SearchBar(
+                    value = searchText,
+                    onValueChange = { searchText = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+
+        when {
+            homeUiState.isLoading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = primaryColor,
+                        strokeWidth = 3.dp
                     )
                 }
             }
 
-            when {
-                homeUiState.isLoading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            color = primaryColor,
-                            strokeWidth = 3.dp
-                        )
-                    }
+            homeUiState.errorMessage != null -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Error: ${homeUiState.errorMessage}",
+                        color = Color(0xFFD32F2F),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
-
+            }
 
             homeUiState.products.isNotEmpty() -> {
                 val filteredProducts = if (searchText.isBlank()) {
@@ -211,60 +209,50 @@ fun HomeScreenContent(
                 } else {
                     homeUiState.products.filter {
                         it.name.contains(searchText.trim(), ignoreCase = true)
-                    }   
-
+                    }
                 }
 
-                homeUiState.products.isNotEmpty() -> {
-                    val filteredProducts = if (searchText.isBlank()) {
-                        homeUiState.products
-                    } else {
-                        homeUiState.products.filter {
-                            it.name.contains(searchText.trim(), ignoreCase = true)
-                        }
-                    }
 
-
-                    // Hero Carousel
-                    Box(
+                // Hero Carousel
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp)
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                ) {
+                    SlideCarousel(
+                        images = listOf(R.drawable.hero1, R.drawable.hero2, R.drawable.hero3),
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(220.dp)
-                            .padding(horizontal = 16.dp, vertical = 12.dp)
-                    ) {
-                        SlideCarousel(
-                            images = listOf(R.drawable.hero1, R.drawable.hero2, R.drawable.hero3),
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(RoundedCornerShape(16.dp))
-                        )
-                    }
-
-
-                    Text(
-                        text = "Featured Products",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            color = textPrimary,
-                            fontWeight = FontWeight.SemiBold
-                        ),
-                        modifier = Modifier.padding(start = 24.dp, top = 24.dp, bottom = 8.dp)
-                    )
-
-                    ProductGrid(
-                        products = filteredProducts,
-                        onProductClick = onProductClick,
-                        homeViewModel = viewModel,
-                        onShowSnackBar = onShowSnackBar,
-                        cardBackground = cardBackground,
-                        primaryColor = primaryColor,
-                        accentColor = accentColor,
-                        textPrimary = textPrimary,
-                        textSecondary = textSecondary,
-                        showDialog = {showDialog = it}
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(16.dp))
                     )
                 }
+
+
+                Text(
+                    text = "Featured Products",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        color = textPrimary,
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    modifier = Modifier.padding(start = 24.dp, top = 24.dp, bottom = 8.dp)
+                )
+
+                ProductGrid(
+                    products = filteredProducts,
+                    onProductClick = onProductClick,
+                    homeViewModel = viewModel,
+                    onShowSnackBar = onShowSnackBar,
+                    cardBackground = cardBackground,
+                    primaryColor = primaryColor,
+                    accentColor = accentColor,
+                    textPrimary = textPrimary,
+                    textSecondary = textSecondary,
+                    showDialog = {showDialog = it}
+                )
             }
         }
+    }
 }
 
 
@@ -320,7 +308,7 @@ fun ProductGrid(
                         showDialog(true)
                     }else{
                         coroutineScope.launch {
-                            val cartItem = homeViewModel.addOneProductToCart(product.productId)
+                            val cartItem = homeViewModel.addOneProductToCart(product.productId, product.price)
                             Log.d("HomeScreen-onAddToCartClick", cartItem.toString())
                             if (cartItem != null) {
                                 onShowSnackBar("Added ${cartItem.productName} to cart")
@@ -405,13 +393,13 @@ fun ProductCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
-                    Text(
-                        text = "${product.price?.formatAsCurrency()}",
-                        style = MaterialTheme.typography.titleSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = primaryColor
-                        )
+                Text(
+                    text = "${product.price?.formatAsCurrency()}",
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = primaryColor
                     )
+                )
 
             }
 

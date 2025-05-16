@@ -134,4 +134,5 @@ dependencies {
     /* string to qrcode lib
      https://mvnrepository.com/artifact/com.google.zxing/core */
     implementation("com.google.zxing:core:3.5.3")
+    implementation("androidx.compose.animation:animation")
 }

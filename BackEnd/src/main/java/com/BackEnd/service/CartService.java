@@ -28,49 +28,27 @@ public class CartService {
     private final ProductRepository productRepo;
     private final UserRepository userRepo;
 
-
-    public Cart getCartByCartId(Long cartId){
-        Cart cart =  cartRepo.findById(cartId)
+    public Cart getCartByCartId(Long cartId) {
+        Cart cart = cartRepo.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("No cart found"));
         return cart;
     }
-    public String changeCartStatus(Long cartId, Cart.CartStatus status){
-        try{
+
+    public String changeCartStatus(Long cartId, Cart.CartStatus status) {
+        try {
             Cart cart = getCartByCartId(cartId);
             cart.setStatus(status);
             cartRepo.save(cart);
             return "Cart status updated successfully";
-        }catch (EntityNotFoundException e){
+        } catch (EntityNotFoundException e) {
             return "Cart not found";
-        }catch(DataAccessException e){
+        } catch (DataAccessException e) {
             return "Database error while saving cart";
-        }catch(Exception e){
+        } catch (Exception e) {
             return "An unexpected error occurred: " + e.getMessage();
         }
     }
-    // public CartDTO getActiveCartDTO(String userName) {
-    // User user = userRepo.findByUserName(userName)
-    // .orElseThrow(() -> new RuntimeException("User not found"));
-    // Cart cart = cartRepo.findByUserAndStatus(user, Cart.CartStatus.ACTIVE)
-    // .orElseThrow(() -> new RuntimeException("Cart not found"));
-    //
-    // return DTOConverter.toCartDTO(cart);
-    // }
-    //
-    // public CartDTO createActiveCartDTO(String userName) {
-    // User user = userRepo.findByUserName(userName)
-    // .orElseThrow(() -> new RuntimeException("User not found"));
-    //
-    // Cart newCart = new Cart();
-    // newCart.setUser(user);
-    // newCart.setStatus(Cart.CartStatus.ACTIVE);
-    //
-    // cartRepo.save(newCart);
-    //
-    // return DTOConverter.toCartDTO(newCart);
-    // }
-    // ->
-    // gop 2 method tren thanh 1, giup controller, frontend do rac roi
+
     public BasicCartInfoDto getOrCreateActiveCartDTO(String userName) {
         User user = userRepo.findByUserName(userName)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -101,22 +79,22 @@ public class CartService {
         return cartItemDTOList;
     }
 
-    public List<CartItem> getAllCartItemsInActiveCart(Long cartId){
+    public List<CartItem> getAllCartItemsInActiveCart(Long cartId) {
         Cart cart = cartRepo.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
-        return  cart.getCartItems();
+        return cart.getCartItems();
 
     }
 
-//    public void checkoutCart(Long cartId) {
-//        Cart cart = cartRepo.findById(cartId).orElseThrow(() -> new RuntimeException("Cart not found"));
-//        cart.setStatus(Cart.CartStatus.ARCHIVED);
-//        cartRepo.save(cart);
-//    }
+    // public void checkoutCart(Long cartId) {
+    // Cart cart = cartRepo.findById(cartId).orElseThrow(() -> new
+    // RuntimeException("Cart not found"));
+    // cart.setStatus(Cart.CartStatus.ARCHIVED);
+    // cartRepo.save(cart);
+    // }
 
-
-    public User getUserByCartId(Long cartId){
+    public User getUserByCartId(Long cartId) {
         User user = cartRepo.findUserByCartId(cartId);
         return user;
     }
@@ -124,70 +102,87 @@ public class CartService {
     @Transactional
     public CartItemDTO addItemToCart(AddToCartRequest addToCartRequest) {
 
-    // Check quantity request
-    if (addToCartRequest.getQuantity() <= 0) {
-        throw new IllegalArgumentException("Quantity must be greater than 0");
+        // Check quantity request
+        if (addToCartRequest.getQuantity() <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than 0");
+        }
+
+        Cart cart = cartRepo.findById(addToCartRequest.getCartId())
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
+
+        Product product = productRepo.findByProductId(addToCartRequest.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        Optional<CartItem> existingCartItem = cart.getCartItems().stream()
+                .filter(item -> item.getProduct().getProductId().equals(addToCartRequest.getProductId()))
+                .findFirst();
+
+        CartItem responseItem;
+        // get current cart price
+        Double cartTotalPrice = cart.getTotalPrice();
+
+        if (existingCartItem.isPresent()) {
+            CartItem item = existingCartItem.get();
+            item.setQuantity(item.getQuantity() + addToCartRequest.getQuantity());
+
+            // increase price
+            Double itemTotalPrice = product.getPrice() * addToCartRequest.getQuantity();
+            cartTotalPrice += itemTotalPrice;
+
+            responseItem = item;
+        } else {
+            CartItem newCartItem = new CartItem(product, addToCartRequest.getQuantity(), cart);
+            cart.getCartItems().add(newCartItem);
+            // increase price
+            Double itemTotalPrice = product.getPrice() * addToCartRequest.getQuantity();
+            cartTotalPrice += itemTotalPrice;
+
+            responseItem = newCartItem;
+        }
+
+        cart.setTotalPrice(cartTotalPrice);
+        cartRepo.save(cart); // co che jpa, lay CartItem tu Cart, sau do thay doi CartItem, sau do chi can
+                             // save Cart thi
+        // jpa tu dong goi CartItemRepo.save(CartItem) do
+        return DTOConverter.toCartItemDTO(responseItem);
     }
-
-    Cart cart = cartRepo.findById(addToCartRequest.getCartId())
-            .orElseThrow(() -> new RuntimeException("Cart not found"));
-
-    Product product = productRepo.findByProductId(addToCartRequest.getProductId())
-            .orElseThrow(() -> new RuntimeException("Product not found"));
-
-    Optional<CartItem> existingCartItem = cart.getCartItems().stream()
-            .filter(item -> item.getProduct().getProductId().equals(addToCartRequest.getProductId()))
-            .findFirst();
-
-    CartItem responseItem;
-    //get current cart price
-    Double cartTotalPrice = cart.getTotalPrice();
-
-    if (existingCartItem.isPresent()) {
-        CartItem item = existingCartItem.get();
-        item.setQuantity(item.getQuantity() + addToCartRequest.getQuantity());
-
-        //increase price
-        Double itemTotalPrice = product.getPrice() * addToCartRequest.getQuantity();
-        cartTotalPrice += itemTotalPrice;
-
-        responseItem = item;
-    } else {
-        CartItem newCartItem = new CartItem(product, addToCartRequest.getQuantity(), cart);
-        cart.getCartItems().add(newCartItem);
-        //increase price
-        Double itemTotalPrice = product.getPrice() * addToCartRequest.getQuantity();
-        cartTotalPrice += itemTotalPrice;
-
-        responseItem = newCartItem;
-    }
-
-    cart.setTotalPrice(cartTotalPrice);
-    cartRepo.save(cart); // co che jpa, lay CartItem tu Cart, sau do thay doi CartItem, sau do chi can save Cart thi
-        //jpa tu dong goi CartItemRepo.save(CartItem) do
-    return DTOConverter.toCartItemDTO(responseItem);
-}
 
     public Cart getCartStatus(Long cartId) {
         return cartRepo.findById(cartId).orElseThrow(() -> new RuntimeException("Cart not found"));
     }
 
-
     public List<String> getImageUrlPerCartItem(Long cartId) {
-        try{
+        try {
             List<String> imageUrls = cartRepo.findImageUrlPerCartItem(cartId);
-             return imageUrls != null ? imageUrls : new ArrayList<>();
-        }catch(Exception e){
+            return imageUrls != null ? imageUrls : new ArrayList<>();
+        } catch (Exception e) {
             e.printStackTrace();
             return new ArrayList<>();
         }
     }
 
-    public Double getTotalPrice(Long cartId){
+    public Double getTotalPrice(Long cartId) {
         Cart cart = cartRepo.findById(cartId).orElseThrow(() -> new RuntimeException("Cart not found"));
         return cart.getTotalPrice();
     }
 
+    @Transactional
+    public void removeItemFromCart(Long cartItemId) {
+        CartItem item = cartItemRepo.findById(cartItemId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid cartItemId: " + cartItemId));
+        Cart cart = item.getCart();
 
+        cartItemRepo.delete(item);
+
+        // Bắt buộc remove khỏi list để lần sau load lại entity không còn
+        cart.getCartItems().removeIf(ci -> ci.getCartItemId().equals(cartItemId));
+
+        double newTotal = cart.getCartItems().stream()
+                .mapToDouble(ci -> ci.getQuantity() * ci.getProduct().getPrice())
+                .sum();
+        cart.setTotalPrice(newTotal);
+
+        cartRepo.save(cart);
+    }
 
 }

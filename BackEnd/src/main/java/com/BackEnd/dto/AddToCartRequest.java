@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class AddToCartRequest {
     private Long cartId;
     private Long productId;
+    private Double price;
     private int quantity;
 }
