@@ -65,41 +65,53 @@ fun OrderScreen(
 
     val showMessage by remember { derivedStateOf { orderViewModel.showPaymentMessage } }
 
-    if (showMessage) {
-        AlertDialog(
-            onDismissRequest = { orderViewModel.dismissPaymentMessage() },
-            title = { Text("Checkout Successfully") },
-            text = { Text("Your Order Has Been Check Out.") },
-            confirmButton = {
-                Button(onClick = { orderViewModel.dismissPaymentMessage() }) {
-                    Text("OK")
+    val hasPendingOrder by remember {orderViewModel.hasPendingOrder}
+
+    if(hasPendingOrder){
+        if (showMessage) {
+            AlertDialog(
+                onDismissRequest = { orderViewModel.dismissPaymentMessage() },
+                title = { Text("Checkout Successfully") },
+                text = { Text("Your Order Has Been Check Out.") },
+                confirmButton = {
+                    Button(onClick = { orderViewModel.dismissPaymentMessage() }) {
+                        Text("OK")
+                    }
                 }
-            }
-        )
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(WindowInsets.statusBars.asPaddingValues())
-            .background(Color.White),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        OrderItemList(orderViewModel = orderViewModel)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        if(currentQrCode.isNotEmpty()){
-            Text(
-                text = "Scan QR To Checkout",
-                fontSize = 20.sp
             )
-            QRCodeImage(currentQrCode)
-        }else{
         }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(WindowInsets.statusBars.asPaddingValues())
+                .background(Color.White),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            OrderItemList(orderViewModel = orderViewModel)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if(currentQrCode.isNotEmpty()){
+                Text(
+                    text = "Scan QR To Checkout",
+                    fontSize = 20.sp
+                )
+                QRCodeImage(currentQrCode)
+            }else{
+            }
+        }
+    }else{
+        Text(
+            modifier = Modifier.padding(WindowInsets.statusBars.asPaddingValues()),
+            text = "You Dont Have Any Pending Order To Check Out",
+            fontSize = 25.sp,
+
+
+        )
     }
 }
 
