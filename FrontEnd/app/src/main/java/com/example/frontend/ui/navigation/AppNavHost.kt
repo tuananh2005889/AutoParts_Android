@@ -29,6 +29,7 @@ import com.example.frontend.ui.screen.home.DetailProductScreen
 
 import com.example.frontend.ui.navigation.Route
 import com.example.frontend.ui.screen.cart.CartScreen
+import com.example.frontend.ui.screen.order.OrderScreen
 import com.example.frontend.ui.screen.profile.ProfileScreen
 
 @Composable
@@ -40,6 +41,7 @@ fun AppNavHost(
     val bottomBarRoutes = listOf(
         Route.Home.route,
         Route.Cart.route,
+        Route.Order.route,
         Route.Profile.route
     )
 
@@ -119,6 +121,7 @@ fun AppNavHost(
             }
 
             // --- Các màn hình có bottom bar ---
+
             composable(Route.Home.route) {
                 HomeScreen(
                     rootNavController = navController,
@@ -128,7 +131,7 @@ fun AppNavHost(
 
             composable(Route.Cart.route) {
                 CartScreen(
-
+                    navController = navController
                 )
             }
 
@@ -150,6 +153,11 @@ fun AppNavHost(
                     }
                 )
             }
+
+            composable(route = Route.Order.route){
+                OrderScreen()
+            }
+
             // --- Màn hình detail không có bottom bar ---
             composable(Route.DetailProduct.route) { backStack ->
                 val id = backStack.arguments

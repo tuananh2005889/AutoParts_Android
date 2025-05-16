@@ -4,6 +4,7 @@ import com.example.frontend.data.model.ProductData
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ProductApiService {
     @GET("/app/product/all")
@@ -13,8 +14,8 @@ interface ProductApiService {
     suspend fun getProductById(@Path("id") productId: Long): Response<ProductData>
 
     @GET("/app/product/imageUrls")
-    suspend fun getImageUrls(@Path("productId") productId: Long): Response<List<String>>
+    suspend fun getImageUrls(@Query("productId") productId: Long): Response<List<String>>
 
     @GET("/app/product/imageUrl")
-    suspend fun getImageUrl(@Path("id") productId: Long): Response<String>
+    suspend fun getImageUrl(@Query("productId") productId: Long): Response<String>
 }

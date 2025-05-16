@@ -78,6 +78,7 @@ import com.example.frontend.ui.common.CloudinaryImage
 
 import com.example.frontend.ui.navigation.HomeNavHost
 import com.example.frontend.ViewModel.LoginViewModel
+import com.example.frontend.ui.common.SimpleDialog
 
 import com.example.frontend.ui.theme.specialGothicFontFamiLy
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -105,7 +106,7 @@ fun HomeScreen(
 
     Scaffold(
         modifier = modifier
-            .background(Color(0xFFF5F7F6)) // Light background
+            .background(Color(0xFFF5F7F6))
             .statusBarsPadding(),
         containerColor = Color.Transparent,
         snackbarHost = { SnackbarHost(snackbarHostState) } ,
@@ -150,63 +151,59 @@ fun HomeScreenContent(
             it.name.contains(searchText.trim(), ignoreCase = true)
         }
     }
-    Column(
-        modifier = modifier
-            .padding(innerPadding)
-            .background(secondaryColor)
-    ) {
-        // Header Section
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(primaryColor)
-                .padding(horizontal = 24.dp, vertical = 16.dp)
+
+    var showDialog by remember {mutableStateOf(false)}
+        SimpleDialog(
+            showDialog,
+            onDismiss = {showDialog = false},
+            title = "Order Alert",
+            text = "Please pay for the previous order"
+            )
+        Column(
+            modifier = modifier
+                .padding(innerPadding)
+                .background(secondaryColor)
         ) {
-            Column {
-                Text(
-                    text = "AutoParts Shop",
-                    style = MaterialTheme.typography.headlineLarge.copy(
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 28.sp
-                    ),
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                // Search Bar
-                SearchBar(
-                    value = searchText,
-                    onValueChange = { searchText = it },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
-
-        when {
-            homeUiState.isLoading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        color = primaryColor,
-                        strokeWidth = 3.dp
-                    )
-                }
-            }
-
-            homeUiState.errorMessage != null -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
+            // Header Section
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(primaryColor)
+                    .padding(horizontal = 24.dp, vertical = 16.dp)
+            ) {
+                Column {
                     Text(
-                        text = "Error: ${homeUiState.errorMessage}",
-                        color = Color(0xFFD32F2F),
-                        style = MaterialTheme.typography.bodyLarge
+                        text = "AutoParts Shop",
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 28.sp
+                        ),
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    // Search Bar
+                    SearchBar(
+                        value = searchText,
+                        onValueChange = { searchText = it },
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
+
+            when {
+                homeUiState.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = primaryColor,
+                            strokeWidth = 3.dp
+                        )
+                    }
+                }
+
 
             homeUiState.products.isNotEmpty() -> {
                 val filteredProducts = if (searchText.isBlank()) {
@@ -215,48 +212,59 @@ fun HomeScreenContent(
                     homeUiState.products.filter {
                         it.name.contains(searchText.trim(), ignoreCase = true)
                     }   
+
                 }
 
+                homeUiState.products.isNotEmpty() -> {
+                    val filteredProducts = if (searchText.isBlank()) {
+                        homeUiState.products
+                    } else {
+                        homeUiState.products.filter {
+                            it.name.contains(searchText.trim(), ignoreCase = true)
+                        }
+                    }
 
-                // Hero Carousel
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(220.dp)
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
-                ) {
-                    SlideCarousel(
-                        images = listOf(R.drawable.hero1, R.drawable.hero2, R.drawable.hero3),
+
+                    // Hero Carousel
+                    Box(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(16.dp))
+                            .fillMaxWidth()
+                            .height(220.dp)
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
+                    ) {
+                        SlideCarousel(
+                            images = listOf(R.drawable.hero1, R.drawable.hero2, R.drawable.hero3),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(16.dp))
+                        )
+                    }
+
+
+                    Text(
+                        text = "Featured Products",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            color = textPrimary,
+                            fontWeight = FontWeight.SemiBold
+                        ),
+                        modifier = Modifier.padding(start = 24.dp, top = 24.dp, bottom = 8.dp)
+                    )
+
+                    ProductGrid(
+                        products = filteredProducts,
+                        onProductClick = onProductClick,
+                        homeViewModel = viewModel,
+                        onShowSnackBar = onShowSnackBar,
+                        cardBackground = cardBackground,
+                        primaryColor = primaryColor,
+                        accentColor = accentColor,
+                        textPrimary = textPrimary,
+                        textSecondary = textSecondary,
+                        showDialog = {showDialog = it}
                     )
                 }
-
-
-                Text(
-                    text = "Featured Products",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        color = textPrimary,
-                        fontWeight = FontWeight.SemiBold
-                    ),
-                    modifier = Modifier.padding(start = 24.dp, top = 24.dp, bottom = 8.dp)
-                )
-
-                ProductGrid(
-                    products = filteredProducts,
-                    onProductClick = onProductClick,
-                    homeViewModel = viewModel,
-                    onShowSnackBar = onShowSnackBar,
-                    cardBackground = cardBackground,
-                    primaryColor = primaryColor,
-                    accentColor = accentColor,
-                    textPrimary = textPrimary,
-                    textSecondary = textSecondary
-                )
             }
         }
-    }
 }
 
 
@@ -281,6 +289,7 @@ fun CategoryChip(category: String) {
 
 @Composable
 fun ProductGrid(
+    showDialog: (Boolean) -> Unit,
     products: List<ProductData>,
     onProductClick: (Long) -> Unit,
     homeViewModel: HomeViewModel,
@@ -292,24 +301,30 @@ fun ProductGrid(
     textSecondary: Color
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val hasPendingOrder by remember {homeViewModel.hasPendingOrder}.collectAsState()
 
+    Log.d("HomeScreen-ProductGrid", "hasPendingOrder: $hasPendingOrder")
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-//        modifier = Modifier.padding(bottom = 80.dp)
     ) {
         items(products) { product ->
             ProductCard(
                 product = product,
                 onProductClick = { onProductClick(product.productId) },
                 onAddToCartClick = {
-                    coroutineScope.launch {
-                        val cartItem = homeViewModel.addOneProductToCart(product.productId)
-                        Log.d("cartItem", cartItem.toString())
-                        if (cartItem != null) {
-                            onShowSnackBar("Added ${cartItem.productName} to cart")
+
+                    if(hasPendingOrder){
+                        showDialog(true)
+                    }else{
+                        coroutineScope.launch {
+                            val cartItem = homeViewModel.addOneProductToCart(product.productId)
+                            Log.d("HomeScreen-onAddToCartClick", cartItem.toString())
+                            if (cartItem != null) {
+                                onShowSnackBar("Added ${cartItem.productName} to cart")
+                            }
                         }
                     }
                 },
@@ -465,8 +480,16 @@ fun SearchBar(
     )
 }
 
+//fun Double.formatAsCurrency(): String {
+//    val formatter = java.text.NumberFormat.getCurrencyInstance().apply {
+//        maximumFractionDigits = 0
+//    }
+//    return formatter.format(this)
+//}
+
 fun Double.formatAsCurrency(): String {
-    val formatter = java.text.NumberFormat.getCurrencyInstance().apply {
+    val localeVN = java.util.Locale("vi", "VN")
+    val formatter = java.text.NumberFormat.getCurrencyInstance(localeVN).apply {
         maximumFractionDigits = 0
     }
     return formatter.format(this)

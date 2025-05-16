@@ -131,4 +131,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.4.3")
     // Material 3 components
     implementation("androidx.compose.material3:material3:1.3.2")
+    /* string to qrcode lib
+     https://mvnrepository.com/artifact/com.google.zxing/core */
+    implementation("com.google.zxing:core:3.5.3")
 }

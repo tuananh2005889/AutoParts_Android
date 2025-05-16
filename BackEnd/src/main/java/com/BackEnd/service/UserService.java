@@ -120,4 +120,15 @@ public class UserService {
         User saved = userRepo.save(u);
         return toDto(saved);
     }
+
+    public User getUserById(Long id){
+        return userRepo.findById(id)
+                .orElseThrow(()-> new RuntimeException("User not found"));
+    }
+
+    public User getUserByName(String name){
+       return userRepo.findByUserName(name)
+               .orElseThrow(()-> new RuntimeException("User not found"));
+    }
+
 }

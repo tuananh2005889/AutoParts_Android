@@ -27,6 +27,7 @@ import com.example.frontend.ui.screen.home.HomeScreenContent
 import com.example.frontend.ViewModel.LoginViewModel
 import com.example.frontend.ui.screen.profile.ProfileScreen
 import com.example.frontend.ViewModel.ProfileViewModel
+import com.example.frontend.ui.screen.order.OrderScreen
 
 /**
  * Root navigation host for the bottom‑navigation area that sits inside [HomeScreen].
@@ -42,7 +43,6 @@ fun HomeNavHost(
     bottomNavController: NavHostController,
     rootNavController: NavController,
     innerPadding: PaddingValues,
-    cartViewModel: CartViewModel = hiltViewModel(),
     onShowSnackBar: (String) -> Unit,
 ) {
 
@@ -107,7 +107,10 @@ fun HomeNavHost(
         }
         /* ---------------- Cart ---------------- */
         composable(Route.Cart.route) {
-            CartScreen()
+            CartScreen(navController = bottomNavController)
+        }
+        composable(route = Route.Order.route){
+            OrderScreen()
         }
     }
 }

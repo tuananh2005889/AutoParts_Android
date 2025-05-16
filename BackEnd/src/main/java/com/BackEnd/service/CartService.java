@@ -109,11 +109,11 @@ public class CartService {
 
     }
 
-    public void checkoutCart(Long cartId) {
-        Cart cart = cartRepo.findById(cartId).orElseThrow(() -> new RuntimeException("Cart not found"));
-        cart.setStatus(Cart.CartStatus.PAID);
-        cartRepo.save(cart);
-    }
+//    public void checkoutCart(Long cartId) {
+//        Cart cart = cartRepo.findById(cartId).orElseThrow(() -> new RuntimeException("Cart not found"));
+//        cart.setStatus(Cart.CartStatus.ARCHIVED);
+//        cartRepo.save(cart);
+//    }
 
 
     public User getUserByCartId(Long cartId){
@@ -181,9 +181,13 @@ public class CartService {
             e.printStackTrace();
             return new ArrayList<>();
         }
-
-
     }
+
+    public Double getTotalPrice(Long cartId){
+        Cart cart = cartRepo.findById(cartId).orElseThrow(() -> new RuntimeException("Cart not found"));
+        return cart.getTotalPrice();
+    }
+
 
 
 }
