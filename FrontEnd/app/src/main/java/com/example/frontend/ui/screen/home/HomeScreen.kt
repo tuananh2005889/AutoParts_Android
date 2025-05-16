@@ -69,7 +69,8 @@ import com.example.frontend.ui.common.SimpleDialog
 
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
-
+import java.text.NumberFormat
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -475,10 +476,21 @@ fun SearchBar(
 //    return formatter.format(this)
 //}
 
+//fun Double.formatAsCurrency(): String {
+//    val localeVN = java.util.Locale("vi", "VN")
+//    val formatter = java.text.NumberFormat.getCurrencyInstance(localeVN).apply {
+//        maximumFractionDigits = 0
+//    }
+//    return formatter.format(this)
+//}
 fun Double.formatAsCurrency(): String {
-    val localeVN = java.util.Locale("vi", "VN")
-    val formatter = java.text.NumberFormat.getCurrencyInstance(localeVN).apply {
+    // Lấy formatter theo locale Việt Nam nhưng chỉ format số, không kèm ký hiệu tiền tệ
+    val formatter = NumberFormat.getNumberInstance(Locale("vi", "VN")).apply {
         maximumFractionDigits = 0
+        isGroupingUsed = true
     }
-    return formatter.format(this)
+    // Ví dụ: 1234567.0 -> "1.234.567"
+    val formattedNumber = formatter.format(this)
+    // Gắn thêm chữ vnđ
+    return "$formattedNumber 000 VNĐ"
 }
