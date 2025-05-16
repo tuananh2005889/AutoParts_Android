@@ -153,57 +153,69 @@ fun HomeScreenContent(
     }
 
     var showDialog by remember {mutableStateOf(false)}
-        SimpleDialog(
-            showDialog,
-            onDismiss = {showDialog = false},
-            title = "Order Alert",
-            text = "Please pay for the previous order"
-            )
-        Column(
-            modifier = modifier
-                .padding(innerPadding)
-                .background(secondaryColor)
+    SimpleDialog(
+        showDialog,
+        onDismiss = {showDialog = false},
+        title = "Order Alert",
+        text = "Please pay for the previous order"
+    )
+    Column(
+        modifier = modifier
+            .padding(innerPadding)
+            .background(secondaryColor)
+    ) {
+        // Header Section
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(primaryColor)
+                .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
-            // Header Section
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(primaryColor)
-                    .padding(horizontal = 24.dp, vertical = 16.dp)
-            ) {
-                Column {
-                    Text(
-                        text = "AutoParts Shop",
-                        style = MaterialTheme.typography.headlineLarge.copy(
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 28.sp
-                        ),
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
+            Column {
+                Text(
+                    text = "AutoParts Shop",
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 28.sp
+                    ),
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
 
-                    // Search Bar
-                    SearchBar(
-                        value = searchText,
-                        onValueChange = { searchText = it },
-                        modifier = Modifier.fillMaxWidth()
+                // Search Bar
+                SearchBar(
+                    value = searchText,
+                    onValueChange = { searchText = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+
+        when {
+            homeUiState.isLoading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = primaryColor,
+                        strokeWidth = 3.dp
                     )
                 }
             }
 
-            when {
-                homeUiState.isLoading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            color = primaryColor,
-                            strokeWidth = 3.dp
-                        )
-                    }
+            homeUiState.errorMessage != null -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Error: ${homeUiState.errorMessage}",
+                        color = Color(0xFFD32F2F),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
-
+            }
 
             homeUiState.products.isNotEmpty() -> {
                 val filteredProducts = if (searchText.isBlank()) {
@@ -211,60 +223,50 @@ fun HomeScreenContent(
                 } else {
                     homeUiState.products.filter {
                         it.name.contains(searchText.trim(), ignoreCase = true)
-                    }   
-
+                    }
                 }
 
-                homeUiState.products.isNotEmpty() -> {
-                    val filteredProducts = if (searchText.isBlank()) {
-                        homeUiState.products
-                    } else {
-                        homeUiState.products.filter {
-                            it.name.contains(searchText.trim(), ignoreCase = true)
-                        }
-                    }
 
-
-                    // Hero Carousel
-                    Box(
+                // Hero Carousel
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp)
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                ) {
+                    SlideCarousel(
+                        images = listOf(R.drawable.hero1, R.drawable.hero2, R.drawable.hero3),
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(220.dp)
-                            .padding(horizontal = 16.dp, vertical = 12.dp)
-                    ) {
-                        SlideCarousel(
-                            images = listOf(R.drawable.hero1, R.drawable.hero2, R.drawable.hero3),
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(RoundedCornerShape(16.dp))
-                        )
-                    }
-
-
-                    Text(
-                        text = "Featured Products",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            color = textPrimary,
-                            fontWeight = FontWeight.SemiBold
-                        ),
-                        modifier = Modifier.padding(start = 24.dp, top = 24.dp, bottom = 8.dp)
-                    )
-
-                    ProductGrid(
-                        products = filteredProducts,
-                        onProductClick = onProductClick,
-                        homeViewModel = viewModel,
-                        onShowSnackBar = onShowSnackBar,
-                        cardBackground = cardBackground,
-                        primaryColor = primaryColor,
-                        accentColor = accentColor,
-                        textPrimary = textPrimary,
-                        textSecondary = textSecondary,
-                        showDialog = {showDialog = it}
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(16.dp))
                     )
                 }
+
+
+                Text(
+                    text = "Featured Products",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        color = textPrimary,
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    modifier = Modifier.padding(start = 24.dp, top = 24.dp, bottom = 8.dp)
+                )
+
+                ProductGrid(
+                    products = filteredProducts,
+                    onProductClick = onProductClick,
+                    homeViewModel = viewModel,
+                    onShowSnackBar = onShowSnackBar,
+                    cardBackground = cardBackground,
+                    primaryColor = primaryColor,
+                    accentColor = accentColor,
+                    textPrimary = textPrimary,
+                    textSecondary = textSecondary,
+                    showDialog = {showDialog = it}
+                )
             }
         }
+    }
 }
 
 
@@ -405,13 +407,13 @@ fun ProductCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
-                    Text(
-                        text = "${product.price?.formatAsCurrency()}",
-                        style = MaterialTheme.typography.titleSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = primaryColor
-                        )
+                Text(
+                    text = "${product.price?.formatAsCurrency()}",
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = primaryColor
                     )
+                )
 
             }
 
