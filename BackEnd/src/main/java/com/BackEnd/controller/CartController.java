@@ -13,9 +13,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/app/cart")
 public class CartController {
-  
+
     private final CartService cartService;
     private final CartRepository cartRepo;
+
     public CartController(CartService cartService, CartRepository cartRepo) {
         this.cartService = cartService;
         this.cartRepo = cartRepo;
@@ -66,17 +67,15 @@ public class CartController {
         }
     }
 
-
     @GetMapping("/imageUrls")
     public ResponseEntity<List<String>> getImageUrlPerCartItem(@RequestParam Long cartId) {
-        try{
-            List<String> imageUrls =
-                    cartService.getImageUrlPerCartItem(cartId);
-            if(imageUrls == null || imageUrls.isEmpty()){
+        try {
+            List<String> imageUrls = cartService.getImageUrlPerCartItem(cartId);
+            if (imageUrls == null || imageUrls.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
             return ResponseEntity.ok(imageUrls);
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -88,26 +87,33 @@ public class CartController {
         return ResponseEntity.ok(cart); // Trả về trạng thái giỏ hàng
     }
 
-//    @PostMapping("/pendingStatus")
-//    public void changeCartStatusToPending(@RequestParam Long cartId){
-//   Cart cart =     cartService.getCartByCartId(cartId);
-//   cart.setStatus(Cart.CartStatus.PENDING);
-//   cartRepo.save(cart);
-//    }
-//
+    // @PostMapping("/pendingStatus")
+    // public void changeCartStatusToPending(@RequestParam Long cartId){
+    // Cart cart = cartService.getCartByCartId(cartId);
+    // cart.setStatus(Cart.CartStatus.PENDING);
+    // cartRepo.save(cart);
+    // }
+    //
     @PostMapping("/activeStatus")
-    public void changeCartStatusToActive(@RequestParam Long cartId){
-        Cart cart =     cartService.getCartByCartId(cartId);
+    public void changeCartStatusToActive(@RequestParam Long cartId) {
+        Cart cart = cartService.getCartByCartId(cartId);
         cart.setStatus(Cart.CartStatus.ACTIVE);
         cartRepo.save(cart);
     }
 
     @GetMapping("/total-price")
-    public ResponseEntity<Double> getCartTotalPrice(@RequestParam Long cartId){
+    public ResponseEntity<Double> getCartTotalPrice(@RequestParam Long cartId) {
         Double price = cartService.getTotalPrice(cartId);
-        if(price == null ){
+        if (price == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.ok(price);
     }
+
+    @DeleteMapping("/remove-item/{cartItemId}")
+    public ResponseEntity<Void> removeItemFromCart(@PathVariable Long cartItemId) {
+        cartService.removeItemFromCart(cartItemId);
+        return ResponseEntity.ok().build();
+    }
+
 }

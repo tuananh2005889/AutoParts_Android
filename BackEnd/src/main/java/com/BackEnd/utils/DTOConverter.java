@@ -15,9 +15,10 @@ public class DTOConverter {
                 cartItem.getCartItemId(),
                 cartItem.getProduct().getProductId(),
                 cartItem.getProduct().getName(),
-                cartItem.getQuantity()
-        );
+                cartItem.getProduct().getPrice(),
+                cartItem.getQuantity());
     }
+
     public static CartDTO toCartDTO(Cart cart) {
         List<CartItemDTO> cartItemDTOs = cart.getCartItems().stream()
                 .map(DTOConverter::toCartItemDTO)
@@ -27,9 +28,9 @@ public class DTOConverter {
                 cart.getCartId(),
                 cart.getUser().getUserId(),
                 cartItemDTOs,
-                cart.getStatus().name()
-        );
+                cart.getStatus().name());
     }
+
     public static BasicCartInfoDto toCartBasicInfoDTO(Cart cart) {
         Long cartId = cart.getCartId();
         String status = cart.getStatus().name();
@@ -43,7 +44,7 @@ public class DTOConverter {
         return new BasicCartItemDTO(productId, quantity);
     }
 
-    public static OrderDetailDTO toOrderDetailDTO(OrderDetail orderDetail){
+    public static OrderDetailDTO toOrderDetailDTO(OrderDetail orderDetail) {
         return new OrderDetailDTO(
                 orderDetail.getProduct().getProductId(),
                 orderDetail.getProduct().getName(),

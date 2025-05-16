@@ -1,9 +1,6 @@
 package com.example.frontend.ViewModel
 
 import android.util.Log
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.frontend.data.dto.CartItemDTO
@@ -14,15 +11,9 @@ import com.example.frontend.data.repository.OrderRepository
 import com.example.frontend.data.repository.ProductRepository
 import com.example.frontend.ui.common.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.WhileSubscribed
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import javax.inject.Inject
 
 data class HomeUiState(
@@ -43,23 +34,12 @@ class HomeViewModel @Inject constructor(
         MutableStateFlow<HomeUiState>(HomeUiState())
     val homeUiState: StateFlow<HomeUiState> = _homeUiState
 
-//    val userName: StateFlow<String?> = authManager.userNameFlow.stateIn(
-//        viewModelScope,
-//        SharingStarted.WhileSubscribed(5000),
-//        null
-//    )
 
     private val _hasPendingOrder = MutableStateFlow(false)
     val hasPendingOrder: StateFlow<Boolean> = _hasPendingOrder
 
     init{
         viewModelScope.launch {
-//            authManager.userNameFlow.filterNotNull().collect { userName ->
-////                val hasPending = checkIfUserHasPendingOrder(userName)
-////                if (!hasPending) {
-//                    createCart(userName)
-////                }
-//            }
             val userName: String = authManager.getUserNameOnce().toString();
             createCart(userName);
         }
@@ -103,7 +83,8 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    suspend fun addOneProductToCart(productId: Long
+    suspend fun addOneProductToCart(
+        productId: Long, price: Double?
     ): CartItemDTO? {
             val cartId: Long? = authManager.getCartIdOnce()
 
@@ -114,6 +95,7 @@ class HomeViewModel @Inject constructor(
 
             val result = cartRepo.addProductToCart(
                 productId = productId,
+                price = price,
                 quantity = 1,
                 cartId = cartId
             )

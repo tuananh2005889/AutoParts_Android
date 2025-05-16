@@ -33,10 +33,19 @@ class CartRepository @Inject constructor(private val cartApiService: CartApiServ
 
    }
 
-    suspend fun addProductToCart(cartId: Long, productId: Long, quantity: Int): ApiResponse<CartItemDTO> {
+    suspend fun addProductToCart(cartId: Long,
+                                 productId: Long,
+                                 quantity: Int,
+                                 price: Double?): ApiResponse<CartItemDTO> {
         Log.d("HomeViewModel", "addProductToCart called")
+
         try {
-            val addToCartRequest = AddToCartRequest(cartId, productId, quantity)
+            val addToCartRequest = AddToCartRequest(
+                cartId    = cartId,
+                productId = productId,
+                price     = price,
+                quantity  = quantity
+            )
             val response = cartApiService.addProductToCart(addToCartRequest)
 
             if (response.isSuccessful) {
@@ -50,6 +59,20 @@ class CartRepository @Inject constructor(private val cartApiService: CartApiServ
         } catch (e: Exception) {
             Log.e("CartRepo-exception", "Exception: ${e.message}")
             return ApiResponse.Error("Exception: ${e.message ?: "Unknown error"}")
+        }
+    }
+    suspend fun removeItemFromCart(cartItemId: Long): ApiResponse<Unit> {
+        return try {
+            val response = cartApiService.removeItemFromCart(cartItemId)
+            if (response.isSuccessful) {
+                ApiResponse.Success(Unit)
+            } else {
+                val errorMsg = response.errorBody()?.string() ?: "Failed to remove item"
+                ApiResponse.Error(errorMsg, response.code())
+            }
+        } catch (e: Exception) {
+            Log.e("CartRepo-exception", "Exception: ${e.message}")
+            ApiResponse.Error("Exception: ${e.localizedMessage ?: "Unknown error"}")
         }
     }
 

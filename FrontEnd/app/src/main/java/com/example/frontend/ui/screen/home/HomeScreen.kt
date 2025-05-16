@@ -1,9 +1,6 @@
 package com.example.frontend.ui.screen.home
 
 import android.util.Log
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,18 +13,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -39,9 +30,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -62,9 +51,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -80,7 +67,6 @@ import com.example.frontend.ui.navigation.HomeNavHost
 import com.example.frontend.ViewModel.LoginViewModel
 import com.example.frontend.ui.common.SimpleDialog
 
-import com.example.frontend.ui.theme.specialGothicFontFamiLy
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 
@@ -136,10 +122,10 @@ fun HomeScreenContent(
 ) {
     // Color scheme
     val primaryColor = Color(0xFFF15D43)
-    val secondaryColor = Color(0xFFF5F7F6) // Light background
-    val accentColor = Color(0xFFFF7D33) // Vibrant orange
-    val textPrimary = Color(0xFF1A2E35) // Dark teal
-    val textSecondary = Color(0xFF6B818C) // Grayish teal
+    val secondaryColor = Color(0xFFF5F7F6)
+    val accentColor = Color(0xFFFF7D33)
+    val textPrimary = Color(0xFF1A2E35)
+    val textSecondary = Color(0xFF6B818C)
     val cardBackground = Color.White
 
     val homeUiState by viewModel.homeUiState.collectAsState()
@@ -322,7 +308,7 @@ fun ProductGrid(
                         showDialog(true)
                     }else{
                         coroutineScope.launch {
-                            val cartItem = homeViewModel.addOneProductToCart(product.productId)
+                            val cartItem = homeViewModel.addOneProductToCart(product.productId, product.price)
                             Log.d("HomeScreen-onAddToCartClick", cartItem.toString())
                             if (cartItem != null) {
                                 onShowSnackBar("Added ${cartItem.productName} to cart")

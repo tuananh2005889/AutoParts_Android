@@ -31,7 +31,6 @@ class ProductDetailViewModel @Inject constructor(
 
     private val _productDetailState = mutableStateOf<ProductDetailUiState>(ProductDetailUiState())
     val productDetailState: State<ProductDetailUiState>  = _productDetailState
-
     val quantity  = mutableStateOf(1)
     val totalPrice: State<Double> = derivedStateOf {
         val initialPrice = _productDetailState.value.product?.price ?: 0.0
@@ -69,7 +68,7 @@ class ProductDetailViewModel @Inject constructor(
      fun addToCart(){
         viewModelScope.launch {
             cartRepo.addProductToCart(authManager.getCartIdOnce()!!.toLong(),
-                productDetailState.value.product!!.productId.toLong(), quantity.value)
+                productDetailState.value.product!!.productId.toLong(), quantity.value, productDetailState.value.product!!.price)
         }
     }
 
