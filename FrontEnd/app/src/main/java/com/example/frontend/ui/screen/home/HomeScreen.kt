@@ -155,6 +155,7 @@ fun HomeScreenContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .statusBarsPadding()
                 .background(primaryColor)
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
@@ -469,28 +470,11 @@ fun SearchBar(
     )
 }
 
-//fun Double.formatAsCurrency(): String {
-//    val formatter = java.text.NumberFormat.getCurrencyInstance().apply {
-//        maximumFractionDigits = 0
-//    }
-//    return formatter.format(this)
-//}
-
-//fun Double.formatAsCurrency(): String {
-//    val localeVN = java.util.Locale("vi", "VN")
-//    val formatter = java.text.NumberFormat.getCurrencyInstance(localeVN).apply {
-//        maximumFractionDigits = 0
-//    }
-//    return formatter.format(this)
-//}
 fun Double.formatAsCurrency(): String {
-    // Lấy formatter theo locale Việt Nam nhưng chỉ format số, không kèm ký hiệu tiền tệ
     val formatter = NumberFormat.getNumberInstance(Locale("vi", "VN")).apply {
         maximumFractionDigits = 0
         isGroupingUsed = true
     }
-    // Ví dụ: 1234567.0 -> "1.234.567"
     val formattedNumber = formatter.format(this)
-    // Gắn thêm chữ vnđ
-    return "$formattedNumber 000 VNĐ"
+    return "$formattedNumber VNĐ"
 }
