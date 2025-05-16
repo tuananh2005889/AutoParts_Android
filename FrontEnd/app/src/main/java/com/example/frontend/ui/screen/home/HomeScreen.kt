@@ -82,25 +82,29 @@ fun HomeScreen(
 ) {
     val systemUiController = rememberSystemUiController()
     SideEffect {
-        // đồng bộ status-bar với theme
-        systemUiController.setSystemBarsColor(color = Color(0xFF1A2E35), darkIcons = false)
+        systemUiController.setSystemBarsColor(
+            color = Color(0xFF1A2E35)
+        )
     }
 
     val bottomNavController = rememberNavController()
     val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope    = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
-        modifier      = modifier.statusBarsPadding(),
+        modifier = modifier
+            .background(Color(0xFFF5F7F6))
+            .statusBarsPadding(),
         containerColor = Color.Transparent,
-        snackbarHost  = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) } ,
+//                bottomBar = { BottomNavBar(navController = bottomNavController) }
     ) { innerPadding ->
         HomeNavHost(
-            loginViewModel    = loginViewModel,
+            loginViewModel = loginViewModel,
             bottomNavController = bottomNavController,
             rootNavController = rootNavController,
-            innerPadding      = innerPadding,
-            onShowSnackBar    = { message ->
+            innerPadding = innerPadding,
+            onShowSnackBar = { message ->
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(message)
                 }
