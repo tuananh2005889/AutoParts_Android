@@ -29,11 +29,14 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -58,6 +61,23 @@ import kotlinx.coroutines.launch
 fun OrderScreen(
     orderViewModel: OrderViewModel = hiltViewModel(),
 ) {
+    val currentQrCode by remember{orderViewModel.currentQRCode }
+
+    val showMessage by remember { derivedStateOf { orderViewModel.showPaymentMessage } }
+
+    if (showMessage) {
+        AlertDialog(
+            onDismissRequest = { orderViewModel.dismissPaymentMessage() },
+            title = { Text("Checkout Successfully") },
+            text = { Text("Your Order Has Been Check Out.") },
+            confirmButton = {
+                Button(onClick = { orderViewModel.dismissPaymentMessage() }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -68,9 +88,7 @@ fun OrderScreen(
 
         OrderItemList(orderViewModel = orderViewModel)
 
-        Spacer(modifier = Modifier.height(16.dp)) // Tạo khoảng cách
-
-
+        Spacer(modifier = Modifier.height(16.dp))
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -79,9 +97,11 @@ fun OrderScreen(
             fontSize = 20.sp
         )
 
-        QRCodeImage(
-            "00020101021238570010A000000727012700069704220113VQRQACLNP26800208QRIBFTTA530370454061000005802VN62270823Thanh toan don hang ABC6304CE4C"
-        )
+        if(currentQrCode.isNotEmpty()){
+            QRCodeImage(currentQrCode)
+        }else{
+            CircularProgressIndicator()
+        }
     }
 }
 

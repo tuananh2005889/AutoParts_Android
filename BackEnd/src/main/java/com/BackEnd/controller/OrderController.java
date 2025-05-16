@@ -1,8 +1,10 @@
 package com.BackEnd.controller;
 
+import com.BackEnd.dto.CreateOrderResponse;
 import com.BackEnd.dto.OrderDetailDTO;
 import com.BackEnd.dto.PaymentRequest;
 import com.BackEnd.model.Cart;
+import com.BackEnd.model.Order;
 import com.BackEnd.model.Payment;
 import com.BackEnd.model.User;
 import com.BackEnd.service.CartService;
@@ -14,7 +16,9 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/app/order")
@@ -61,30 +65,40 @@ public class OrderController{
 //        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tạo đơn hàng thất bại");
 //    }
 
-    @PostMapping("/create")
-    public ResponseEntity<String> createOrder(@RequestParam Long cartId) {
-        try {
-            List<OrderDetailDTO> orderDetailDTOList = orderService.createOrder(cartId);
-            Integer totalPrice = 0;
-            for(OrderDetailDTO orderDetailDTO : orderDetailDTOList){
-                totalPrice +=  orderDetailDTO.getTotalPrice().intValue();
-            }
-
-
-            User user =  cartService.getUserByCartId(cartId);
-            Long orderId =  orderService.getPendingOrderId(user.getUserName());
-            PaymentRequest paymentRequest = new PaymentRequest(orderId, totalPrice,"Checkout AutoParts Order");
-            String qrCode =  paymentService.createOrderInPayOS(paymentRequest);
-
-            return ResponseEntity.ok(qrCode);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+//    @PostMapping("/create")
+//    public ResponseEntity<String> createOrder(@RequestParam Long cartId) {
+//        try {
+//            List<OrderDetailDTO> orderDetailDTOList = orderService.createOrder(cartId);
+//            Integer totalPrice = 0;
+//            for(OrderDetailDTO orderDetailDTO : orderDetailDTOList){
+//                totalPrice +=  orderDetailDTO.getTotalPrice().intValue();
+//            }
+//
+//
+//            User user =  cartService.getUserByCartId(cartId);
+//            Long orderId =  orderService.getPendingOrderId(user.getUserName());
+//            PaymentRequest paymentRequest = new PaymentRequest(orderId, totalPrice,"Checkout AutoParts Order");
+//            String qrCode =  paymentService.createOrderInPayOS(paymentRequest);
+//
+//            return ResponseEntity.ok(qrCode);
+//        } catch (IllegalArgumentException e) {
+//            e.printStackTrace();
+//            return ResponseEntity.badRequest().build();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
+@PostMapping("/create")
+public ResponseEntity<CreateOrderResponse> createOrder(@RequestParam Long cartId) {
+    try {
+        CreateOrderResponse response = orderService.createOrder(cartId);
+        return ResponseEntity.ok(response);
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
+}
 
     @GetMapping("/check-pending-status")
     public ResponseEntity<Boolean> checkIfUserHasPendingOrder(@RequestParam String userName){
@@ -103,6 +117,12 @@ public class OrderController{
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @PutMapping("/change-order-status")
+    public ResponseEntity<Void> changeOrderStatus(@RequestParam Long orderCode, @RequestParam Order.OrderStatus status){
+        orderService.changeOrderStatus(orderCode, status);
+        return ResponseEntity.ok().build();
     }
 
 }

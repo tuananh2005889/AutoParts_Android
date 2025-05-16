@@ -17,6 +17,6 @@ interface PaymentApiService {
     ): Response<CreateOrderResponse>
 
     @GET("/app/payment/status")
-    suspend fun getPaymentStatus(@Query("orderId") orderId: Long): Response<PaymentStatus>
+    suspend fun getPaymentStatus(@Query("orderCode") orderCode: Long): Response<PaymentStatus>
 }
 

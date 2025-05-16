@@ -2,9 +2,11 @@ package com.example.frontend.di
 
 import com.example.frontend.data.remote.ApiServiceUser          // <-- thêm
 import com.example.frontend.data.remote.LoginApiService
+import com.example.frontend.data.remote.PaymentApiService
 import com.example.frontend.data.remote.ProductApiService
 import com.example.frontend.data.remote.ReviewApiService
 import com.example.frontend.data.repository.LoginRepository
+import com.example.frontend.data.repository.PaymentRepository
 import com.example.frontend.data.repository.ProductRepository
 import com.example.frontend.data.repository.ReviewRepository
 import dagger.Module
@@ -41,4 +43,9 @@ object RepositoryModule {
     @Provides @Singleton
     fun provideReviewRepository(api: ReviewApiService): ReviewRepository =
         ReviewRepository(api)
+
+    @Provides @Singleton
+    fun providePaymentRepository(api: PaymentApiService): PaymentRepository{
+       return PaymentRepository(api)
+    }
 }

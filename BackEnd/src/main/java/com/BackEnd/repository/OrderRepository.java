@@ -20,5 +20,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     Order findTopByUserAndStatusOrderByCreatedAtDesc(User user, Order.OrderStatus status);
 
+    Order findByOrderCode(Long orderCode);
+
 }
 
