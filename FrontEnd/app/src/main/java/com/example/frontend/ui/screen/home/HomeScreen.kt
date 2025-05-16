@@ -204,17 +204,15 @@ fun HomeScreenContent(
                     }
                 }
 
-                homeUiState.errorMessage != null -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Error: ${homeUiState.errorMessage}",
-                            color = Color(0xFFD32F2F),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
+
+            homeUiState.products.isNotEmpty() -> {
+                val filteredProducts = if (searchText.isBlank()) {
+                    homeUiState.products
+                } else {
+                    homeUiState.products.filter {
+                        it.name.contains(searchText.trim(), ignoreCase = true)
+                    }   
+
                 }
 
                 homeUiState.products.isNotEmpty() -> {
