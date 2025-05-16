@@ -214,7 +214,7 @@ fun HomeScreenContent(
                 } else {
                     homeUiState.products.filter {
                         it.name.contains(searchText.trim(), ignoreCase = true)
-                    }
+                    }   
                 }
 
 
