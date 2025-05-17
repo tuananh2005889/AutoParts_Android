@@ -131,7 +131,6 @@ fun AppNavHost(
             composable(Route.Home.route) {
                 HomeScreen(
                     rootNavController = navController,
-                    loginViewModel = loginViewModel
                 )
             }
 
