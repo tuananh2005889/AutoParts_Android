@@ -104,7 +104,7 @@ class CartViewModel @Inject constructor(
                             _imageUrlPerCartItemList.value = response.data
                         }
                         is ApiResponse.Error ->{
-                           _errorMessage.value = "Failed to fetch image urls: ${response.message}"
+//                           _errorMessage.value = "Failed to fetch image urls: ${response.message}"
                         }
                         is ApiResponse.Loading -> {}
                     }
