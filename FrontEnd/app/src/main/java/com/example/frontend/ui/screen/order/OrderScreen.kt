@@ -96,7 +96,7 @@ fun OrderScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(secondaryColor)
-                .padding(paddingValues)
+                .padding(  top    = paddingValues.calculateTopPadding() - 30.dp,)
         ) {
             Column(
                 modifier = Modifier
