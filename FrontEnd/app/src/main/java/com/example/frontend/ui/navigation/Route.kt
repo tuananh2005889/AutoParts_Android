@@ -16,6 +16,7 @@ sealed class Route(val route: String, val icon: ImageVector? = null) {
     object Cart : Route("Cart", Icons.Default.ShoppingCart)
     object Order: Route("Order", Icons.Default.AllInbox)
     object Profile : Route("Profile", Icons.Default.Person)
+    object ProfileGraph: Route("ProfileGraph", Icons.Default.Person)
     object ForgotPassword : Route("forgotPassword", null)
 
     object DetailProduct: Route(route = "detailProduct/{productId}", null){
@@ -23,5 +24,12 @@ sealed class Route(val route: String, val icon: ImageVector? = null) {
             return "detailProduct/${productId}"
         }
     }
+
+    object AwaitingConfirmation: Route("awaitingConfirmation")
+    object AwaitingShipment: Route("awaitingShipment")
+    object InTransit: Route("inTransit")
+    object Delivered: Route("delivered")
+
+
 
 }

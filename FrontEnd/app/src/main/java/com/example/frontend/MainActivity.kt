@@ -18,41 +18,12 @@ import androidx.core.view.WindowCompat
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Kiểm tra Intent có chứa URL không
-        val intent: Intent = intent
-        val data: Uri? = intent.data
-
-        // Nếu có URL được gửi tới, xử lý theo URL
-        data?.let { uri ->
-            if (uri.host == "payment-result") {
-                handlePaymentSuccess()
-            } else if (uri.host == "payment-cancel") {
-                handlePaymentCancel()
-            }
-        }
-
         setContent {
-
             FrontEndTheme {
                 val navController = rememberNavController()
                 AppNavHost(navController)
             }
         }
-    }
-
-    private fun handlePaymentSuccess() {
-        // Thực hiện hành động khi thanh toán thành công
-        Log.d("MainActivity", "Thanh toán thành công")
-        Toast.makeText(this, "Thanh toán thành công!", Toast.LENGTH_SHORT).show()
-        // Bạn có thể điều hướng hoặc làm gì đó sau khi thanh toán thành công
-    }
-
-    private fun handlePaymentCancel() {
-        // Thực hiện hành động khi thanh toán bị hủy
-        Log.d("MainActivity", "Thanh toán bị hủy")
-        Toast.makeText(this, "Thanh toán bị hủy!", Toast.LENGTH_SHORT).show()
-        // Bạn có thể điều hướng hoặc làm gì đó khi thanh toán bị hủy
     }
 }
 
