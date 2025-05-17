@@ -39,6 +39,9 @@ class OrderViewModel @Inject constructor(
     private val _currentQRCode = mutableStateOf<String>("")
     val currentQRCode = _currentQRCode
 
+    private val _currentOrderCode = mutableStateOf<Long>(0L)
+    val currentOrderCode = _currentOrderCode
+
     private val _orderStatus = mutableStateOf("PENDING")
     val orderStatus = _orderStatus
 
@@ -53,11 +56,10 @@ class OrderViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getCurrentQRCode()
             val hasPendingOrder = async { checkHasPendingOrder() }
             if(hasPendingOrder.await()){
-                checkOrderStatus()
-                getCurrentQRCode()
+                checkOrderStatusLongPolling()
+                getCurrentQRCodeAndOrderCode()
                 getAllOrderDetailsInPendingOrder()
             }
 
@@ -89,13 +91,12 @@ class OrderViewModel @Inject constructor(
 
     }
 
-    fun checkOrderStatus() {
+    fun checkOrderStatusLongPolling() {
      viewModelScope.launch {
         while (true) {
             try {
-                val orderCode = authManager.getCurrentPendingOrderCodeOnce()
-                if (orderCode != null) {
-                    val status = paymentRepo.getPaymentStatus(orderCode)
+                if ( _currentOrderCode.value != 0L) {
+                    val status = paymentRepo.getPaymentStatus(_currentOrderCode.value)
                     when (status) {
                         is ApiResponse.Success -> {
                             if (status.data == PaymentStatus.PAID) {
@@ -123,15 +124,13 @@ class OrderViewModel @Inject constructor(
 
 fun dismissPaymentMessage() {
     viewModelScope.launch {
-        val orderCode = authManager.getCurrentPendingOrderCodeOnce()
-        if (orderCode != null) {
-            val result = orderRepo.changeOrderStatus(orderCode, OrderStatus.PAID)
+        if (_currentOrderCode.value != 0L) {
+            val result = orderRepo.changeOrderStatus(_currentOrderCode.value, OrderStatus.PAID)
             if (result is ApiResponse.Success) {
                 _orderDetailList.value = emptyList()
                 showPaymentMessage = false
                 isOrderPaid = false
                 _currentQRCode.value = ""
-                authManager.clearCurrentQRCode()
             } else if (result is ApiResponse.Error) {
                 Log.d("OrdVM", "Error changing order status: ${result.message}")
             }
@@ -141,15 +140,14 @@ fun dismissPaymentMessage() {
     }
 }
 
-    suspend fun getCurrentQRCode(){
-//        val qrCode = authManager.getCurrentQRCodeOnce().toString()
-//        _currentQRCode.value = qrCode
+    suspend fun getCurrentQRCodeAndOrderCode(){
         val result = orderRepo.getPendingOrderOfUser(authManager.getUserNameOnce().toString())
         when(result){
             is ApiResponse.Success -> {
                 val order: OrderDTO = result.data
                 Log.d("order-qrcode", " ${result.data}")
                 _currentQRCode.value = order.qrCodeToCheckout
+                _currentOrderCode.value = order.orderCode
             }
             is ApiResponse.Error -> {
                 Log.d("order-qrcode", "${result.message}")
