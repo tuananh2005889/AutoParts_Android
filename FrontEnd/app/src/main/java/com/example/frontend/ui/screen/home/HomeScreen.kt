@@ -82,7 +82,6 @@ fun HomeScreen(
     rootNavController: NavHostController,
     modifier: Modifier = Modifier,
     homeViewModel: HomeViewModel = hiltViewModel(),
-    loginViewModel: LoginViewModel
 ) {
     val systemUiController = rememberSystemUiController()
     SideEffect {
@@ -91,7 +90,6 @@ fun HomeScreen(
         )
     }
 
-    val bottomNavController = rememberNavController()
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
@@ -133,16 +131,14 @@ fun HomeScreen(
     ) { innerPadding ->
         HomeScreenContent(
             viewModel = homeViewModel,
-//            bottomNavController = bottomNavController,
-//            rootNavController = rootNavController,
             innerPadding = innerPadding,
             onShowSnackBar = { message ->
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(message)
                 }
             },
-            onProductClick = {
-                rootNavController.navigate(Route.DetailProduct.route)
+            onProductClick = { id ->
+                rootNavController.navigate(Route.DetailProduct.createRouteById(id))
             }
         )
     }
