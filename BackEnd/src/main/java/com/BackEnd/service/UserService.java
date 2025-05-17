@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -121,14 +123,20 @@ public class UserService {
         return toDto(saved);
     }
 
-    public User getUserById(Long id){
+    public User getUserById(Long id) {
         return userRepo.findById(id)
-                .orElseThrow(()-> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    public User getUserByName(String name){
-       return userRepo.findByUserName(name)
-               .orElseThrow(()-> new RuntimeException("User not found"));
+    public User getUserByName(String name) {
+        return userRepo.findByUserName(name)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
+    public List<UserDTO> getAllUsers() {
+        return userRepo.findAll()
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
 }

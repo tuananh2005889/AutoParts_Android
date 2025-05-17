@@ -105,10 +105,10 @@ fun CartScreen(
                 .fillMaxSize()
                 .statusBarsPadding()
                 .background(secondaryColor)
-                .padding(paddingValues)
+//                .padding(top=70.dp)
+                .padding(  top    = paddingValues.calculateTopPadding() - 30.dp,)
         ) {
             Column(Modifier.fillMaxSize()) {
-                Spacer(Modifier.height(16.dp))
 
                 if (cartItems.isEmpty()) {
                     EmptyCartPlaceholder(textPrimary, textSecondary)

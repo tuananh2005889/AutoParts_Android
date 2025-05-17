@@ -234,7 +234,7 @@ fun HomeScreenContent(
                             .clip(RoundedCornerShape(16.dp))
                     )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
+//                Spacer(modifier = Modifier.height(5.dp))
                 SearchBar(
                     value = searchText,
                     onValueChange = { searchText = it },
@@ -243,7 +243,7 @@ fun HomeScreenContent(
                         .padding(12.dp)
 
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+//                Spacer(modifier = Modifier.height(5.dp))
                 Text(
                     text = "Featured Products",
                     style = MaterialTheme.typography.titleLarge.copy(
