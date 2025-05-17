@@ -37,6 +37,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
@@ -56,6 +58,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.frontend.R
@@ -78,6 +81,7 @@ import java.util.Locale
 fun HomeScreen(
     rootNavController: NavHostController,
     modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = hiltViewModel(),
     loginViewModel: LoginViewModel
 ) {
     val systemUiController = rememberSystemUiController()
@@ -93,11 +97,39 @@ fun HomeScreen(
 
     Scaffold(
         modifier = modifier
-            .background(Color(0xFFF5F7F6))
-            .statusBarsPadding(),
-        containerColor = Color.Transparent,
-        snackbarHost = { SnackbarHost(snackbarHostState) } ,
-//                bottomBar = { BottomNavBar(navController = bottomNavController) }
+            .background(Color(0xFFF5F7F6)),
+        topBar = {
+            TopAppBar(
+                title = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .statusBarsPadding()
+                            .padding(horizontal = 24.dp, vertical = 16.dp)
+
+                    ) {
+                        Column() {
+                            Text(
+                                text = "AutoParts Shop",
+                                style = MaterialTheme.typography.headlineLarge.copy(
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 28.sp
+                                ),
+                            )
+
+                        }
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFFF15D43),
+                    titleContentColor = Color.White,
+                    actionIconContentColor = Color.White
+                )
+
+            )
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         HomeNavHost(
             loginViewModel = loginViewModel,
@@ -129,8 +161,9 @@ fun HomeScreenContent(
     val textSecondary = Color(0xFF6B818C)
     val cardBackground = Color.White
 
-    val homeUiState by viewModel.homeUiState.collectAsState()
     var searchText by remember { mutableStateOf("") }
+
+    val homeUiState by viewModel.homeUiState.collectAsState()
     val filteredProducts = if (searchText.isBlank()) {
         homeUiState.products
     } else {
@@ -138,7 +171,6 @@ fun HomeScreenContent(
             it.name.contains(searchText.trim(), ignoreCase = true)
         }
     }
-
     var showDialog by remember {mutableStateOf(false)}
     SimpleDialog(
         showDialog,
@@ -146,39 +178,12 @@ fun HomeScreenContent(
         title = "Order Alert",
         text = "Please pay for the previous order"
     )
+
     Column(
         modifier = modifier
             .padding(innerPadding)
             .background(secondaryColor)
     ) {
-        // Header Section
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .statusBarsPadding()
-                .background(primaryColor)
-                .padding(horizontal = 24.dp, vertical = 16.dp)
-        ) {
-            Column {
-                Text(
-                    text = "AutoParts Shop",
-                    style = MaterialTheme.typography.headlineLarge.copy(
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 28.sp
-                    ),
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                // Search Bar
-                SearchBar(
-                    value = searchText,
-                    onValueChange = { searchText = it },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
-
         when {
             homeUiState.isLoading -> {
                 Box(
@@ -229,8 +234,16 @@ fun HomeScreenContent(
                             .clip(RoundedCornerShape(16.dp))
                     )
                 }
+                Spacer(modifier = Modifier.height(8.dp))
+                SearchBar(
+                    value = searchText,
+                    onValueChange = { searchText = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp)
 
-
+                )
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "Featured Products",
                     style = MaterialTheme.typography.titleLarge.copy(

@@ -14,9 +14,13 @@ import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.rememberDismissState
 import androidx.compose.material3.*
 import androidx.compose.material3.Icon
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.runtime.*
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,11 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.frontend.R
@@ -42,20 +42,29 @@ import com.example.frontend.data.dto.CartItemDTO
 import com.example.frontend.ui.common.CloudinaryImage
 import com.example.frontend.ui.common.Notification
 import com.example.frontend.ui.common.SimpleDialog
-import com.example.frontend.ui.screen.home.formatAsCurrency
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun CartScreen(
     cartViewModel: CartViewModel = hiltViewModel(),
-    navController: NavHostController
+    navController: NavHostController,
 ) {
-    // Màu sắc chủ đạo
+    // 1. Trong suốt status bar để Monet accent hiển thị
+    val systemUiController = rememberSystemUiController()
+    SideEffect {
+        systemUiController.setSystemBarsColor(
+            color = Color.Transparent,
+            darkIcons = false
+        )
+    }
+
+    // Theme colors
     val primaryColor = Color(0xFFF15D43)
-    val secondaryColor = Color(0xFFF5F7F6)
+    val secondaryColor = Color(0xFFF4F4F4)
     val textPrimary = Color(0xFF1A2E35)
     val textSecondary = Color(0xFF6B818C)
 
@@ -77,89 +86,80 @@ fun CartScreen(
         }
     }
 
-    Box(
-        Modifier
-            .fillMaxSize()
-            .background(secondaryColor)
-    ) {
-        Column(
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("MY CART", fontSize = 20.sp, color = Color.White) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = primaryColor,
+                    titleContentColor = Color.White,
+                    actionIconContentColor = Color.White
+                ),
+
+            )
+        },
+        containerColor = secondaryColor
+    ) { paddingValues ->
+        Box(
             Modifier
                 .fillMaxSize()
-                .padding(WindowInsets.statusBars.asPaddingValues())
+                .statusBarsPadding()
+                .background(secondaryColor)
+                .padding(paddingValues)
         ) {
-            // Header
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(80.dp)
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(primaryColor, primaryColor.copy(alpha = 0.8f))
-                        ),
+            Column(Modifier.fillMaxSize()) {
+                Spacer(Modifier.height(16.dp))
+
+                if (cartItems.isEmpty()) {
+                    EmptyCartPlaceholder(textPrimary, textSecondary)
+                } else {
+                    CartItemsList(
+                        items = cartItems,
+                        images = imageUrls,
+                        primaryColor = primaryColor,
+                        textPrimary = textPrimary,
+                        textSecondary = textSecondary,
+                        onIncrease = { cartViewModel.increaseQuantity(it) },
+                        onDecrease = { cartViewModel.decreaseQuantity(it) },
+                        onRemove = { cartViewModel.removeItemFromCart(it) }
                     )
-                    .padding(vertical = 12.dp),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    "MY CART",
-                    modifier = Modifier.padding(start = 16.dp),
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.5.sp
-                    ),
-                    textAlign = TextAlign.Left
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (cartItems.isEmpty()) {
-                EmptyCartPlaceholder(textPrimary, textSecondary)
-            } else {
-                CartItemsList(
-                    items = cartItems,
-                    images = imageUrls,
-                    primaryColor = primaryColor,
-                    textPrimary = textPrimary,
-                    textSecondary = textSecondary,
-                    onIncrease = { cartViewModel.increaseQuantity(it) },
-                    onDecrease = { cartViewModel.decreaseQuantity(it) },
-                    onRemove = { cartViewModel.removeItemFromCart(it) }
-                )
-            }
-        }
-
-        // Thanh thanh toán
-        if (cartItems.isNotEmpty()) {
-            FloatingCheckoutBar(
-                total = totalPrice,
-                primaryColor = primaryColor,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .offset(y = (-16).dp),
-                onCheckout = {
-                    if (hasPending) showDialog = true
-                    else cartViewModel.clickOrderNow(navController)
                 }
+            }
+
+            // Floating Checkout Bar ở đáy Box
+            if (cartItems.isNotEmpty()) {
+                FloatingCheckoutBar(
+                    total = totalPrice,
+                    primaryColor = primaryColor,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .offset(y = (-16).dp),
+                    onCheckout = {
+                        if (hasPending) showDialog = true
+                        else cartViewModel.clickOrderNow(navController)
+                    }
+                )
+            }
+
+            // Thông báo lỗi ở trên cùng
+            if (showError) {
+                Notification(
+                    modifier = Modifier.align(Alignment.TopCenter),
+                    text = errorMsg ?: "Unknown error"
+                )
+            }
+
+            // Dialog pending order ở giữa Box
+            SimpleDialog(
+                showDialog = showDialog,
+                onDismiss = { showDialog = false },
+                title = "Pending Order",
+                text = "Please complete your previous order before placing a new one."
             )
         }
-
-        // Thông báo lỗi
-        if (showError) {
-            Notification(
-                modifier = Modifier.align(Alignment.TopCenter),
-                text = errorMsg ?: "Unknown error"
-            )
-        }
-
-        SimpleDialog(
-            showDialog = showDialog,
-            onDismiss = { showDialog = false },
-            title = "Pending Order",
-            text = "Please complete your previous order before placing a new one."
-        )
     }
 }
+
 @Composable
 fun FloatingCheckoutBar(
     total: Double,
@@ -167,15 +167,12 @@ fun FloatingCheckoutBar(
     modifier: Modifier = Modifier,
     onCheckout: () -> Unit
 ) {
-
     Box(
         modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            // Nổi lên bằng shadow và bo góc
             .shadow(elevation = 12.dp, shape = RoundedCornerShape(24.dp))
             .background(color = Color.White, shape = RoundedCornerShape(24.dp))
-            // Padding bên trong để nội dung không sát viền
             .padding(horizontal = 24.dp, vertical = 16.dp)
     ) {
         Row(
@@ -187,7 +184,7 @@ fun FloatingCheckoutBar(
                 Text(
                     "TOTAL",
                     style = MaterialTheme.typography.labelSmall.copy(
-                        color = Color(0xFF6B818C),
+                        color = Color.White,
                         letterSpacing = 0.5.sp
                     )
                 )
@@ -208,7 +205,7 @@ fun FloatingCheckoutBar(
                 ),
                 modifier = Modifier.height(48.dp)
             ) {
-                Text("CHECKOUT".uppercase(), fontWeight = FontWeight.Bold)
+                Text("CHECKOUT", fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -230,8 +227,9 @@ private fun CartItemsList(
         Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 100.dp)
     ) {
-        itemsIndexed(items) { index, item ->
-            val imageUrl = images.getOrNull(index) ?: ""
+        itemsIndexed(items) { _, item ->
+            val idx = items.indexOf(item)
+            val imageUrl = images.getOrNull(idx) ?: ""
             SwipeableCartItem(
                 item = item,
                 imageUrl = imageUrl,
@@ -259,8 +257,6 @@ private fun SwipeableCartItem(
     onRemove: () -> Unit
 ) {
     val dismissState = rememberDismissState()
-
-    // Khi vuốt đủ sang phải
     LaunchedEffect(dismissState.currentValue) {
         if (dismissState.currentValue == DismissValue.DismissedToEnd) {
             onRemove()
@@ -270,15 +266,10 @@ private fun SwipeableCartItem(
     SwipeToDismiss(
         state = dismissState,
         directions = setOf(DismissDirection.StartToEnd),
-
-        // Chỉ hiển thị nền đỏ khi đang vuốt (dragging) hoặc đã vuốt xong
         background = {
-            // màu sẽ chuyển từ Transparent sang Red tuỳ trạng thái vuốt
             val bgColor by animateColorAsState(
-                when (dismissState.targetValue) {
-                    DismissValue.Default -> Color.Transparent
-                    else                  -> Color(0xFFEF5350)
-                }
+                if (dismissState.targetValue == DismissValue.Default) Color.Transparent
+                else Color(0xFFEF5350)
             )
             Box(
                 Modifier
@@ -290,14 +281,13 @@ private fun SwipeableCartItem(
                 if (bgColor != Color.Transparent) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete",
+                        contentDescription = null,
                         tint = Color.White
                     )
                 }
             }
         },
         dismissContent = {
-
             Card(
                 Modifier
                     .fillMaxWidth()
@@ -306,7 +296,6 @@ private fun SwipeableCartItem(
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
-                Spacer(Modifier.width(30.dp))
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -315,7 +304,7 @@ private fun SwipeableCartItem(
                 ) {
                     CloudinaryImage(
                         url = imageUrl,
-                        contentDescription = "Product image",
+                        contentDescription = null,
                         modifier = Modifier
                             .size(80.dp)
                             .clip(RoundedCornerShape(12.dp))
@@ -329,7 +318,7 @@ private fun SwipeableCartItem(
                                 color = textPrimary
                             ),
                             maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
+                            overflow =	TextOverflow.Ellipsis
                         )
                         Spacer(Modifier.height(8.dp))
                         Text(
@@ -372,10 +361,10 @@ private fun QuantitySelector(
             modifier = Modifier.height(40.dp)
         ) {
             IconButton(onClick = onDecrease, modifier = Modifier.size(40.dp)) {
-                Icon(Icons.Default.Remove, contentDescription = "Decrease", tint = primaryColor)
+                Icon(Icons.Default.Remove, contentDescription = null, tint = primaryColor)
             }
             Text(
-                currentQuantity.toString(),
+                "$currentQuantity",
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
                     color = primaryColor
@@ -383,7 +372,7 @@ private fun QuantitySelector(
                 modifier = Modifier.padding(horizontal = 8.dp)
             )
             IconButton(onClick = onIncrease, modifier = Modifier.size(40.dp)) {
-                Icon(Icons.Default.Add, contentDescription = "Increase", tint = primaryColor)
+                Icon(Icons.Default.Add, contentDescription =	null, tint = primaryColor)
             }
         }
     }
@@ -398,13 +387,13 @@ private fun EmptyCartPlaceholder(
         Modifier
             .fillMaxSize()
             .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        horizontalAlignment =	Alignment.CenterHorizontally,
+        verticalArrangement =	Arrangement.Center
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.cart),
-            contentDescription = "Empty cart",
-            tint = textSecondary.copy(alpha = 0.4f),
+            painter =	painterResource(id =	R.drawable.cart),
+            contentDescription =	null,
+            tint =	textSecondary.copy(alpha = 0.4f),
             modifier = Modifier.size(120.dp)
         )
         Spacer(Modifier.height(24.dp))
@@ -417,19 +406,19 @@ private fun EmptyCartPlaceholder(
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            "Explore our products and add items to your cart",
+            "Explore our products and	add items to your cart",
             style = MaterialTheme.typography.bodyLarge.copy(
                 color = textSecondary,
-                textAlign = TextAlign.Center
+                textAlign =	TextAlign.Center
             )
         )
     }
 }
-fun Double.formatAsCurrency(): String {
-    val formatter = NumberFormat.getNumberInstance(Locale("vi", "VN")).apply {
+
+fun	Double.formatAsCurrency(): String {
+    val formatter =	NumberFormat.getNumberInstance(Locale("vi", "VN")).apply {
         maximumFractionDigits = 0
         isGroupingUsed = true
     }
-    val formattedNumber = formatter.format(this)
-    return "$formattedNumber VNĐ"
+    return	"${formatter.format(this)} VNĐ"
 }
