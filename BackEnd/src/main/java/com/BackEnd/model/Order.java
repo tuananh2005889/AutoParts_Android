@@ -48,12 +48,15 @@ public class Order {
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
     private Payment payment;
 
-
+    private String qrCodeToCheckout;
 
     public enum OrderStatus{
         PENDING,
         PAID,
         CANCELLED,
+        SUBMITTED,
+        SHIPPED,
+        DELIVERED,
     }
 }
 

@@ -2,6 +2,7 @@ package com.example.frontend.data.repository
 
 import android.util.Log
 import com.example.frontend.data.dto.CreateOrderResponse
+import com.example.frontend.data.dto.OrderDTO
 import com.example.frontend.data.dto.OrderDetailDTO
 import com.example.frontend.data.dto.OrderStatus
 import com.example.frontend.data.model.OrderDetails
@@ -74,7 +75,25 @@ class OrderRepository @Inject constructor(private val orderApiService: OrderApiS
             e.printStackTrace()
             ApiResponse.Error("Exception: ${e.message}", null)
         }
-
     }
+
+    suspend fun getPendingOrderOfUser(userName: String): ApiResponse<OrderDTO> {
+        return try {
+            val result = orderApiService.getPendingOrderOfUser(userName)
+            if (result.isSuccessful) {
+                val body = result.body()
+                if (body != null) {
+                    ApiResponse.Success(body)
+                } else {
+                    ApiResponse.Error("body null")
+                }
+            } else {
+                ApiResponse.Error("Response not successful: ${result.code()} ${result.message()}")
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error("Exception: ${e.message}")
+        }
+    }
+
 
 }

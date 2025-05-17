@@ -1,9 +1,6 @@
 package com.BackEnd.service;
 
-import com.BackEnd.dto.CartItemDTO;
-import com.BackEnd.dto.CreateOrderResponse;
-import com.BackEnd.dto.OrderDetailDTO;
-import com.BackEnd.dto.PaymentRequest;
+import com.BackEnd.dto.*;
 import com.BackEnd.model.*;
 import com.BackEnd.repository.*;
 import com.BackEnd.repository.OrderDetailRepository;
@@ -179,6 +176,7 @@ public CreateOrderResponse createOrder(Long cartId) {
             success = true;
 
             Order order = new Order();
+            order.setQrCodeToCheckout(qrCode);
             order.setUser(user);
             order.setStatus(Order.OrderStatus.PENDING);
             order.setCreatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
@@ -242,5 +240,22 @@ public CreateOrderResponse createOrder(Long cartId) {
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public List<OrderDTO> getOrdersByStatus(Order.OrderStatus status){
+        List<Order> orders = orderRepo.findByStatus(status);
+        return orders.stream().map(
+                order -> DTOConverter.toOrderDTO(order)
+        ).collect(Collectors.toList());
+    }
+    public List<OrderDTO> getAllOrders(){
+    List<Order> orders =  orderRepo.findAll();
+    return  orders.stream().map(order -> DTOConverter.toOrderDTO(order)).collect(Collectors.toList());
+    }
+
+    public OrderDTO getPendingOrderOfUser(String userName){
+        User user = userService.getUserByName(userName);
+        Order order = orderRepo.findByUserAndStatus(user, Order.OrderStatus.PENDING);
+        return DTOConverter.toOrderDTO(order);
     }
 }
