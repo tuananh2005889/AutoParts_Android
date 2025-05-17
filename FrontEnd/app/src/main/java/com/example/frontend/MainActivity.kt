@@ -11,6 +11,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import androidx.core.content.ContextCompat
 import android.util.Log
 import android.widget.Toast
+import androidx.core.view.WindowCompat
 
 
 @AndroidEntryPoint
@@ -32,8 +33,7 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            window.statusBarColor = ContextCompat.getColor(this, R.color.dark_background)
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_background)
+
             FrontEndTheme {
                 val navController = rememberNavController()
                 AppNavHost(navController)

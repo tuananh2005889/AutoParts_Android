@@ -26,9 +26,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -54,6 +58,7 @@ import com.example.frontend.ui.common.QRCodeImage
 import java.text.NumberFormat
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrderScreen(
     orderViewModel: OrderViewModel = hiltViewModel(),
@@ -69,64 +74,60 @@ fun OrderScreen(
     val showMessage by remember { derivedStateOf { orderViewModel.showPaymentMessage } }
     val hasPendingOrder by remember { orderViewModel.hasPendingOrder }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(secondaryColor)
-    ) {
-        Column(
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        "My Order",
+                        fontSize = 20.sp,
+                        color = Color.White
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = primaryColor,
+                    titleContentColor = Color.White,
+                    actionIconContentColor = Color.White
+                )
+            )
+        }
+    ) { paddingValues ->
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(WindowInsets.statusBars.asPaddingValues())
+                .background(secondaryColor)
+                .padding(paddingValues)
         ) {
-            // Header với gradient
-            Box(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(80.dp)
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(primaryColor, primaryColor.copy(alpha = 0.8f))
-                        )
-                    )
-                    .padding(vertical = 12.dp),
-                contentAlignment = Alignment.CenterStart
+                    .fillMaxSize()
+                    .padding(WindowInsets.statusBars.asPaddingValues())
             ) {
-                Text(
-                    "ORDER DETAILS",
-                    modifier = Modifier.padding(start = 16.dp),
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.5.sp
+
+
+                if (hasPendingOrder) {
+                    OrderContent(
+                        orderViewModel = orderViewModel,
+                        currentQrCode = currentQrCode,
+                        primaryColor = primaryColor,
+                        textPrimary = textPrimary,
+                        textSecondary = textSecondary
                     )
-                )
+                } else {
+                    EmptyOrderPlaceholder(textPrimary, textSecondary)
+                }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (hasPendingOrder) {
-                OrderContent(
-                    orderViewModel = orderViewModel,
-                    currentQrCode = currentQrCode,
-                    primaryColor = primaryColor,
-                    textPrimary = textPrimary,
-                    textSecondary = textSecondary
+            if (showMessage) {
+                PaymentSuccessDialog(
+                    onDismiss = { orderViewModel.dismissPaymentMessage() },
+                    primaryColor = primaryColor
                 )
-            } else {
-                EmptyOrderPlaceholder(textPrimary, textSecondary)
             }
-        }
-
-        // Thông báo thanh toán thành công
-        if (showMessage) {
-            PaymentSuccessDialog(
-                onDismiss = { orderViewModel.dismissPaymentMessage() },
-                primaryColor = primaryColor
-            )
         }
     }
 }
+
 
 @Composable
 private fun OrderContent(
@@ -141,10 +142,9 @@ private fun OrderContent(
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
-        // Danh sách sản phẩm
         LazyColumn(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+//            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(orderViewModel.orderDetailList.value) { item ->
                 OrderItemCard(

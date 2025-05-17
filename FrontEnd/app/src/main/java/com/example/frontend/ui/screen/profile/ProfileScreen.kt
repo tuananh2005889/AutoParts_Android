@@ -177,7 +177,6 @@ fun ProfileContent(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Avatar + camera overlay
             Box(
                 Modifier
                     .size(120.dp)
