@@ -19,6 +19,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navArgument
+import androidx.navigation.navigation
 import com.example.frontend.ViewModel.LoginViewModel
 import com.example.frontend.ui.screen.login.LoginScreen
 import com.example.frontend.ui.screen.login.ForgotPasswordScreen
@@ -30,6 +32,10 @@ import com.example.frontend.ui.screen.home.DetailProductScreen
 import com.example.frontend.ui.navigation.Route
 import com.example.frontend.ui.screen.cart.CartScreen
 import com.example.frontend.ui.screen.order.OrderScreen
+import com.example.frontend.ui.screen.profile.AwaitingConfirmationScreen
+import com.example.frontend.ui.screen.profile.AwaitingShipmentScreen
+import com.example.frontend.ui.screen.profile.DeliveredScreen
+import com.example.frontend.ui.screen.profile.InTransitScreen
 import com.example.frontend.ui.screen.profile.ProfileScreen
 
 @Composable
@@ -135,23 +141,50 @@ fun AppNavHost(
                 )
             }
 
-            composable(Route.Profile.route) {
-                // Lấy userName từ LoginViewModel (AuthManager) bằng produceState
-                val userName by produceState(initialValue = "", loginViewModel) {
-                    value =
-                        loginViewModel.getUserName().toString()
+            navigation(
+                startDestination = Route.Profile.route,
+                route = Route.ProfileGraph.route
+            ) {
+                composable(Route.Profile.route) {
+                    val userName by produceState(initialValue = "", loginViewModel) {
+                    value = loginViewModel.getUserName().toString()
+                }
+                    ProfileScreen(
+                        userName = userName,
+                        onLogout = {
+                            // Khi logout thì clear state và back về màn Login
+                            loginViewModel.logout()
+                            navController.navigate(Route.Login.route) {
+                                popUpTo(Route.Home.route) { inclusive = true }
+                            }
+                        },
+                        clickAwaitingConfirmation = {
+                            navController.navigate(Route.AwaitingConfirmation.route)
+                        },
+                        clickAwaitingShipment = {
+                            navController.navigate(Route.AwaitingShipment.route)
+                        },
+                        clickInTransit = {
+                            navController.navigate(Route.InTransit.route)
+                        },
+                        clickDelivered = {
+                            navController.navigate(Route.InTransit.route)
+                        }
+                    )
+                }
+                composable(Route.AwaitingConfirmation.route) {
+                    AwaitingConfirmationScreen()
+                }
+                composable(Route.AwaitingShipment.route){
+                    AwaitingShipmentScreen()
+                }
+                composable(Route.InTransit.route){
+                    InTransitScreen()
+                }
+                composable(Route.Delivered.route){
+                    DeliveredScreen()
                 }
 
-                ProfileScreen(
-                    userName = userName,
-                    onLogout = {
-                        // Khi logout thì clear state và back về màn Login
-                        loginViewModel.logout()
-                        navController.navigate(Route.Login.route) {
-                            popUpTo(Route.Home.route) { inclusive = true }
-                        }
-                    }
-                )
             }
 
             composable(route = Route.Order.route){

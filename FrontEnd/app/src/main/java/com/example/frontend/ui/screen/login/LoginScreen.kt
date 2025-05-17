@@ -59,7 +59,7 @@ fun LoginScreen(
     onLoginSuccess: () -> Unit = {},
     onSignupClick: () -> Unit = {},
     onForgotPasswordClick: () -> Unit = {},
-    loginViewModel: LoginViewModel = hiltViewModel(),
+    loginViewModel: LoginViewModel,
 ) {
     /* -------- Observe state từ ViewModel -------- */
     val uiState   by loginViewModel.ui

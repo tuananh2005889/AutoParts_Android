@@ -66,9 +66,9 @@ import com.example.frontend.ViewModel.HomeViewModel
 import com.example.frontend.data.model.ProductData
 import com.example.frontend.ui.common.CloudinaryImage
 
-import com.example.frontend.ui.navigation.HomeNavHost
 import com.example.frontend.ViewModel.LoginViewModel
 import com.example.frontend.ui.common.SimpleDialog
+import com.example.frontend.ui.navigation.Route
 
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
@@ -81,7 +81,7 @@ import java.util.Locale
 fun HomeScreen(
     rootNavController: NavHostController,
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = hiltViewModel(),
     loginViewModel: LoginViewModel
 ) {
     val systemUiController = rememberSystemUiController()
@@ -131,15 +131,18 @@ fun HomeScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
-        HomeNavHost(
-            loginViewModel = loginViewModel,
-            bottomNavController = bottomNavController,
-            rootNavController = rootNavController,
+        HomeScreenContent(
+            viewModel = homeViewModel,
+//            bottomNavController = bottomNavController,
+//            rootNavController = rootNavController,
             innerPadding = innerPadding,
             onShowSnackBar = { message ->
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(message)
                 }
+            },
+            onProductClick = {
+                rootNavController.navigate(Route.DetailProduct.route)
             }
         )
     }

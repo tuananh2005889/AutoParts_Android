@@ -57,7 +57,11 @@ import java.io.File
 fun ProfileScreen(
     userName: String,
     onLogout: () -> Unit,
-    profileViewModel: ProfileViewModel = hiltViewModel()
+    profileViewModel: ProfileViewModel = hiltViewModel(),
+    clickAwaitingConfirmation: ()->Unit,
+    clickAwaitingShipment: ()->Unit,
+    clickInTransit: ()->Unit,
+    clickDelivered: ()->Unit,
 ) {
     val user by profileViewModel.userDataState.collectAsState()
     val avatarError by profileViewModel.updateAvatarError.collectAsState()
@@ -101,7 +105,11 @@ fun ProfileScreen(
                 }
             },
             onLogout = onLogout,
-            profileViewModel = profileViewModel
+            profileViewModel = profileViewModel,
+            clickAwaitingConfirmation = clickAwaitingConfirmation,
+            clickAwaitingShipment = clickAwaitingShipment,
+            clickInTransit = clickInTransit,
+            clickDelivered = clickDelivered,
         )
     }
 }
@@ -112,7 +120,11 @@ fun ProfileContent(
     user: UserData,
     onUpload: (File) -> Unit,
     onLogout: () -> Unit,
-    profileViewModel: ProfileViewModel
+    profileViewModel: ProfileViewModel,
+    clickAwaitingConfirmation: () -> Unit,
+    clickAwaitingShipment: () -> Unit,
+    clickInTransit: () -> Unit,
+    clickDelivered: () -> Unit,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -302,10 +314,10 @@ fun ProfileContent(
                     Text("Purchase Orders", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
                     Spacer(Modifier.height(12.dp))
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        item { OrderStatusItem(R.drawable.ic_hourglass, "Awaiting\nConfirmation") }
-                        item { OrderStatusItem(R.drawable.ic_inventory, "Awaiting\nShipment") }
-                        item { OrderStatusItem(R.drawable.ic_local_shipping, "In\nTransit") }
-                        item { OrderStatusItem(R.drawable.check, "Delivered") }
+                        item { OrderStatusItem(R.drawable.ic_hourglass, "Awaiting\nConfirmation", onClick = clickAwaitingConfirmation) }
+                        item { OrderStatusItem(R.drawable.ic_inventory, "Awaiting\nShipment", onClick = clickAwaitingShipment) }
+                        item { OrderStatusItem(R.drawable.ic_local_shipping, "In\nTransit", onClick = clickInTransit) }
+                        item { OrderStatusItem(R.drawable.check, "Delivered", onClick = clickDelivered) }
                     }
                 }
             }
@@ -471,11 +483,15 @@ fun ProfileContent(
 }
 
 @Composable
-private fun OrderStatusItem(iconRes: Int, label: String) {
+private fun OrderStatusItem(
+    iconRes: Int,
+    label: String,
+    onClick: ()->Unit
+) {
     Column(
         Modifier
             .width(72.dp)
-            .clickable { /* TODO */ },
+            .clickable { onClick() },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
