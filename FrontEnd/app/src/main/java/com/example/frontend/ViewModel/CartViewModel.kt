@@ -225,10 +225,6 @@ class CartViewModel @Inject constructor(
                val result  = orderRepo.createOrder(cartId)
                 when(result){
                     is ApiResponse.Success ->{
-                        val data: CreateOrderResponse = result.data
-                        authManager.saveCurrentQRCode(data.qrCode)
-                        authManager.saveCurrentPendingOrderCode(data.orderCode)
-
                         navController.navigate(Route.Order.route)
                     }
                     is ApiResponse.Error ->{
