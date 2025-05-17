@@ -5,9 +5,11 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.frontend.data.dto.OrderDTO
 import com.example.frontend.data.dto.OrderDetailDTO
 import com.example.frontend.data.dto.OrderStatus
 import com.example.frontend.data.dto.PaymentStatus
@@ -51,6 +53,7 @@ class OrderViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            getCurrentQRCode()
             val hasPendingOrder = async { checkHasPendingOrder() }
             if(hasPendingOrder.await()){
                 checkOrderStatus()
@@ -139,8 +142,20 @@ fun dismissPaymentMessage() {
 }
 
     suspend fun getCurrentQRCode(){
-        val qrCode = authManager.getCurrentQRCodeOnce().toString()
-        _currentQRCode.value = qrCode
+//        val qrCode = authManager.getCurrentQRCodeOnce().toString()
+//        _currentQRCode.value = qrCode
+        val result = orderRepo.getPendingOrderOfUser(authManager.getUserNameOnce().toString())
+        when(result){
+            is ApiResponse.Success -> {
+                val order: OrderDTO = result.data
+                Log.d("order-qrcode", " ${result.data}")
+                _currentQRCode.value = order.qrCodeToCheckout
+            }
+            is ApiResponse.Error -> {
+                Log.d("order-qrcode", "${result.message}")
+            }
+            is ApiResponse.Loading -> {}
+        }
     }
 
    suspend fun getAllOrderDetailsInPendingOrder(){

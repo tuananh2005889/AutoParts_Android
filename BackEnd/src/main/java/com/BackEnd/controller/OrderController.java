@@ -1,6 +1,7 @@
 package com.BackEnd.controller;
 
 import com.BackEnd.dto.CreateOrderResponse;
+import com.BackEnd.dto.OrderDTO;
 import com.BackEnd.dto.OrderDetailDTO;
 import com.BackEnd.dto.PaymentRequest;
 import com.BackEnd.model.Cart;
@@ -34,71 +35,16 @@ public class OrderController{
     @Value("${PAYOS_CLIENT_ID}")
     private String clientId;
 
-//    @PostMapping("/create")
-//    public ResponseEntity<?> createOrder(@RequestParam Double ammount) {
-//        String orderCode = UUID.randomUUID().toString();
-//        Double amount = ammount;
-//
-//        Map<String, Object> body = Map.of(
-//                "orderCode", orderCode,
-//                "amount", amount,
-//                "description", "Thanh toán đơn hàng " + orderCode,
-//                "returnUrl", "autoparts://payment-result",
-//                "cancelUrl", "autoparts://payment-cancel"
-//        );
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.set("x-client-id", "YOUR_CLIENT_ID");
-//        headers.set("x-api-key", "YOUR_API_KEY");
-//        headers.setContentType(MediaType.APPLICATION_JSON);
-//
-//        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
-//
-//        ResponseEntity<Map> res = restTemplate.postForEntity("https://api.payos.vn/v1/payment-requests", entity, Map.class);
-//
-//        if (res.getStatusCode().is2xxSuccessful()) {
-//            String checkoutUrl = (String) ((Map<String, Object>) res.getBody().get("data")).get("checkoutUrl");
-//            // Lưu trạng thái đơn hàng là "pending" trong DB
-//            return ResponseEntity.ok(Map.of("checkoutUrl", checkoutUrl, "orderCode", orderCode));
-//        }
-//
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tạo đơn hàng thất bại");
-//    }
-
-//    @PostMapping("/create")
-//    public ResponseEntity<String> createOrder(@RequestParam Long cartId) {
-//        try {
-//            List<OrderDetailDTO> orderDetailDTOList = orderService.createOrder(cartId);
-//            Integer totalPrice = 0;
-//            for(OrderDetailDTO orderDetailDTO : orderDetailDTOList){
-//                totalPrice +=  orderDetailDTO.getTotalPrice().intValue();
-//            }
-//
-//
-//            User user =  cartService.getUserByCartId(cartId);
-//            Long orderId =  orderService.getPendingOrderId(user.getUserName());
-//            PaymentRequest paymentRequest = new PaymentRequest(orderId, totalPrice,"Checkout AutoParts Order");
-//            String qrCode =  paymentService.createOrderInPayOS(paymentRequest);
-//
-//            return ResponseEntity.ok(qrCode);
-//        } catch (IllegalArgumentException e) {
-//            e.printStackTrace();
-//            return ResponseEntity.badRequest().build();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
-@PostMapping("/create")
-public ResponseEntity<CreateOrderResponse> createOrder(@RequestParam Long cartId) {
-    try {
-        CreateOrderResponse response = orderService.createOrder(cartId);
-        return ResponseEntity.ok(response);
-    } catch (Exception e) {
-        e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    @PostMapping("/create")
+    public ResponseEntity<CreateOrderResponse> createOrder(@RequestParam Long cartId) {
+        try {
+            CreateOrderResponse response = orderService.createOrder(cartId);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
-}
 
     @GetMapping("/check-pending-status")
     public ResponseEntity<Boolean> checkIfUserHasPendingOrder(@RequestParam String userName){
@@ -123,6 +69,21 @@ public ResponseEntity<CreateOrderResponse> createOrder(@RequestParam Long cartId
     public ResponseEntity<Void> changeOrderStatus(@RequestParam Long orderCode, @RequestParam Order.OrderStatus status){
         orderService.changeOrderStatus(orderCode, status);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/get-orders-by-status")
+    public List<OrderDTO> getOrder(@RequestParam Order.OrderStatus status){
+        return orderService.getOrdersByStatus(status);
+    }
+
+    @GetMapping("/get-all-orders")
+    public List<OrderDTO> getAllOrder(){
+    return orderService.getAllOrders();
+    }
+
+    @GetMapping("/get-pending-order-of-user")
+    public OrderDTO getPendingOrderOfUser(@RequestParam String userName) throws Exception{
+       return orderService.getPendingOrderOfUser(userName);
     }
 
 }

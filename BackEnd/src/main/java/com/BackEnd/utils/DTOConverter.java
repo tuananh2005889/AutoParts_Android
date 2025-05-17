@@ -3,6 +3,7 @@ package com.BackEnd.utils;
 import com.BackEnd.dto.*;
 import com.BackEnd.model.Cart;
 import com.BackEnd.model.CartItem;
+import com.BackEnd.model.Order;
 import com.BackEnd.model.OrderDetail;
 
 import java.util.List;
@@ -50,6 +51,18 @@ public class DTOConverter {
                 orderDetail.getProduct().getName(),
                 orderDetail.getQuantity(),
                 orderDetail.getTotalPrice());
+    }
+
+    public static OrderDTO toOrderDTO(Order order) {
+       return new OrderDTO(
+               order.getOrderId(),
+               order.getOrderCode(),
+               order.getUser().getUserName(),
+               order.getCreatedAt(),
+               order.getTotalPrice(),
+               order.getStatus(),
+               order.getQrCodeToCheckout()
+       );
     }
 
 }
