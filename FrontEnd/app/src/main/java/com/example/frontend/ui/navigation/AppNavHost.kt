@@ -172,16 +172,32 @@ fun AppNavHost(
                     )
                 }
                 composable(Route.AwaitingConfirmation.route) {
-                    AwaitingConfirmationScreen()
+                    AwaitingConfirmationScreen(
+                        onClick = {
+                            navController.navigate(Route.Profile.route)
+                        }
+                    )
                 }
                 composable(Route.AwaitingShipment.route){
-                    AwaitingShipmentScreen()
+                    AwaitingShipmentScreen(
+                        onClick = {
+                            navController.navigate(Route.Profile.route)
+                        }
+                    )
                 }
                 composable(Route.InTransit.route){
-                    InTransitScreen()
+                    InTransitScreen(
+                        onClick = {
+                            navController.navigate(Route.Profile.route)
+                        }
+                    )
                 }
                 composable(Route.Delivered.route){
-                    DeliveredScreen()
+                    DeliveredScreen(
+                        onClick = {
+                            navController.navigate(Route.Profile.route)
+                        }
+                    )
                 }
 
             }
