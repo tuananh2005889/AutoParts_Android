@@ -144,7 +144,8 @@ fun dismissPaymentMessage() {
         val result = orderRepo.getPendingOrderOfUser(authManager.getUserNameOnce().toString())
         when(result){
             is ApiResponse.Success -> {
-                val order: OrderDTO = result.data
+                val orderList: List<OrderDTO> = result.data
+                val order = orderList[0]
                 Log.d("order-qrcode", " ${result.data}")
                 _currentQRCode.value = order.qrCodeToCheckout
                 _currentOrderCode.value = order.orderCode

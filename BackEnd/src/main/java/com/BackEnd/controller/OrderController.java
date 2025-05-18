@@ -82,8 +82,25 @@ public class OrderController{
     }
 
     @GetMapping("/get-pending-order-of-user")
-    public OrderDTO getPendingOrderOfUser(@RequestParam String userName) throws Exception{
-       return orderService.getPendingOrderOfUser(userName);
+    public List<OrderDTO> getPendingOrderOfUser(@RequestParam String userName) throws Exception{
+       return orderService.getAllOrdersOfUserByStatusAndName(userName, Order.OrderStatus.PENDING);
+    }
+
+    @GetMapping("/get-all-paid-orders-of-user")
+    public List<OrderDTO> getAllPaidOrdersOfUser(@RequestParam String userName) throws Exception{
+        return orderService.getAllOrdersOfUserByStatusAndName(userName, Order.OrderStatus.PAID);
+    }
+    @GetMapping("/get-all-submitted-orders-of-user")
+    public List<OrderDTO> getAllSubmittedOrdersOfUser(@RequestParam String userName) throws Exception{
+        return orderService.getAllOrdersOfUserByStatusAndName(userName, Order.OrderStatus.SUBMITTED);
+    }
+    @GetMapping("/get-all-shipped-orders-of-user")
+    public List<OrderDTO> getAllShippedOrdersOfUser(@RequestParam String userName) throws Exception{
+        return orderService.getAllOrdersOfUserByStatusAndName(userName, Order.OrderStatus.SHIPPED);
+    }
+    @GetMapping("/get-all-delivered-orders-of-user")
+    public List<OrderDTO> getAllDeliveredOrdersOfUser(@RequestParam String userName) throws Exception{
+        return orderService.getAllOrdersOfUserByStatusAndName(userName, Order.OrderStatus.DELIVERED);
     }
 
 }

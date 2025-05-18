@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -209,8 +210,6 @@ public CreateOrderResponse createOrder(Long cartId) {
     return new CreateOrderResponse(qrCode, orderCode);
 }
 
-
-
     public Boolean checkIfUserHasPendingOrder(String userName){
         User user = userService.getUserByName(userName);
         return orderRepo.existsByUserAndStatus(user, Order.OrderStatus.PENDING);
@@ -225,8 +224,11 @@ public CreateOrderResponse createOrder(Long cartId) {
     @Transactional
     public List<OrderDetailDTO> getOrderDetailListInPendingOrder(String userName){
         User user = userService.getUserByName(userName);
-        Order order = orderRepo.findByUserAndStatus(user, Order.OrderStatus.PENDING);
-        List<OrderDetail> orderDetailList = order.getOrderDetails();
+        List<Order> orderList = orderRepo.findByUserAndStatus(user, Order.OrderStatus.PENDING);
+        List<OrderDetail> orderDetailList = new ArrayList<>();
+        orderList.stream().findFirst().ifPresent(order -> {
+            orderDetailList.addAll(order.getOrderDetails());
+        });
         return orderDetailList.stream()
                 .map(DTOConverter::toOrderDetailDTO)
                 .collect(Collectors.toList());
@@ -242,20 +244,26 @@ public CreateOrderResponse createOrder(Long cartId) {
         }
     }
 
+    @Transactional
     public List<OrderDTO> getOrdersByStatus(Order.OrderStatus status){
         List<Order> orders = orderRepo.findByStatus(status);
         return orders.stream().map(
                 order -> DTOConverter.toOrderDTO(order)
         ).collect(Collectors.toList());
     }
+    @Transactional
     public List<OrderDTO> getAllOrders(){
     List<Order> orders =  orderRepo.findAll();
     return  orders.stream().map(order -> DTOConverter.toOrderDTO(order)).collect(Collectors.toList());
     }
 
-    public OrderDTO getPendingOrderOfUser(String userName){
+    @Transactional
+    public List<OrderDTO> getAllOrdersOfUserByStatusAndName(String userName, Order.OrderStatus status){
         User user = userService.getUserByName(userName);
-        Order order = orderRepo.findByUserAndStatus(user, Order.OrderStatus.PENDING);
-        return DTOConverter.toOrderDTO(order);
+        List<Order> orderList =  orderRepo.findByUserAndStatus(user, status);
+        return orderList.stream().map(order ->  {
+            return DTOConverter.toOrderDTO(order);
+        }).collect(Collectors.toList());
     }
+
 }

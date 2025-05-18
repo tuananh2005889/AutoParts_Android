@@ -68,6 +68,7 @@ import com.example.frontend.ui.common.CloudinaryImage
 
 import com.example.frontend.ViewModel.LoginViewModel
 import com.example.frontend.ui.common.SimpleDialog
+import com.example.frontend.ui.common.formatAsCurrency
 import com.example.frontend.ui.navigation.Route
 
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -482,11 +483,3 @@ fun SearchBar(
     )
 }
 
-fun Double.formatAsCurrency(): String {
-    val formatter = NumberFormat.getNumberInstance(Locale("vi", "VN")).apply {
-        maximumFractionDigits = 0
-        isGroupingUsed = true
-    }
-    val formattedNumber = formatter.format(this)
-    return "$formattedNumber VNĐ"
-}

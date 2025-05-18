@@ -1,4 +1,5 @@
 package com.BackEnd.model;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -30,6 +31,7 @@ public class Order {
     private Long orderCode;
 
     @Column( columnDefinition = "DATETIME(0)")
+    @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy")
     private LocalDateTime createdAt;
 
     @Column(nullable = false)

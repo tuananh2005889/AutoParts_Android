@@ -54,14 +54,18 @@ public class DTOConverter {
     }
 
     public static OrderDTO toOrderDTO(Order order) {
+//        String createAt = order.getCreatedAt().toString();
+            List<OrderDetailDTO> orderDetailDTOList = order.getOrderDetails().stream().map(orderDetail->toOrderDetailDTO(orderDetail)).collect(Collectors.toList());
        return new OrderDTO(
                order.getOrderId(),
                order.getOrderCode(),
                order.getUser().getUserName(),
+//               createAt,
                order.getCreatedAt(),
                order.getTotalPrice(),
                order.getStatus(),
-               order.getQrCodeToCheckout()
+               order.getQrCodeToCheckout(),
+               orderDetailDTOList
        );
     }
 

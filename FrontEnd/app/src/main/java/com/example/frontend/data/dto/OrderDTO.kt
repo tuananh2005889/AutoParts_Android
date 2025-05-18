@@ -6,8 +6,9 @@ data class OrderDTO(
     val orderId: Long,
     val orderCode: Long,
     val userName: String,
-//    val createTime: LocalDateTime,
+    val createTime: String,
     val totalPrice: Double,
     val status: OrderStatus,
     val qrCodeToCheckout: String,
+    val orderDetailDTOList: List<OrderDetailDTO>,
 )

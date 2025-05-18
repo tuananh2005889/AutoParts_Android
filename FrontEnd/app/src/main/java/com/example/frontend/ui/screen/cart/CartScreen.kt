@@ -42,6 +42,7 @@ import com.example.frontend.data.dto.CartItemDTO
 import com.example.frontend.ui.common.CloudinaryImage
 import com.example.frontend.ui.common.Notification
 import com.example.frontend.ui.common.SimpleDialog
+import com.example.frontend.ui.common.formatAsCurrency
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 import java.text.NumberFormat
@@ -121,7 +122,8 @@ fun CartScreen(
                         textSecondary = textSecondary,
                         onIncrease = { cartViewModel.increaseQuantity(it) },
                         onDecrease = { cartViewModel.decreaseQuantity(it) },
-                        onRemove = { cartViewModel.removeItemFromCart(it) }
+                        onRemove = { cartViewModel.removeItemFromCart(it) },
+                        modifier = Modifier.padding(bottom = 25.dp)
                     )
                 }
             }
@@ -165,7 +167,7 @@ fun FloatingCheckoutBar(
     total: Double,
     primaryColor: Color,
     modifier: Modifier = Modifier,
-    onCheckout: () -> Unit
+    onCheckout: () -> Unit,
 ) {
     Box(
         modifier
@@ -221,11 +223,12 @@ private fun CartItemsList(
     textSecondary: Color,
     onIncrease: (Long) -> Unit,
     onDecrease: (Long) -> Unit,
-    onRemove: (Long) -> Unit
+    onRemove: (Long) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     LazyColumn(
-        Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 100.dp)
+        modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = 120.dp)
     ) {
         itemsIndexed(items) { _, item ->
             val idx = items.indexOf(item)
@@ -415,10 +418,3 @@ private fun EmptyCartPlaceholder(
     }
 }
 
-fun	Double.formatAsCurrency(): String {
-    val formatter =	NumberFormat.getNumberInstance(Locale("vi", "VN")).apply {
-        maximumFractionDigits = 0
-        isGroupingUsed = true
-    }
-    return	"${formatter.format(this)} VNĐ"
-}
