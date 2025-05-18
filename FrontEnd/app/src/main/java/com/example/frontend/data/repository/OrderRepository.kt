@@ -77,7 +77,7 @@ class OrderRepository @Inject constructor(private val orderApiService: OrderApiS
         }
     }
 
-    suspend fun getPendingOrderOfUser(userName: String): ApiResponse<OrderDTO> {
+    suspend fun getPendingOrderOfUser(userName: String): ApiResponse<List<OrderDTO>> {
         return try {
             val result = orderApiService.getPendingOrderOfUser(userName)
             if (result.isSuccessful) {
@@ -85,12 +85,88 @@ class OrderRepository @Inject constructor(private val orderApiService: OrderApiS
                 if (body != null) {
                     ApiResponse.Success(body)
                 } else {
-                    ApiResponse.Error("body null")
+                    ApiResponse.Error("Body null: ${result.message()}", result.code())
                 }
             } else {
                 ApiResponse.Error("Response not successful: ${result.code()} ${result.message()}")
             }
         } catch (e: Exception) {
+            ApiResponse.Error("Exception: ${e.message}")
+        }
+    }
+
+    suspend fun getAllPaidOrdersOfUser(userName: String): ApiResponse<List<OrderDTO>>{
+        return try{
+            val result = orderApiService.getAllPaidOrdersOfUser(userName)
+            if(result.isSuccessful){
+                val body = result.body()
+                if(body != null){
+                     ApiResponse.Success(body)
+                }else{
+                     ApiResponse.Error("Body null: ${result.message()}", result.code())
+                }
+            }else{
+                val errorMessage = result.errorBody()?.string() ?: result.message()
+                ApiResponse.Error("Response not successful: $errorMessage", result.code())
+            }
+        }catch(e: Exception){
+            ApiResponse.Error("Exception: ${e.message}")
+        }
+    }
+
+    suspend fun getAllSubmittedOrdersOfUser(userName: String): ApiResponse<List<OrderDTO>>{
+        return try{
+            val result = orderApiService.getAllSubmittedOrdersOfUser(userName)
+            if(result.isSuccessful){
+                val body = result.body()
+                if(body != null){
+                    ApiResponse.Success(body)
+                }else{
+                    ApiResponse.Error("Body null: ${result.message()}", result.code())
+                }
+            }else{
+                val errorMessage = result.errorBody()?.string() ?: result.message()
+                ApiResponse.Error("Response not successful: $errorMessage", result.code())
+            }
+        }catch(e: Exception){
+            ApiResponse.Error("Exception: ${e.message}")
+        }
+    }
+
+    suspend fun getAllDeliveredOrdersOfUser(userName: String): ApiResponse<List<OrderDTO>>{
+        return try{
+            val result = orderApiService.getAllDeliveredOrdersOfUser(userName)
+            if(result.isSuccessful){
+                val body = result.body()
+                if(body != null){
+                    ApiResponse.Success(body)
+                }else{
+                    ApiResponse.Error("Body null: ${result.message()}", result.code())
+                }
+            }else{
+                val errorMessage = result.errorBody()?.string() ?: result.message()
+                ApiResponse.Error("Response not successful: $errorMessage", result.code())
+            }
+        }catch(e: Exception){
+            ApiResponse.Error("Exception: ${e.message}")
+        }
+    }
+
+    suspend fun getAllShippedOrdersOfUser(userName: String): ApiResponse<List<OrderDTO>>{
+        return try{
+            val result = orderApiService.getAllShippedOrdersOfUser(userName)
+            if(result.isSuccessful){
+                val body = result.body()
+                if(body != null){
+                    ApiResponse.Success(body)
+                }else{
+                    ApiResponse.Error("Body null: ${result.message()}", result.code())
+                }
+            }else{
+                val errorMessage = result.errorBody()?.string() ?: result.message()
+                ApiResponse.Error("Response not successful: $errorMessage", result.code())
+            }
+        }catch(e: Exception){
             ApiResponse.Error("Exception: ${e.message}")
         }
     }

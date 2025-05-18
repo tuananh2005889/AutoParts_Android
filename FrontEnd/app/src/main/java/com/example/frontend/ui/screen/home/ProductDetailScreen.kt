@@ -70,6 +70,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
+import com.example.frontend.ui.common.formatAsCurrency
 import java.time.LocalDateTime
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -196,7 +197,7 @@ fun DetailProductScreen(
                                     Spacer(modifier = Modifier.height(8.dp))
 
                                     Text(
-                                        text = "${product.price}",
+                                        text = "${product.price?.formatAsCurrency()}",
                                         style = MaterialTheme.typography.h6.copy(
                                             color = accentColor,
                                             fontWeight = FontWeight.Bold

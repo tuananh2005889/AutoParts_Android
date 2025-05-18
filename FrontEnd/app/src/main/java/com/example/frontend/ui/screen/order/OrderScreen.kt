@@ -55,6 +55,7 @@ import com.example.frontend.ViewModel.OrderViewModel
 import com.example.frontend.data.dto.OrderDetailDTO
 import com.example.frontend.ui.common.CloudinaryImage
 import com.example.frontend.ui.common.QRCodeImage
+import com.example.frontend.ui.common.formatAsCurrency
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -152,10 +153,13 @@ private fun OrderContent(
                     imageUrl = orderViewModel.productImageUrls[item.productId] ?: "",
                     primaryColor = primaryColor,
                     textPrimary = textPrimary,
-                    textSecondary = textSecondary
+                    textSecondary = textSecondary,
+                    modifier = Modifier.padding(vertical = 8.dp)
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp).fillMaxWidth())
 
         // Section QR Code
         if (currentQrCode.isNotEmpty()) {
@@ -176,10 +180,11 @@ private fun OrderItemCard(
     imageUrl: String,
     primaryColor: Color,
     textPrimary: Color,
-    textSecondary: Color
+    textSecondary: Color,
+    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .shadow(4.dp, RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
@@ -348,11 +353,3 @@ private fun PaymentSuccessDialog(
     )
 }
 
-fun Double.formatAsCurrency(): String {
-    val formatter = NumberFormat.getNumberInstance(Locale("vi", "VN")).apply {
-        maximumFractionDigits = 0
-        isGroupingUsed = true
-    }
-    val formattedNumber = formatter.format(this)
-    return "$formattedNumber VNĐ"
-}

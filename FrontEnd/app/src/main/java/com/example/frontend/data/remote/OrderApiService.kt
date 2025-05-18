@@ -25,5 +25,21 @@ interface OrderApiService{
     suspend fun changeOrderStatus(@Query("orderCode") orderCode: Long, @Query("status") status: OrderStatus): Response<Unit>
 
     @GET("/app/order/get-pending-order-of-user")
-    suspend fun getPendingOrderOfUser(@Query("userName") userName: String): Response<OrderDTO>
+    suspend fun getPendingOrderOfUser(@Query("userName") userName: String): Response<List<OrderDTO>>
+
+    @GET("/app/order/get-all-paid-orders-of-user")
+    suspend fun getAllPaidOrdersOfUser(@Query("userName") userName: String): Response<List<OrderDTO>>
+    @GET("/app/order/get-all-submitted-orders-of-user")
+    suspend fun getAllSubmittedOrdersOfUser(@Query("userName") userName: String): Response<List<OrderDTO>>
+    @GET("/app/order/get-all-shipped-orders-of-user")
+    suspend fun getAllShippedOrdersOfUser(@Query("userName") userName: String): Response<List<OrderDTO>>
+    @GET("/app/order/get-all-delivered-orders-of-user")
+    suspend fun getAllDeliveredOrdersOfUser(@Query("userName") userName: String): Response<List<OrderDTO>>
+
+
+
+
+
+
+
 }
