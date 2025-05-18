@@ -21,6 +21,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Output
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -56,21 +58,33 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AwaitingConfirmationScreen(
-    awaitingComfirmationViewModel: AwaitingComfirmationViewModel = hiltViewModel()
+    awaitingComfirmationViewModel: AwaitingComfirmationViewModel = hiltViewModel(),
+    onClick: ()->Unit
 ){
     val orderList by remember { awaitingComfirmationViewModel.orderList }
 
     Scaffold(
         topBar = {
             TopAppBar(
+
                 title = {
-                    Text(text = "Awaiting Comfirmation")
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ){
+                        Text(text = "Awaiting Confirmation")
+                        Button(
+                            onClick = onClick
+                        ) {
+                            Icon(Icons.Default.Output, contentDescription = null)
+                        }
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )
-
             )
         }
     ) {

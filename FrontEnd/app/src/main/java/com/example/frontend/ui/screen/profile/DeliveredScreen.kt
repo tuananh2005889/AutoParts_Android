@@ -21,6 +21,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Output
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,7 +39,6 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -46,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import com.example.frontend.data.dto.OrderDTO
 import com.example.frontend.data.dto.OrderDetailDTO
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import com.example.frontend.ui.common.CloudinaryImage
 import com.example.frontend.ui.common.OrderItemCard
@@ -57,7 +59,8 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeliveredScreen(
-    deliveredViewModel: DeliveredViewModel = hiltViewModel()
+    deliveredViewModel: DeliveredViewModel = hiltViewModel(),
+    onClick: () -> Unit
 ){
     val orderList by remember { deliveredViewModel.orderList }
 
@@ -65,7 +68,18 @@ fun DeliveredScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "Delivered")
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ){
+                        Text(text = "Delivered")
+                        Button(
+                            onClick = onClick
+                        ) {
+                            Icon(Icons.Default.Output, contentDescription = null)
+                        }
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,

@@ -14,6 +14,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Output
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -40,7 +42,8 @@ import com.example.frontend.ui.common.formatAsCurrency
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InTransitScreen(
-    inTransitViewModel: InTransitViewModel = hiltViewModel()
+    inTransitViewModel: InTransitViewModel = hiltViewModel(),
+    onClick: ()->Unit
 ){
     val orderList by remember { inTransitViewModel.orderList }
 
@@ -48,12 +51,19 @@ fun InTransitScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "In Transit")
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ){
+                        Text(text = "In Transit")
+                        Button(
+                            onClick = onClick
+                        ) {
+                            Icon(Icons.Default.Output, contentDescription = null)
+                        }
+                    }
+                }
 
             )
         }

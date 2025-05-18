@@ -14,6 +14,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Output
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -40,21 +42,33 @@ import com.example.frontend.ui.common.formatAsCurrency
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AwaitingShipmentScreen(
-    awaitingShipmentViewModel: AwaitingShipmentViewModel = hiltViewModel()
+    awaitingShipmentViewModel: AwaitingShipmentViewModel = hiltViewModel(),
+    onClick: ()->Unit
 ){
     val orderList by remember { awaitingShipmentViewModel.orderList }
 
     Scaffold(
         topBar = {
             TopAppBar(
+
                 title = {
-                    Text(text = "Awaiting Shipment")
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ){
+                        Text(text = "Awaiting Shipment")
+                        Button(
+                            onClick = onClick
+                        ) {
+                            Icon(Icons.Default.Output, contentDescription = null)
+                        }
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )
-
             )
         }
     ) {
