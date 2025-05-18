@@ -55,6 +55,8 @@ import com.example.frontend.ui.common.formatAsCurrency
 import com.example.frontend.ui.navigation.Route
 import java.text.NumberFormat
 import java.util.Locale
+import com.example.frontend.R
+import com.example.frontend.ui.common.EmptyPlaceHolder
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +64,7 @@ fun DeliveredScreen(
     deliveredViewModel: DeliveredViewModel = hiltViewModel(),
     onClick: () -> Unit
 ){
-    val orderList by remember { deliveredViewModel.orderList }
+    val orderList by deliveredViewModel.orderList
 
     Scaffold(
         topBar = {
@@ -90,13 +92,21 @@ fun DeliveredScreen(
         }
     ) {
             paddingValues ->
-        Card(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding() )
-        ){
+        if(orderList.isNotEmpty()){
+            Card(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = paddingValues.calculateTopPadding() )
+            ){
 
-            OrderList(orderList, deliveredViewModel = deliveredViewModel )
+                OrderList(orderList, deliveredViewModel = deliveredViewModel )
+            }
+        }else{
+            EmptyPlaceHolder(
+                R.drawable.check,
+                "No Delivered Orders",
+                "Your delivered orders will appear here"
+            )
         }
 
     }
