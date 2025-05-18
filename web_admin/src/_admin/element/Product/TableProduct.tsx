@@ -124,7 +124,7 @@ const TableProduct = ({ refresh }: ProductGridProps) => {
   useEffect(() => {
     handleGetAllProducts();
   }, [refresh]);
-// Updated color scheme for the TableProduct component
+  
 return (
   <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
     {/* Header and Search - Updated with richer colors */}

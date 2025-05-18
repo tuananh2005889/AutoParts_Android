@@ -31,7 +31,7 @@ const OverviewPage = () => {
                                 Total Sales
 							</span>
 							<p className="mt-1 text-3xl font-semibold text-gray-100">
-								$1000
+								$765 0000
 							</p>
 						</div>
 					</motion.div>
@@ -48,7 +48,7 @@ const OverviewPage = () => {
                                 New Users
 							</span>
 							<p className="mt-1 text-3xl font-semibold text-gray-100">
-								1000
+								23
 							</p>
 						</div>
 					</motion.div>
@@ -65,7 +65,7 @@ const OverviewPage = () => {
                                  Products
 							</span>
 							<p className="mt-1 text-3xl font-semibold text-gray-100">
-								1000
+								6
 							</p>
 						</div>
 					</motion.div>
@@ -82,7 +82,7 @@ const OverviewPage = () => {
                                 Conversiton Rate
 							</span>
 							<p className="mt-1 text-3xl font-semibold text-gray-100">
-								90%
+								70%
 							</p>
 						</div>
 					</motion.div>
