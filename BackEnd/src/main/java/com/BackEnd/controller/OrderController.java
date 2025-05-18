@@ -98,7 +98,7 @@ public class OrderController{
     public List<OrderDTO> getAllShippedOrdersOfUser(@RequestParam String userName) throws Exception{
         return orderService.getAllOrdersOfUserByStatusAndName(userName, Order.OrderStatus.SHIPPED);
     }
-    @GetMapping("/get-all-dlivered-orders-of-user")
+    @GetMapping("/get-all-delivered-orders-of-user")
     public List<OrderDTO> getAllDeliveredOrdersOfUser(@RequestParam String userName) throws Exception{
         return orderService.getAllOrdersOfUserByStatusAndName(userName, Order.OrderStatus.DELIVERED);
     }
