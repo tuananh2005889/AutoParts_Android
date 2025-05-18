@@ -1,5 +1,6 @@
 package com.example.frontend.ui.screen.profile
 
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -49,7 +50,13 @@ import com.example.frontend.data.dto.OrderDTO
 import com.example.frontend.data.dto.OrderDetailDTO
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
+import com.example.frontend.R
 import com.example.frontend.ui.common.CloudinaryImage
+import com.example.frontend.ui.common.EmptyPlaceHolder
 import com.example.frontend.ui.common.OrderItemCard
 import com.example.frontend.ui.common.formatAsCurrency
 import java.text.NumberFormat
@@ -61,8 +68,7 @@ fun AwaitingConfirmationScreen(
     awaitingComfirmationViewModel: AwaitingComfirmationViewModel = hiltViewModel(),
     onClick: ()->Unit
 ){
-    val orderList by remember { awaitingComfirmationViewModel.orderList }
-
+    val orderList by awaitingComfirmationViewModel.orderList
     Scaffold(
         topBar = {
             TopAppBar(
@@ -89,19 +95,28 @@ fun AwaitingConfirmationScreen(
         }
     ) {
         paddingValues ->
-        Card(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding() )
-        ){
+        if(orderList.isNotEmpty()){
+            Card(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = paddingValues.calculateTopPadding() )
+            ){
 
-            OrderList(orderList, awaitingComfirmationViewModel = awaitingComfirmationViewModel)
+                OrderList(orderList, awaitingComfirmationViewModel = awaitingComfirmationViewModel)
+            }
+        }else{
+            EmptyPlaceHolder(
+                R.drawable.ic_hourglass,
+                "No Awating Confirmation Orders",
+                "Your awaiting confirmation orders will appear here"
+            )
         }
 
     }
 
 
 }
+
 
 
 @Composable

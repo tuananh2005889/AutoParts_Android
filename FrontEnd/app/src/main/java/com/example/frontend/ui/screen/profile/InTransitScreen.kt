@@ -36,8 +36,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.frontend.data.dto.OrderDTO
 import androidx.compose.runtime.setValue
+import com.example.frontend.ui.common.EmptyPlaceHolder
 import com.example.frontend.ui.common.OrderItemCard
 import com.example.frontend.ui.common.formatAsCurrency
+import com.example.frontend.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,7 +47,7 @@ fun InTransitScreen(
     inTransitViewModel: InTransitViewModel = hiltViewModel(),
     onClick: ()->Unit
 ){
-    val orderList by remember { inTransitViewModel.orderList }
+    val orderList by  inTransitViewModel.orderList
 
     Scaffold(
         topBar = {
@@ -73,15 +75,23 @@ fun InTransitScreen(
         }
     ) {
             paddingValues ->
-        Card(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding() )
-        ){
+        if(orderList.isNotEmpty()){
+            Card(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = paddingValues.calculateTopPadding() )
+            ){
 
-            OrderList(
-                orderList,
-                inTransitViewModel = inTransitViewModel
+                OrderList(
+                    orderList,
+                    inTransitViewModel = inTransitViewModel
+                )
+            }
+        }else{
+            EmptyPlaceHolder(
+                R.drawable.ic_local_shipping,
+                "No In Transit Orders",
+                "Your in transit orders will appear here"
             )
         }
 

@@ -36,16 +36,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.frontend.data.dto.OrderDTO
 import androidx.compose.runtime.setValue
+import com.example.frontend.ui.common.EmptyPlaceHolder
 import com.example.frontend.ui.common.OrderItemCard
 import com.example.frontend.ui.common.formatAsCurrency
-
+import com.example.frontend.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AwaitingShipmentScreen(
     awaitingShipmentViewModel: AwaitingShipmentViewModel = hiltViewModel(),
     onClick: ()->Unit
 ){
-    val orderList by remember { awaitingShipmentViewModel.orderList }
+    val orderList by awaitingShipmentViewModel.orderList
 
     Scaffold(
         topBar = {
@@ -73,15 +74,23 @@ fun AwaitingShipmentScreen(
         }
     ) {
             paddingValues ->
-        Card(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding() )
-        ){
+        if(orderList.isNotEmpty()){
+            Card(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = paddingValues.calculateTopPadding() )
+            ){
 
-            OrderList(
-                orderList,
-                awaitingShipmentViewModel = awaitingShipmentViewModel
+                OrderList(
+                    orderList,
+                    awaitingShipmentViewModel = awaitingShipmentViewModel
+                )
+            }
+        }else{
+            EmptyPlaceHolder(
+                R.drawable.ic_inventory,
+                "No Awaiting Shipment Orders",
+                "Your awaiting shipment orders will appear here"
             )
         }
 
