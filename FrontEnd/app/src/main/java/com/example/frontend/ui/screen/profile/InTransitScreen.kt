@@ -48,7 +48,7 @@ fun InTransitScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "Awaiting Shipment")
+                    Text(text = "In Transit")
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
