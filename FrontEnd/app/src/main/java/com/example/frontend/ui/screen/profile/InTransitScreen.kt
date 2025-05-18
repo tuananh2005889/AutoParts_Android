@@ -63,7 +63,11 @@ fun InTransitScreen(
                             Icon(Icons.Default.Output, contentDescription = null)
                         }
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                )
 
             )
         }
