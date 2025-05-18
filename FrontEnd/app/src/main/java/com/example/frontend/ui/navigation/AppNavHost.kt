@@ -167,7 +167,7 @@ fun AppNavHost(
                             navController.navigate(Route.InTransit.route)
                         },
                         clickDelivered = {
-                            navController.navigate(Route.InTransit.route)
+                            navController.navigate(Route.Delivered.route)
                         }
                     )
                 }
