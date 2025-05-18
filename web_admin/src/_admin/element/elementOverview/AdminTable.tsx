@@ -3,8 +3,8 @@ import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 
 const userData = [
-    { id: 1, name: "Tuấn Anh", email: "anh@gmail.com", role: "Admin", status: "Active", amountUsed:"$65466000"  },
-    { id: 2, name: "Hoàng Phát", email: "phat@gmail.com", role: "Customer", status: "Inactive", amountUsed:"$2340"  },
+    { id: 1, name: "Tuấn Anh", email: "anh@gmail.com", role: "Admin", status: "Active" },
+    { id: 2, name: "Hoàng Phát", email: "phat@gmail.com", role: "Customer", status: "Inactive" },
 ];
 
 const UsersTable = () => {
@@ -58,9 +58,6 @@ const UsersTable = () => {
                                 <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
                                     Status
                                 </th>
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                                Amount used
-                                </th>
                             </tr>
                         </thead>
 
@@ -104,10 +101,6 @@ const UsersTable = () => {
                                         >
                                             {user.status}
                                         </span>
-                                    </td>
-                                 
-                                    <td className='px-6 py-4 whitespace-nowrap'>
-                                        <div className='text-sm text-gray-300'>{user.amountUsed}</div>
                                     </td>
                                 </motion.tr>
                             ))}
