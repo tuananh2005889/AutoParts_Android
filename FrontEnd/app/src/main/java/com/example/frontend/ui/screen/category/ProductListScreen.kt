@@ -108,11 +108,11 @@ fun ProductListScreen(
                                 product = product,
                                 onProductClick = { onProductClick(product.productId) },
                                 onAddToCartClick = { onAddToCartClick(product.productId) },
-                                cardBackground = cardBg,
-                                primaryColor = primaryColor,
-                                accentColor = accentColor,
-                                textPrimary = textPrimary,
-                                textSecondary = textSecondary
+//                                cardBackground = cardBg,
+//                                primaryColor = primaryColor,
+//                                accentColor = accentColor,
+//                                textPrimary = textPrimary,
+//                                textSecondary = textSecondary
                             )
                         }
                     }
