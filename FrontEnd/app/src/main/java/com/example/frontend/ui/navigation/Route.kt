@@ -29,7 +29,10 @@ sealed class Route(val route: String, val icon: ImageVector? = null) {
     object AwaitingShipment: Route("awaitingShipment")
     object InTransit: Route("inTransit")
     object Delivered: Route("delivered")
+    object Category : Route("category", Icons.Default.AllInbox)
 
 
-
+    object ProductList : Route("productList/{category}", null) {
+        fun createRoute(category: String) = "productList/$category"
+    }
 }

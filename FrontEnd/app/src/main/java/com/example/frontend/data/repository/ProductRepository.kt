@@ -64,17 +64,17 @@ class ProductRepository @Inject constructor(private val productApiService: Produ
         }
     }
 
-//suspend fun getImageUrl(productId: Long): ApiResponse<String> {
-//    return try {
-//        val response = apiService.getProductImage(productId)
-//        if (response.isSuccessful && response.body() != null) {
-//            ApiResponse.Success(response.body()!!)
-//        } else {
-//            ApiResponse.Error("Error ${response.code()}")
-//        }
-//    } catch (e: Exception) {
-//        ApiResponse.Error(e.message ?: "Unknown error")
-//    }
-//}
+    suspend fun getProductsByCategory(category: String): ApiResponse<List<ProductData>> {
+        return try {
+            val response = productApiService.getProductsByCategory(category)
+            if (response.isSuccessful) {
+                ApiResponse.Success(response.body() ?: emptyList())
+            } else {
+                ApiResponse.Error("get product failed", response.code())
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(e.message ?: "I don't know")
+        }
+    }
 
 }
