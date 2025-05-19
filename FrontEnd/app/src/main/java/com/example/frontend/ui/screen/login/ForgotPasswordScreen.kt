@@ -24,12 +24,12 @@ fun ForgotPasswordScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Quên mật khẩu", style = MaterialTheme.typography.titleMedium) },
+                title = { Text("Forgot password", style = MaterialTheme.typography.titleMedium) },
                 navigationIcon = {
                     IconButton(onClick = onBackToLogin) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Quay lại đăng nhập"
+                            contentDescription = "Back login"
                         )
                     }
                 }
@@ -47,7 +47,7 @@ fun ForgotPasswordScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                text = "Bước ${vm.step} trên 3",
+                text = "Step ${vm.step} on 3",
                 style = MaterialTheme.typography.labelLarge,
                 modifier = Modifier.align(Alignment.Start)
             )
@@ -56,7 +56,7 @@ fun ForgotPasswordScreen(
             when (vm.step) {
                 1 -> {
                     Text(
-                        text = "Nhập email của bạn",
+                        text = "Input your email",
                         style = MaterialTheme.typography.titleSmall,
                         modifier = Modifier.align(Alignment.Start)
                     )
@@ -83,13 +83,13 @@ fun ForgotPasswordScreen(
                                 strokeWidth = 2.dp
                             )
                         } else {
-                            Text("Gửi mã", style = MaterialTheme.typography.labelLarge)
+                            Text("Send code", style = MaterialTheme.typography.labelLarge)
                         }
                     }
                 }
                 2 -> {
                     Text(
-                        text = "Nhập mã 4 số",
+                        text = "Input code",
                         style = MaterialTheme.typography.titleSmall,
                         modifier = Modifier.align(Alignment.Start)
                     )
@@ -97,7 +97,7 @@ fun ForgotPasswordScreen(
                     OutlinedTextField(
                         value = vm.code,
                         onValueChange = vm::onCodeChange,
-                        placeholder = { Text("Mã 4 số") },
+                        placeholder = { Text("Code") },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth()
@@ -123,7 +123,7 @@ fun ForgotPasswordScreen(
                 }
                 3 -> {
                     Text(
-                        text = "Đặt mật khẩu mới",
+                        text = "Input new password",
                         style = MaterialTheme.typography.titleSmall,
                         modifier = Modifier.align(Alignment.Start)
                     )
@@ -131,7 +131,7 @@ fun ForgotPasswordScreen(
                     OutlinedTextField(
                         value = vm.newPass,
                         onValueChange = vm::onNewPassChange,
-                        placeholder = { Text("Mật khẩu mới") },
+                        placeholder = { Text("Input new password") },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth()
@@ -151,7 +151,7 @@ fun ForgotPasswordScreen(
                                 strokeWidth = 2.dp
                             )
                         } else {
-                            Text("Đổi mật khẩu", style = MaterialTheme.typography.labelLarge)
+                            Text("Change password", style = MaterialTheme.typography.labelLarge)
                         }
                     }
                 }
