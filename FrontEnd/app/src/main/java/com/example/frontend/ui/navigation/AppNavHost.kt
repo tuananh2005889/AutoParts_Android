@@ -212,7 +212,7 @@ fun AppNavHost(
                     ?.getString("productId")?.toLongOrNull() ?: return@composable
                 DetailProductScreen(
                     productId = id,
-                    innerPadding = innerPadding,
+//                    innerPadding = innerPadding,
                     clickBack = { navController.popBackStack() }
                 )
             }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { BarChart2, Trash2, Upload } from "lucide-react";
@@ -7,15 +7,61 @@ import toast, { Toaster } from "react-hot-toast";
 import TableProduct from "./Product/TableProduct";
 
 const API_ADD = "http://localhost:8080/app/product/add";
+const API_PRODUCTS = "http://localhost:8080/app/product/all";
+
+interface Product {
+  id: number;
+  name: string;
+  brand: string;
+  category: string;
+  description: string;
+  compatibleVehicles: string;
+  yearOfManufacture: string;
+  size: string;
+  material: string;
+  weight: string;
+  discount: string;
+  warranty: string;
+  price: string;
+  quantity: string;
+  createdAt: string;
+}
+
+interface ProductStats {
+  totalProducts: number;
+  totalSales: number;
+  totalInventory: number;
+}
+
+interface ProductFormData {
+  name: string;
+  brand: string;
+  category: string;
+  description: string;
+  compatibleVehicles: string;
+  yearOfManufacture: string;
+  size: string;
+  material: string;
+  weight: string;
+  discount: string;
+  warranty: string;
+  price: string;
+  quantity: string;
+}
 
 const ProductPage = () => {
   const [productsform, setProductsform] = useState(false);
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
+  const [stats, setStats] = useState<ProductStats>({
+    totalProducts: 0,
+    totalSales: 0,
+    totalInventory: 0
+  });
 
   const handleForm = () => setProductsform(!productsform);
 
-  const [items, setItems] = useState({
+  const [items, setItems] = useState<ProductFormData>({
     name: "",
     brand: "",
     category: "",
@@ -31,19 +77,52 @@ const ProductPage = () => {
     quantity: "",
   });
 
-  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
-  const handleChange = (e) => {
+  useEffect(() => {
+    const fetchProductStats = async () => {
+      try {
+        const response = await axios.get<Product[]>(API_PRODUCTS);
+        const products = response.data;
+        
+        // Calculate statistics
+        const totalProducts = products.length;
+        const totalSales = products.reduce((sum: number, product: Product) => {
+          return sum + (Number(product.price) * Number(product.quantity));
+        }, 0);
+        
+        // Calculate total inventory quantity
+        const totalInventory = products.reduce((sum: number, product: Product) => {
+          return sum + Number(product.quantity);
+        }, 0);
+
+        setStats({
+          totalProducts,
+          totalSales,
+          totalInventory
+        });
+      } catch (error) {
+        console.error('Error fetching product stats:', error);
+        toast.error('Failed to load product statistics');
+      }
+    };
+
+    fetchProductStats();
+  }, [refresh]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setItems({ ...items, [name]: value });
   };
 
-  const handleFileSelect = (e) => {
-    const files = Array.from(e.target.files);
-    setSelectedFiles((prev) => [...prev, ...files]);
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      setSelectedFiles((prev) => [...prev, ...files]);
+    }
   };
 
-  const handleRemoveFile = (index) => {
+  const handleRemoveFile = (index: number) => {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -62,7 +141,7 @@ const ProductPage = () => {
     }
   };
 
-  const handleAddProduct = async (e) => {
+  const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
@@ -92,6 +171,7 @@ const ProductPage = () => {
       handleForm();
       setRefresh((prev) => !prev);
     } catch (error) {
+      console.error('Error adding product:', error);
       toast.error("Failed to add product");
     } finally {
       setLoading(false);
@@ -104,16 +184,30 @@ const ProductPage = () => {
       <div className="max-w-7xl mx-auto py-6 px-4 lg:px-8 bg-gray-900">
         <Toaster position="top-center" reverseOrder={false} />
         <motion.div className="grid grid-cols-2 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>
-          {["Total Sales", "New Users", "Products"].map((label, idx) => (
-            <motion.div key={idx} className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl border border-gray-700" whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" }}>
-              <div className="px-4 py-5 sm:p-6">
-                <span className="flex items-center text-sm font-medium text-gray-400">
-                  <BarChart2 size={20} className="mr-2" />{label}
-                </span>
-                <p className="mt-1 text-3xl font-semibold text-gray-100">1000</p>
-              </div>
-            </motion.div>
-          ))}
+          <motion.div className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl border border-gray-700" whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" }}>
+            <div className="px-4 py-5 sm:p-6">
+              <span className="flex items-center text-sm font-medium text-gray-400">
+                <BarChart2 size={20} className="mr-2" />Total Sales
+              </span>
+              <p className="mt-1 text-3xl font-semibold text-gray-100">${stats.totalSales.toLocaleString()}</p>
+            </div>
+          </motion.div>
+          <motion.div className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl border border-gray-700" whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" }}>
+            <div className="px-4 py-5 sm:p-6">
+              <span className="flex items-center text-sm font-medium text-gray-400">
+                <BarChart2 size={20} className="mr-2" />Total Products
+              </span>
+              <p className="mt-1 text-3xl font-semibold text-gray-100">{stats.totalProducts}</p>
+            </div>
+          </motion.div>
+          <motion.div className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl border border-gray-700" whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" }}>
+            <div className="px-4 py-5 sm:p-6">
+              <span className="flex items-center text-sm font-medium text-gray-400">
+                <BarChart2 size={20} className="mr-2" />Total Inventory
+              </span>
+              <p className="mt-1 text-3xl font-semibold text-gray-100">{stats.totalInventory.toLocaleString()}</p>
+            </div>
+          </motion.div>
           <motion.div className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl border border-gray-700" whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" }}>
             <div onClick={handleForm} className="px-4 py-5 sm:p-6 cursor-pointer">
               <span className="flex items-center text-sm font-medium text-gray-400">
