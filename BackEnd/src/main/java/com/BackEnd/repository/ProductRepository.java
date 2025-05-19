@@ -15,11 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findByProductId(Long productId);
 
-    // Optional<List<String>> findImageByProductId(Long productId);
-    // @Query("SELECT i.imageUrl FROM Product p JOIN p.images i WHERE p.id = " +
-    // ":productId")
-    // Optional<List<String>> findImageByProductId(@Param("productId") Long
-    // productId);
+    List<Product> findByCategory(String category);
+
     @Query("SELECT p.images FROM Product p WHERE p.productId = :productId")
     Optional<List<String>> findImageByProductId(@Param("productId") Long productId);
 

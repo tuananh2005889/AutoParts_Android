@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -25,12 +26,15 @@ import com.example.frontend.ViewModel.LoginViewModel
 import com.example.frontend.ui.screen.login.LoginScreen
 import com.example.frontend.ui.screen.login.ForgotPasswordScreen
 import com.example.frontend.ui.screen.signup.SignupScreen
-import com.example.frontend.ui.screen.home.HomeScreen
+
 
 import com.example.frontend.ui.screen.home.DetailProductScreen
-
+import com.example.frontend.ui.navigation.EnhancedBottomNavBar
 import com.example.frontend.ui.navigation.Route
 import com.example.frontend.ui.screen.cart.CartScreen
+import com.example.frontend.ui.screen.category.CategoryScreen
+import com.example.frontend.ui.screen.category.ProductListScreen
+import com.example.frontend.ui.screen.home.HomeScreen
 import com.example.frontend.ui.screen.order.OrderScreen
 import com.example.frontend.ui.screen.profile.AwaitingConfirmationScreen
 import com.example.frontend.ui.screen.profile.AwaitingShipmentScreen
@@ -48,7 +52,8 @@ fun AppNavHost(
         Route.Home.route,
         Route.Cart.route,
         Route.Order.route,
-        Route.Profile.route
+        Route.Profile.route,
+        Route.Category.route
     )
 
     // 2. Lắng nghe trạng thái login
@@ -63,7 +68,7 @@ fun AppNavHost(
         // 4. Chèn bottomBar với điều kiện
         bottomBar = {
             if (currentRoute in bottomBarRoutes) {
-                BottomNavBar(navController)
+                EnhancedBottomNavBar(navController)
             }
         }
     ) { innerPadding ->
@@ -204,6 +209,28 @@ fun AppNavHost(
 
             composable(route = Route.Order.route){
                 OrderScreen()
+            }
+            composable(Route.Category.route) {
+                CategoryScreen(onCategoryClick = { category ->
+                    navController.navigate(Route.ProductList.createRoute(category))
+                })
+            }
+
+            composable(
+                route = Route.ProductList.route,
+                arguments = listOf(navArgument("category") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val category = backStackEntry.arguments?.getString("category") ?: ""
+                ProductListScreen(
+                    category = category,
+                    onBack = { navController.popBackStack() },
+                    onProductClick = { id ->
+                        navController.navigate(Route.DetailProduct.createRouteById(id))
+                    },
+                    onAddToCartClick = { productId ->
+                        navController.navigate(Route.Cart.route)
+                    }
+                )
             }
 
             // --- Màn hình detail không có bottom bar ---

@@ -92,4 +92,7 @@ public class ProductService {
         return false;
     }
 
+    public List<Product> getProductsByCategory(String category) {
+        return productRepository.findByCategory(category);
+    }
 }
