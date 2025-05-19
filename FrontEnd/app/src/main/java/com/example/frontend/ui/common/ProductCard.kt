@@ -1,4 +1,6 @@
 package com.example.frontend.ui.common
+import android.R.attr.fontWeight
+import android.R.color.white
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -6,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,6 +21,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.frontend.data.model.ProductData
 import com.example.frontend.ui.common.CloudinaryImage
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxWidth
+
+import androidx.compose.material3.Card
+import androidx.compose.ui.unit.dp
+
 
 @Composable
 fun ProductCard(
@@ -25,7 +37,7 @@ fun ProductCard(
     onProductClick: () -> Unit,
     onAddToCartClick: () -> Unit = {},
     modifier: Modifier = Modifier,
-    cardBackground: Color = MaterialTheme.colors.surface,
+//    cardBackground: Color = MaterialTheme.colors.surface,
     primaryColor: Color = Color(0xFFF15D43),
     accentColor: Color = Color(0xFF2A7F62),
     textPrimary: Color = Color.Black,
@@ -34,7 +46,7 @@ fun ProductCard(
     Card(
         shape = RoundedCornerShape(12.dp),
 //        colors = CardDefaults.cardColors(containerColor = cardBackground),
-//        elevation = CardDefaults.cardElevation(4.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onProductClick)
@@ -58,22 +70,20 @@ fun ProductCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             // Product Name
+
             Text(
                 text = product.name,
-//                style = MaterialTheme.typography.titleMedium.copy(
-//                    fontWeight = FontWeight.Bold,
-//                    color = textPrimary
-//                ),
+                style = MaterialTheme.typography.titleMedium
+                    .copy(fontWeight = FontWeight.Bold),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
-
             // Brand
             Text(
                 text = product.brand,
-//                style = MaterialTheme.typography.bodySmall.copy(
-//                    color = textSecondary
-//                ),
+                style = MaterialTheme.typography.bodySmall.copy(
+                    color = textSecondary
+                ),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -87,10 +97,10 @@ fun ProductCard(
             ) {
                 Text(
                     text = "${product.price?.formatAsCurrency()}",
-//                    style = MaterialTheme.typography.titleSmall.copy(
-//                        fontWeight = FontWeight.Bold,
-//                        color = primaryColor
-//                    )
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = primaryColor
+                    )
                 )
             }
 
@@ -101,22 +111,27 @@ fun ProductCard(
                 onClick = onAddToCartClick,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-//                colors = ButtonDefaults.buttonColors(
-//                    containerColor = Color(0xFFF15D43),
-//                    contentColor = Color.White
-//                ),
-//                elevation = ButtonDefaults.buttonElevation(
-//                    defaultElevation = 2.dp,
-//                    pressedElevation = 4.dp
-//                )
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFF15D43),
+                    contentColor = White
+                ),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 2.dp,
+                    pressedElevation = 4.dp
+                )
             ) {
                 Icon(
                     imageVector = Icons.Default.ShoppingCart,
                     contentDescription = "Add to cart",
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(18.dp),
+                    tint = Color.White
+
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Add to Cart")
+                Text(
+                    text = "Add to Cart",
+                    color = Color.White
+                )
             }
         }
     }
