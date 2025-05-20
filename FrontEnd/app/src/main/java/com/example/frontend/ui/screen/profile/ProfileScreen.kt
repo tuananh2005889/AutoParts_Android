@@ -74,13 +74,13 @@ fun ProfileScreen(
     }
     LaunchedEffect(avatarError) {
         avatarError?.let {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+//            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
             profileViewModel.clearAvatarError()
         }
     }
     LaunchedEffect(updateError) {
         updateError?.let {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+//            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
             profileViewModel.clearUpdateUserError()
         }
     }

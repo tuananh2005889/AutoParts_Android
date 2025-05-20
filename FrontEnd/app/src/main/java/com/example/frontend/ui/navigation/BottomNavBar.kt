@@ -59,7 +59,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 @Composable
 fun EnhancedBottomNavBar(navController: NavController) {
-    val items = listOf(Route.Home, Route.Category, Route.Cart, Route.Order, Route.ProfileGraph)
+    val items = listOf(Route.Home, Route.Category, Route.Cart, Route.Order, Route.Profile)
     val navBackStack by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStack?.destination?.route
 
@@ -68,14 +68,14 @@ fun EnhancedBottomNavBar(navController: NavController) {
             .fillMaxWidth()
             .shadow(
                 elevation = 16.dp,
-                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 36.dp),
                 spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
             )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(80.dp)
+                .height(110.dp)
                 .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f)),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
