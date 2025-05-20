@@ -16,7 +16,7 @@ sealed class Route(val route: String, val icon: ImageVector? = null) {
     object Cart : Route("Cart", Icons.Default.ShoppingCart)
     object Order: Route("Order", Icons.Default.AllInbox)
     object Profile : Route("Profile", Icons.Default.Person)
-    object ProfileGraph: Route("ProfileGraph", Icons.Default.Person)
+//    object ProfileGraph: Route("ProfileGraph", Icons.Default.Person)
     object ForgotPassword : Route("forgotPassword", null)
 
     object DetailProduct: Route(route = "detailProduct/{productId}", null){
