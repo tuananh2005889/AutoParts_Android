@@ -1,65 +1,74 @@
-# 🚗 Auto Parts Hub - Ứng dụng Mua Phụ Tùng Ô Tô
+# AutoParts – Android App
 
-> Ứng dụng Android hiện đại giúp người dùng dễ dàng tìm kiếm và mua các phụ tùng ô tô chất lượng cao. Được xây dựng với mục tiêu tối ưu trải nghiệm người dùng và hiệu suất hệ thống.
+![Android CI](https://img.shields.io/badge/Android%20Build-Passing-brightgreen) ![Kotlin](https://img.shields.io/badge/Kotlin-1.7.10-blue) ![MVVM](https://img.shields.io/badge/Architecture-MVVM-yellow) ![License](https://img.shields.io/badge/License-MIT-orange)
 
-![banner](https://your-image-link.com/banner.png) <!-- Có thể thay bằng ảnh UI app hoặc ảnh mockup -->
+> **AutoParts** is a native Android application for browsing, searching, and purchasing automotive parts. It follows a modern MVVM architecture, communicates with a RESTful back-end, and provides a user-friendly shopping experience on mobile devices.
 
----
-
-## 🛠️ Công nghệ sử dụng
-
-### 💻 Frontend - Android App
-- **Jetpack Compose**: UI hiện đại, code ngắn gọn, dễ bảo trì
-- **Retrofit**: Kết nối API đơn giản, mạnh mẽ
-- **Hilt**: Dependency Injection hiệu quả, tăng khả năng test và maintain
-- **ViewModel + LiveData/StateFlow**: Quản lý vòng đời và dữ liệu reactive
-
-### 🌐 Backend - Spring Boot
-- **Spring Boot**: RESTful API nhanh chóng và chuẩn hóa
-- **Spring Data JPA**: Tương tác cơ sở dữ liệu hiệu quả với Hibernate
-- **Thymeleaf**: Template Engine để quản trị giao diện web nội bộ (admin)
-- **Cloudinary**: Lưu trữ và xử lý hình ảnh đám mây
 
 ---
 
-## ⚙️ Các tính năng chính
+## Features
 
-- 🔍 **Tìm kiếm phụ tùng** theo tên, hãng xe, loại sản phẩm
-- 🛒 **Giỏ hàng**: thêm, xóa, cập nhật số lượng sản phẩm
-- 💳 **Mua hàng dễ dàng**: giao diện thân thiện, đơn giản
-- 📦 **Xem lịch sử đơn hàng** và trạng thái vận chuyển
-- 🖼️ **Hình ảnh phụ tùng** được lưu trữ và xử lý trên Cloudinary
-- 👨‍💻 **Giao diện quản trị** (web admin) để thêm/sửa/xoá sản phẩm
-- 🔐 **Xác thực người dùng** (JWT / Session-based Authentication)
-
----
-
-## 🖼️ Giao diện ứng dụng
-
-| Trang chủ | Chi tiết sản phẩm | Giỏ hàng |
-|----------|-------------------|----------|
-| ![home](https://your-link.com/home.png) | ![detail](https://your-link.com/detail.png) | ![cart](https://your-link.com/cart.png) |
+- **Browse Catalog**: View a paginated list of auto parts with images, names, prices, and stock status.  
+- **Search & Filter**: Search by part name or SKU, filter by category, brand, or price range.  
+- **Part Details**: View detailed information on each part, including description, specifications, and images (swipe through gallery).  
+- **Shopping Cart**: Add/remove items to a persistent cart; update quantities before checkout.  
+- **User Authentication**: Sign up / log in with email and password; keep user session with JWT tokens.  
+- **Order Placement**: Submit orders directly from the cart; view order confirmation and history.  
+- **Profile & Settings**: View and edit user profile, shipping address, and payment methods.  
+- **Offline Support**: Cache last-fetched catalog pages with Room (SQLite) so users can browse recently viewed items offline.  
+- **Push Notifications**: Receive order updates, promotional offers, and restock alerts via Firebase Cloud Messaging.  
 
 ---
 
-## 🚀 Cách chạy ứng dụng
+## Tech Stack
 
-### 1. Backend (Spring Boot)
+- **Language**: Kotlin (1.7.x)  
+- **Minimum SDK**: API Level 21 (Android 5.0 Lollipop)  
+- **Target SDK**: API Level 33 (Android 13)  
+- **Architecture**: MVVM (ViewModel + LiveData + Repository + Room)  
+- **Networking**: Retrofit2 + OkHttp + Moshi (JSON parsing)  
+- **Dependency Injection**: Hilt  
+- **Image Loading**: Glide  
+- **Persistence**: Room (SQLite)  
+- **Reactive Streams**: Kotlin Coroutines + Flow  
+- **UI**: AndroidX (AppCompat, Material Components, ConstraintLayout)  
+- **Navigation**: AndroidX Navigation Component  
+- **Authentication & Messaging**: Firebase Authentication & Firebase Cloud Messaging (FCM)  
+- **Build System**: Gradle (Kotlin DSL)  
+- **CI/CD**: GitHub Actions (unit tests + lint checks)  
+
+---
+
+
+## Getting Started
+
+Follow these steps to set up the project locally and run it on your device or emulator.
+
+### Prerequisites
+
+- **Android Studio** (2022.3.1 or later) with Android SDK tools installed.  
+- **Java Development Kit**: Java 11 or higher.  
+- **Gradle**: Uses the wrapper bundled in the repository (`./gradlew`).  
+- **Emulator/Device**: Any Android device running Lollipop (API 21) or higher.  
+
+> **Optional:**  
+> - **Firebase Project**: If you want to test push notifications, set up a Firebase project and add the `google-services.json` file to `app/`.  
+> - **REST Back-End**: The app expects a running RESTful API (e.g., at `https://api.example.com/`) for parts data, authentication, and order processing. See [API Endpoints](#api-endpoints) below for details.
+
+---
+
+### Clone & Open
+
 ```bash
-cd backend
-./mvnw spring-boot:run
 
+git clone https://github.com/tuananh2005889/AutoParts_Android.git
+cd BackEnd
+./gradlew BootRun
 
+cd FrontEnd
+run MainActivity
 
-## API cho Web admin và Android App
-
-### Web
-/web/product/all
-/web/product/add
-...
-### App
-/app/product/all
-/app/cart/active/
-/app/cart/add
-...
-
+cd web_admin
+npm install
+npm run dev
